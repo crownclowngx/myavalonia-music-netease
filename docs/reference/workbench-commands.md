@@ -1,6 +1,6 @@
 # Workbench Command 开发说明
 
-> 当前状态：2026-09-22 登录页面替换了初始 ApplyWorkbenchMessage 示例，现不注册 Workbench Command 或快捷键。以下是模板开发参考，不是本插件现有功能；原测试的替代映射见[阶段记录](archive/records/netease-v1/login-implementation-20260922.md)。
+> 当前状态：2026-09-22 登录页面替换了初始 ApplyWorkbenchMessage 示例，现不注册 Workbench Command 或快捷键。以下是模板开发参考，不是本插件现有功能；原测试的替代映射见[阶段记录](../archive/records/netease-v1/login-implementation-20260922.md)。
 
 Plugin SDK `3.4.1` 允许插件把少量高价值的用户意图声明为 Workbench Command，使同一语义动作可由
 Host 菜单、快捷键或后续 Command Palette 投影。Command 不是 Avalonia `ICommand` 的替代品；按钮点击、

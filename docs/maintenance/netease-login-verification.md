@@ -1,8 +1,9 @@
 # 网易云音乐扫码登录专用开发验证
 
-> 用途：为[Flurl 与登录方案](../roadmap/netease-v1-flurl-login-plan.md)提供可追溯的测试矩阵、本地开发门禁和人工验证范围。
+> 用途：维护[当前登录实现](../reference/netease-http-session.md)的测试矩阵、本地开发门禁和人工验证范围；原方案见[归档计划](../archive/plans/netease-v1-flurl-login-plan.md)。
 > 状态：当前维护矩阵；核对日期：2026-09-22。原场景映射见第 10 节，微信矩阵见第 12 节；真实微信扫码已验证，其他人工项以[微信专项记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)的边界为准。
 > 约束：SOLID 优先、模式朴素、详细中文注释；不使用 AIFLOW、Windows CI、seal、发布 Windows Smoke、发布覆盖率或发布重复性门禁。
+> 后续扩展：[V2 / M1 验证矩阵](netease-v2-m1-playback-verification.md)规划音乐能力测试与同一开发门禁入口的扩展；本页继续作为登录回归依据，当前脚本行为不因方案编写而改变。
 
 ## 1. 测试分层与夹具原则
 

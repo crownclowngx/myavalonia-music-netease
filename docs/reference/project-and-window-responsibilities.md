@@ -1,5 +1,20 @@
 # 项目、Host 与 Standalone 窗口职责
 
+> 用途：本插件的项目结构与宿主接入参考。当前只注册登录主页面，账号与登录协调器在插件容器中共享。
+
+## 项目结构
+
+```text
+myavalonia-music-netease/
+├─ MusicNetEasePlugin.slnx
+├─ src/
+│  ├─ MusicNetEasePlugin.Plugin/       # 唯一业务、界面与正式交付项目
+│  └─ MusicNetEasePlugin.Standalone/   # 复用 Plugin 的独立开发窗口
+├─ tests/MusicNetEasePlugin.Tests/    # 业务、协议、存储、UI 与组合测试
+├─ tools/                            # 本地开发检查、协议向量生成与联网探针
+└─ docs/                             # 文档总导航、当前说明、路线图及历史记录
+```
+
 ## 三个项目如何分工
 
 | 项目 | 应当负责 | 不应负责 |
@@ -24,6 +39,8 @@ Host 读取构建生成的 `plugin.manifest.json`，检查 Plugin SDK 兼容区�
 Host 容器，或保存 `IPluginRegistration` 供运行时使用。
 
 ## Standalone/MainWindow 应当做什么
+
+当前 [MainWindow](../../src/MusicNetEasePlugin.Standalone/MainWindow.axaml.cs)使用同一服务注册入口和真实 `MainDocument`，仅替换数据目录与 `IDocumentLifetime` 关闭信号。账号会话的共享和页面所有者取消规则见[HTTP 与会话契约](netease-http-session.md)。
 
 Standalone 的 `MainWindow` 是开发工作台，不是插件对 Host 暴露的正式窗体。它应当保持轻薄，只负责：
 

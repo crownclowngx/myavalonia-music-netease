@@ -1,9 +1,12 @@
 # 网易云音乐 V1：Flurl 接入与扫码登录实施计划
 
+> 归档状态：2026-09-22 已归档。用户确认登录可用，原 P4–P5 由[能力路线图](../../roadmap/netease-capability-roadmap.md)承接；剩余人工验证由[维护矩阵](../../maintenance/netease-login-verification.md)跟踪。
+> 下文保留原计划及当时的状态、约束和待办。现行行为以[HTTP 与会话契约](../../reference/netease-http-session.md)为准；阶段证据见[归档索引](../README.md)。
+
 > 用途：以 api-enhanced 为主要协议上游，为 MusicNetEasePlugin 建立原生 C# 网络接入，先完成扫码登录最短闭环，再扩展播放器。
-> 状态：P0–P3 及微信默认登录已实现；2026-09-22 微信真实扫码、网易回调和账号核验通过，Host/重启恢复仍待验证。见[初期记录](../archive/records/netease-v1/login-implementation-20260922.md)和[微信专项记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)。P4–P5 保留为后续计划。
+> 状态：P0–P3 及微信默认登录已实现；2026-09-22 微信真实扫码、网易回调和账号核验通过，Host/重启恢复仍待验证。见[初期记录](../records/netease-v1/login-implementation-20260922.md)和[微信专项记录](../records/netease-v1/wechat-login-implementation-20260922.md)。P4–P5 保留为后续计划。
 > 本仓调研基线：`1d58e97a4f65a915f3dabc0318837b491a645bc5`；编写前工作树干净。实施前重新检查工作树。
-> 配套：[专用开发验证计划](../maintenance/netease-login-verification.md)、[上游能力清单](netease-api-enhanced-capabilities.md)。
+> 配套：[专用开发验证计划](../../maintenance/netease-login-verification.md)、[上游能力清单](../../reference/netease-api-enhanced-capabilities.md)。
 
 V1 是本计划的阶段标识，不修改产品、SDK 或插件包版本。“上游有接口”“C# 已实现”“自动测试通过”“真实账号验证通过”分别记录，不能相互替代。
 
@@ -21,11 +24,11 @@ V1 是本计划的阶段标识，不修改产品、SDK 或插件包版本。“�
 
 后续明确追加：默认微信扫码，保留网易云 App 备用；部署到 `D:\data\avalonia\Controls\` 并清理中间文件。
 微信采用独立 Provider，经网易官方 SNS 入口和回调取得会话，复用账号验证、存储与生命周期，不复用 App codekey。
-下文原始 P0–P3 的 App 协议选型作为实施历史保留，现行协议和入口以[当前契约](../reference/netease-http-session.md)为准。
+下文原始 P0–P3 的 App 协议选型作为实施历史保留，现行协议和入口以[当前契约](../../reference/netease-http-session.md)为准。
 
 ## 2. 实施前事实与上游基线
 
-下表的“模板/未引入”是原始调研基线；现行实现见[HTTP 与会话契约](../reference/netease-http-session.md)，不将历史基线当作当前状态。
+下表的“模板/未引入”是原始调研基线；现行实现见[HTTP 与会话契约](../../reference/netease-http-session.md)，不将历史基线当作当前状态。
 
 | 项目 | 核对结果 |
 | --- | --- |
@@ -41,10 +44,10 @@ V1 是本计划的阶段标识，不修改产品、SDK 或插件包版本。“�
 
 网络约定的本地参考：
 
-- [百度 Flurl 基础设施](../../../myavalonia-baidu-netdisk/src/BaiduDiskPlugin.Plugin/Infrastructure/Http/BaiduHttpInfrastructure.cs)：Client 所有权和错误摘要。
-- [百度 OAuth 适配器](../../../myavalonia-baidu-netdisk/src/BaiduDiskPlugin.Plugin/Infrastructure/Http/BaiduOAuthApi.cs)：依赖注入、DTO 转换与取消传递。
-- [百度集中依赖版本](../../../myavalonia-baidu-netdisk/Directory.Packages.props)。
-- [当前插件服务注册](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs)。
+- [百度 Flurl 基础设施](../../../../myavalonia-baidu-netdisk/src/BaiduDiskPlugin.Plugin/Infrastructure/Http/BaiduHttpInfrastructure.cs)：Client 所有权和错误摘要。
+- [百度 OAuth 适配器](../../../../myavalonia-baidu-netdisk/src/BaiduDiskPlugin.Plugin/Infrastructure/Http/BaiduOAuthApi.cs)：依赖注入、DTO 转换与取消传递。
+- [百度集中依赖版本](../../../../myavalonia-baidu-netdisk/Directory.Packages.props)。
+- [当前插件服务注册](../../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs)。
 
 上述是请求组织方式的参考；网易二维码授权不是百度 OAuth，不能复用百度的授权码、refresh token 或错误码语义。第一版只在本插件内部统一，不先修改 host 或抽取跨插件公共 HTTP 包。
 
@@ -151,7 +154,7 @@ eapi/weapi 的加密 JSON与普通响应 DTO 的序列化配置分开管理；�
 
 已采用邻仓 Flurl.Http 4.0.2，并通过 net10.0 构建及锁文件验证。二维码、凭据保护与后续 xeapi 加密库按真实需要选择，不引入 Node 运行时。
 
-新增依赖时同步集中版本、Plugin PackageReference、必要的 ManagedPluginPrivatePackage 和三个项目的 lock 文件。依赖声明完整性是本地开发检查；正式 ZIP、Windows Smoke 和发布验证留到发布阶段。具体打包惯例见[既有部署说明](../deployment-and-release.md)。
+新增依赖时同步集中版本、Plugin PackageReference、必要的 ManagedPluginPrivatePackage 和三个项目的 lock 文件。依赖声明完整性是本地开发检查；正式 ZIP、Windows Smoke 和发布验证留到发布阶段。具体打包惯例见[既有部署说明](../../maintenance/deployment-and-release.md)。
 
 ## 5. SOLID、对象寿命与会话保存
 
@@ -194,18 +197,18 @@ P0–P3 构成本轮后续开发的登录里程碑。P4–P5 是扩容顺序；�
 
 ## 7. 本地开发门禁
 
-详细要求与编号见[专用验证计划](../maintenance/netease-login-verification.md)。当前实现与回归保持以下要求：
+详细要求与编号见[专用验证计划](../../maintenance/netease-login-verification.md)。当前实现与回归保持以下要求：
 
 - 确定性协议对照、Flurl HttpTest 契约测试、登录状态与并发取消测试、真实隔离存储测试、UI 状态/组合测试和既有测试回归。
 - 全解决方案 Debug 构建警告作为错误；测试完整执行、有测试发现、无失败，关键用例不得用 Skip 掩盖。失败、取消、超时、缺失或不完整报告均不算通过。
 - 真实账号联网验证单独手动执行；自动单测无网络、无真实 Cookie，不使用个人数据目录。
 - 文档链接、状态、接口映射、中文注释和职责审查；仅文档修改时只运行文档检查，不运行登录测试或重型发布流程。
 
-已提供 [verify-development.ps1](../../tools/verify-development.ps1)，编排锁定还原、Debug 构建、测试、TRX 和文档检查。不得假定 host 门禁会替本插件验证账号业务，也不引入 Windows CI 作为开发完成条件。
+已提供 [verify-development.ps1](../../../tools/verify-development.ps1)，编排锁定还原、Debug 构建、测试、TRX 和文档检查。不得假定 host 门禁会替本插件验证账号业务，也不引入 Windows CI 作为开发完成条件。
 
 ## 8. 上游跟进与能力边界
 
-[能力清单](netease-api-enhanced-capabilities.md)列出固定提交中的能力分组和 440 个模块索引。模块存在只证明上游提供相应实现入口，兼容性须逐项验证。
+[能力清单](../../reference/netease-api-enhanced-capabilities.md)列出固定提交中的能力分组和 440 个模块索引。模块存在只证明上游提供相应实现入口，兼容性须逐项验证。
 
 维护一份“C# 方法 → 上游模块 → 固定提交 → 协议 → 已验证场景”的映射。跟进上游时检查已用模块及其 request、crypto、config、初始化依赖的变化；选取必要修改，先更新协议向量和回归，再更新基线。保留移植代码所需的上游版权与许可信息。
 
@@ -213,7 +216,7 @@ P0–P3 构成本轮后续开发的登录里程碑。P4–P5 是扩容顺序；�
 
 ## 9. 文档同步与归档
 
-参考 [host 文档维护规则](../../../../avalonia_dock_simple_test/docs/maintenance/documentation.md)与 [host V22 方案结构](../../../../avalonia_dock_simple_test/docs/roadmap/host-v22-plugin-distribution-plan.md)，只借鉴文档模式，不沿用该方案的业务或暂停状态。
+参考 [host 文档维护规则](../../../../../avalonia_dock_simple_test/docs/maintenance/documentation.md)与 [host V22 方案结构](../../../../../avalonia_dock_simple_test/docs/roadmap/host-v22-plugin-distribution-plan.md)，只借鉴文档模式，不沿用该方案的业务或暂停状态。
 
 | 位置 | 本项目维护约定 |
 | --- | --- |
@@ -228,7 +231,7 @@ P0–P3 构成本轮后续开发的登录里程碑。P4–P5 是扩容顺序；�
 
 阶段记录须分开填写代码实施、自动验证、真实账号/桌面观察、host 验证、部署与发布；没有执行的项目写“未执行”。测试名称与数量、TRX 路径和源码基线放在当次记录中，不能在导航中反复复制。
 
-## 10. 计划待办
+## 10. 计划待办（历史快照）
 
 - [x] P0：全新进程获取 key、观测 801 与未登录账号；此路径无需匿名初始化，真实 803 另行验证。
 - [x] P1：Flurl 接入、eapi/weapi、登录状态和会话存储。

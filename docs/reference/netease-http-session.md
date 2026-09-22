@@ -1,12 +1,12 @@
 # 网易登录 HTTP 与会话契约
 
-> 状态：P0–P3 加微信默认登录；核对日期：2026-09-22。自动验证见[专用回归矩阵](../maintenance/netease-login-verification.md)，真实微信闭环见[微信专项记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)。
+> 状态：当前登录与会话实现，默认微信扫码、网易云 App 备用；核对日期：2026-09-22。自动验证见[专用回归矩阵](../maintenance/netease-login-verification.md)，真实微信闭环见[微信专项记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)。
 
 ## 1. 接入范围与来源
 
 原生 C# + Flurl.Http 4.0.2 直连网易 HTTPS。上游固定为 api-enhanced 提交
 `a8c781fd64faab17fedfd46e0615a2609307f163`，移植许可见 [THIRD-PARTY-NOTICES](../../THIRD-PARTY-NOTICES.md)。
-不运行 Node 服务，不调用 Enhanced 的 HTTP 外壳路由。下表是当前已接入事实；[440 个上游模块索引](../roadmap/netease-api-enhanced-capabilities.md)是后续调研范围。
+不运行 Node 服务，不调用 Enhanced 的 HTTP 外壳路由。下表是当前已接入事实；[440 个上游模块索引](netease-api-enhanced-capabilities.md)是后续调研范围。
 
 | C# 入口 | 上游模块 | 原生行为 | 验证边界 |
 | --- | --- | --- | --- |
@@ -18,8 +18,8 @@
 | ProtectedLoginSessionStore | 本地能力 | DPAPI 保存、加载、清除 | 隔离文件测试与本机 CurrentUser 保护测试 |
 | NeteaseAuthApi.LogoutAsync | logout | eapi POST `/api/logout` | 离线流程；真实账号远端退出待验证 |
 
-eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全新进程证明获取 QR 和 801 不需要匿名 Cookie 或 xeapi 初始化；803 后的真实账号闭环仍需手机确认。
-未实现短信/密码登录、扫码 Cookie 刷新、多账号、搜索和播放。新版播放协议 xeapi 留给 P4。
+eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全新进程证明网易云 App 路径获取 QR 和 801 不需要匿名 Cookie 或 xeapi 初始化；该路径的真实 803 授权仍缺单独验证记录。微信路径已完成真实授权、回调与账号核验。
+未实现短信/密码登录、扫码 Cookie 刷新、多账号、搜索和播放。新版播放协议 xeapi 与音乐能力按[能力路线图](../roadmap/netease-capability-roadmap.md)推进。
 
 ## 2. 职责与资源所有权
 

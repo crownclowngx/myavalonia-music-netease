@@ -1,7 +1,8 @@
-# V6.1 插件图标与公共资源
+# 插件图标与公共资源
 
-V6.1 同时提供插件专属图标和 `MyAvaloniaManagement.Icons` 公共矢量包。图标仍通过描述符的
-`IconPath` 字符串引用；新版目录树与功能中心显示声明图标，旧版目录继续显示默认四宫格。
+> 用途：基于仓库当前 SDK / Build `3.4.1` 的图标接入参考。当前模块使用 `CommonIcons.TextCheck` 注册 `main-document`，用于网易云音乐入口，见[模块实现](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginModule.cs)。
+
+插件可使用专属图标和 `MyAvaloniaManagement.Icons` 公共矢量包，通过描述符的 `IconPath` 字符串引用。以下说明与示例用于后续图标开发；示例名称不表示当前已注册对应功能。
 
 ## 版本与职责
 
@@ -12,7 +13,7 @@ V6.1 同时提供插件专属图标和 `MyAvaloniaManagement.Icons` 公共矢量
 | Plugin.Build | 3.4.1 | 允许图标资源 DLL 作为私有依赖部署及打包 |
 | Plugin.Templates | 3.4.1 | 使用 Avalonia 12.1.2 的统一版本模板 |
 
-`AddIcon` 最初在 SDK 3.4.0 提供。本模板按 SDK 3.4.1 编译，生成的 manifest 最低版本为 `3.4.1`；既有 3.4.0 插件无需因图标契约改变清单。
+`AddIcon` 最初在 SDK 3.4.0 提供。本插件按 SDK 3.4.1 编译，生成的 manifest 最低版本为 `3.4.1`；既有 3.4.0 插件无需因图标契约改变清单。
 仅在自己的 View 使用资源包的旧 SDK 插件，不因资源包本身被强制升级 SDK。
 资源包升级后要重新构建并交付消费者，不会自动替换已安装程序中的资源。
 
@@ -68,9 +69,7 @@ var icon = registration.AddIcon("text-review", new VectorIconDefinition(
 <ManagedPluginPrivatePackage Include="MyAvaloniaManagement.Icons" />
 ```
 
-本模板使用 Build `3.4.1`（此能力最初由 `1.1.3` 提供）；ZIP 中应包含 `MyAvaloniaManagement.Icons.dll`，不能包含共享 Core/UI SDK DLL。
-本仓 MyPlugTest 使用 ProjectReference，通过既有 `ManagedPluginAsset` 扩展点部署图标 DLL；
-外部模板使用上述 NuGet 私有包声明。两条路径均需验收真实 ZIP，不能只检查普通 bin 目录。
+本插件使用 Build `3.4.1` 和上述 NuGet 私有包声明；ZIP 中应包含 `MyAvaloniaManagement.Icons.dll`，不能包含共享 Core/UI SDK DLL。具体声明见[插件项目](../../src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj)，交付验收见[部署与发布说明](../maintenance/deployment-and-release.md)。
 
 ## 页面、主题和异常
 
@@ -79,11 +78,11 @@ var icon = registration.AddIcon("text-review", new VectorIconDefinition(
 当前位置的主题画刷决定前景色，每个位置拥有独立控件，仅复用本 Runtime 内的几何数据。
 
 自己的 View / Standalone 可直接使用 `asset.PathData`：用 Viewbox 包住指定宽高的 Canvas，
-在 Canvas 中放置填充 Path。模板已有实际示例；Standalone 直接创建同一个 View，不依赖 Host 注册表。
+在 Canvas 中放置填充 Path。当前登录页面未使用这一图标预览示例；以后添加时仍由 Standalone 复用同一个 View，不依赖 Host 注册表。
 页面使用的资源与 Host 功能入口注册是两个使用位置，拥有相同数据即可，无需建立全局单例。
 
 空引用、未知名称、不支持的文件/网址引用、跨插件引用、不可用插件或坏路径都显示默认图标。
 坏几何仅降级显示并去重记录 `ICON_GEOMETRY_INVALID`，不会删除业务功能；结构性注册错误仍按候选隔离处理。
 创建意图省略图标时继续继承 Document 图标；填写未知引用时按该引用降级，不改变原有创建意图规则。
 
-更多说明见 Host 仓库 docs/quick-start/plugin-icons.md；本模板 MainView 可独立预览。
+当前登录页面与入口图标是不同使用位置；修改页面资源时同时检查 Standalone 展示，修改入口注册时检查真实 Host。

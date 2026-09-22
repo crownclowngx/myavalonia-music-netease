@@ -1,6 +1,6 @@
 # api-enhanced 上游能力清单与移植边界
 
-> 用途：为[Flurl 登录与扩容计划](netease-v1-flurl-login-plan.md)提供选型依据、能力范围和固定源码索引。
+> 用途：为[能力路线图](../roadmap/netease-capability-roadmap.md)提供选型依据、能力范围和固定源码索引；本文属于上游调研参考。
 > 状态：上游登录子集已实现并离线验证；独立补充的微信登录已通过真实账号核验，其他模块未移植。核对日期：2026-09-22。
 > 基线：[a8c781fd64faab17fedfd46e0615a2609307f163](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/tree/a8c781fd64faab17fedfd46e0615a2609307f163)，提交日期 2026-09-11 UTC。
 > 统计：该提交 `module/` 下共有 **440 个直接子级 JavaScript 模块**。包括业务接口、本地包装和工具；不等于 440 个独立网易 HTTP 接口，更不代表 440 项当前可用能力。
@@ -12,12 +12,12 @@
 微信登录是本插件按网易 SNS/微信网站授权链补充的能力，不属于下列 440 个上游模块。
 默认微信、备用网易云 App；真实微信验证不能外推上游 App 二维码或其他模块的真实可用性，见[微信记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)。
 
-| 优先级 | 范围 | 状态 |
+| 能力层 | 范围 | 当前承接 |
 | --- | --- | --- |
-| 登录最短路径 | QR key、本地二维码、扫码状态、账号检查、Cookie 会话、退出 | P0–P3 已实现；真实手机授权待验证 |
-| 基础播放器 | 搜索、歌曲详情、播放地址、歌词、用户歌单、歌单曲目 | 后续 P4；待规划播放专项 |
-| 常用扩展 | 推荐、FM、收藏、歌单编辑、播放历史、歌手/专辑、云盘 | 后续按需求选择 |
-| 产品扩展 | 评论、视频、播客、广播、私信、一起听、乐谱等 | 候选；不进入首阶段 |
+| 登录与会话 | QR key、本地二维码、扫码状态、账号检查、Cookie 会话、退出 | 已实现；微信真实授权及账号核验通过，App 授权等验证边界见当前契约 |
+| 基础播放器 | 搜索、歌曲详情、播放地址、歌词、用户歌单、歌单曲目 | 路线图 M1–M2；尚未实现 |
+| 日常扩展 | 收藏、歌单编辑、推荐、FM、远端历史、歌手/专辑 | 路线图 M3–M4；尚未实现 |
+| 场景扩展 | 云盘、下载、评论、视频、播客、广播、一起听等 | 路线图 M5 候选，按需求选择 |
 | 专项能力 | 账号管理、会员/广告/积分任务、音乐人、UGC、购买等 | 只记录上游范围；需具体产品需求与独立验证 |
 
 ## 2. 能力与边界
@@ -28,7 +28,7 @@
 | --- | --- | --- |
 | 二维码登录 | `login_qr_key`、`login_qr_create`、`login_qr_check` | 首阶段采用；create 是本地二维码包装，key/check 请求网易；真实成功还需账号检查 |
 | 手机/邮箱登录、注册 | `login_cellphone`、`login`、`captcha_sent*`、`captcha_verify`、`register_cellphone` | 涉及验证、限流和账号状态；后续单独验证，不视为 QR 的自动降级路径 |
-| 游客、登录状态、刷新与退出 | `register_anonimous`、`login_status`、`login_refresh`、`logout` | 文档明确刷新不适用于二维码 Cookie；匿名注册当前为 xeapi，是否是 QR 前置由 P0 验证 |
+| 游客、登录状态、刷新与退出 | `register_anonimous`、`login_status`、`login_refresh`、`logout` | 上游说明刷新不适用于二维码 Cookie；匿名注册为 xeapi，P0 已证明当前 App key/801 路径不依赖它，详见当前契约 |
 | 账号资料与绑定 | `user_account`、`user_detail*`、`user_level`、`user_update`、`avatar_upload`、`user_binding*` | 首阶段只取确认账号需要的数据；改资料、绑定手机是独立写操作 |
 | 设备与验证 | `device_list`、`device_kickoff`、`deviceinfo_center_upload`、`captcha_safe_sent`、`verify_*` | 可能需要安全验证；强制下线设备不进入基本退出流程 |
 | 搜索与建议 | `search`、`cloudsearch`、`search_hot*`、`search_suggest*`、`search_multimatch` | 歌曲/歌手/专辑/歌单等类型由参数区分；分页、搜索结果与可播放性独立 |
@@ -75,17 +75,9 @@
 
 ## 4. 接入登记方式
 
-下表为当前接入摘要；权威路径、方法和验证边界见[HTTP 与会话契约](../reference/netease-http-session.md)。本调研保留其余模块的固定基线。
+当前已接入端点、C# 入口、协议和真实验证边界统一维护在[HTTP 与会话契约](netease-http-session.md)第 1 节。本清单保留固定上游范围，不再复制一份容易过时的登录接入状态表。
 
-| 上游模块 | 计划业务方法 | 协议 | C# 实施 | 自动验证 | 真实账号验证 |
-| --- | --- | --- | --- | --- | --- |
-| login_qr_key | 创建二维码登录凭据 | eapi（当前默认配置） | 已实施 | 已通过 | 未执行 |
-| login_qr_create | 本地构造二维码内容 | 本地 | 已实施 | 已通过 | 未执行 |
-| login_qr_check | 查询扫码状态 | eapi（当前默认配置） | 已实施 | 已通过 | 未执行 |
-| login_status | 检查当前账号 | weapi | 已实施 | 已通过 | 未执行 |
-| logout | 请求远端退出 | eapi（当前默认配置） | 已实施 | 已通过 | 未执行 |
-| register_anonimous | 游客初始化（P0 的 QR 路径不需要） | xeapi | 未实施 | 未执行 | 未执行 |
-| song_url_v1 | 获取播放地址（后续阶段） | xeapi | 未实施 | 未执行 | 未执行 |
+新增能力时，在相应当前契约中登记上游模块、原生端点、C# 方法、请求协议与账号范围；自动测试和真实账号结果分别关联维护矩阵及当次记录。未实现的模块只作为调研候选，不登记为可用能力。
 
 升级基线时按使用模块及共享依赖差异审查，不盲目覆盖 C# 实现；人工记录保留日期、账号权益条件的概括、网络环境、实际返回分类和未覆盖范围，不记录凭据。
 
@@ -239,4 +231,4 @@
 - [新版播放地址模块](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/blob/a8c781fd64faab17fedfd46e0615a2609307f163/module/song_url_v1.js)：xeapi 与独立音源匹配分支。
 - [项目许可](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/blob/a8c781fd64faab17fedfd46e0615a2609307f163/LICENSE)：移植时保留适用版权和许可说明，依赖包另查各自许可。
 
-本清单不随 main 自动变化。每次计划接入或上游升级时重新核对选中模块、共享协议与实测记录，并同步[主计划](netease-v1-flurl-login-plan.md)和[专用验证计划](netease-v1-login-verification.md)。
+本清单不随 main 自动变化。每次计划接入或上游升级时重新核对选中模块、共享协议与实测记录，并同步[能力路线图](../roadmap/netease-capability-roadmap.md)、相应当前契约和验证矩阵；登录回归继续使用[维护矩阵](../maintenance/netease-login-verification.md)。归档的 V1 计划保留历史，不再承担当前接入登记。

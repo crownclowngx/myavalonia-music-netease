@@ -2,7 +2,7 @@
 
 > 日期：2026-09-22；状态：首批自动验证与未登录联网探针已完成，授权后真实账号验证未执行。
 > 实施起点：38d77ff6ccfea145448450c80e70a7779346f40a；上游固定提交：a8c781fd64faab17fedfd46e0615a2609307f163。
-> 配套：[实施计划](../../../roadmap/netease-v1-flurl-login-plan.md)、[专用矩阵](../../../roadmap/netease-v1-login-verification.md)。
+> 配套：[实施计划](../../plans/netease-v1-flurl-login-plan.md)、[专用矩阵](../../../maintenance/netease-login-verification.md)。
 
 ## 已实现
 

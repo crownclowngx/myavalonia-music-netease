@@ -1,6 +1,8 @@
 # 临时部署、正式发布与验收
 
-最近一次实际操作见 [2026-09-22 网易插件开发部署记录](archive/records/netease-v1/development-deploy-20260922.md)，包含指定目录、文件摘要与中间文件清理结果。
+> 用途：开发部署与正式发布的可复用操作参考。当前目标为 Windows x64；本文不表示已完成正式发布或 Host 验收。
+
+最近一次有完整记录的开发部署见[微信登录实现与部署记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)第 5 节，包含指定目录、文件摘要与中间文件清理结果。[此前 App 版部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
 
 部署分为开发期临时联调和正式 ZIP 发布。两者都必须使用 Build 包筛选出的干净插件目录，不能直接复制
 普通 `bin/Debug` 或 `bin/Release`，因为普通输出可能包含 Host 应当统一提供的共享程序集。
@@ -115,9 +117,9 @@ Host 提供的导入入口；若由维护者手工解压，也必须保留 ZIP �
 ## 真实 Host 最小验收
 
 - 插件状态显示已加载，manifest 的 ID、版本、入口和 SDK 区间正确；
-- 每个 Document/Tool 出现在预期菜单或 Dock 区域；
-- 同一种 Document 打开两次时状态和 Scope 互不影响；
-- Tool 隐藏后可恢复且 singleton 状态保留；
+- 已声明的 Document 出现在预期菜单或 Dock 区域；当前只声明网易云音乐主页面；
+- 多次打开页面时，各自展示资源与订阅正确释放，共享账号状态一致；只有发起页面关闭才取消它拥有的登录尝试；
+- 以后若新增 Tool，再验证其隐藏、恢复与 singleton 状态；当前未注册 Tool；
 - 保存、恢复、关闭和生命周期行为符合插件声明；
 - Host 没有报告共享程序集、私有依赖、入口类型或稳定 ID 错误；
 - 替换为正式 ZIP 后完整重启 Host，并再次完成一次关键业务流程。
