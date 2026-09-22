@@ -54,3 +54,4 @@ Desktop.ini
 
 # packages.lock.json、Directory.Packages.props、源码、文档及共享配置应提交。
 # 不全局忽略 DLL、EXE、ZIP，避免隐藏需要纳入版本控制的测试资产。
+.aiflow/insight/
