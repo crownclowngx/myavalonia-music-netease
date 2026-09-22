@@ -13,6 +13,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Flurl.Http" />
+    <PackageReference Include="QRCoder" />
+    <PackageReference Include="System.Security.Cryptography.ProtectedData" />
+    <ManagedPluginPrivatePackage Include="Flurl;Flurl.Http;QRCoder;System.Security.Cryptography.ProtectedData" />
     <PackageReference Include="CommunityToolkit.Mvvm" />
     <PackageReference Include="MyAvaloniaManagement.Plugin.Build" PrivateAssets="all" />
     <PackageReference Include="MyAvaloniaManagement.PluginSdk" />
@@ -21,4 +25,8 @@
     <PackageReference Include="MyAvaloniaManagement.PluginSdk.UI" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Include="../../THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md"
+          CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

@@ -119,6 +119,11 @@
           "Avalonia.Skia": "12.1.2"
         }
       },
+      "Flurl": {
+        "type": "Transitive",
+        "resolved": "4.0.0",
+        "contentHash": "rpts69yYgvJqg6PPgqShBQEZ4aNzWQqWpWppcT0oDWxDCIsBqiod4pj6LQZdhk+1OozLFagemldMRACdHF3CsA=="
+      },
       "HarfBuzzSharp": {
         "type": "Transitive",
         "resolved": "8.3.1.3",
@@ -191,6 +196,11 @@
         "resolved": "10.0.10",
         "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
       },
+      "Microsoft.Win32.SystemEvents": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "hqTM5628jSsQiv+HGpiq3WKBl2c8v1KZfby2J6Pr7pEPlK9waPdgEO6b8A/+/xn/yZ9ulv8HuqK71ONy2tg67A=="
+      },
       "Semi.Avalonia": {
         "type": "Transitive",
         "resolved": "12.1.0",
@@ -229,6 +239,14 @@
         "resolved": "3.119.4",
         "contentHash": "XOpbx/4CReO2wYsq2s6rbvdauc6dntG4Zv499sHGTJ87bwZaFXszFkwql3+FIZMc8kUPeaj3Mx2ezIJmo8a1Kg=="
       },
+      "System.Drawing.Common": {
+        "type": "Transitive",
+        "resolved": "6.0.0",
+        "contentHash": "NfuoKUiP2nUWwKZN6twGqXioIe1zVD0RIj2t976A+czLHr2nY454RwwXs6JU9Htc6mwqL6Dn/nEL3dpVf2jOhg==",
+        "dependencies": {
+          "Microsoft.Win32.SystemEvents": "6.0.0"
+        }
+      },
       "Tmds.DBus.Protocol": {
         "type": "Transitive",
         "resolved": "0.94.1",
@@ -238,9 +256,12 @@
         "type": "Project",
         "dependencies": {
           "CommunityToolkit.Mvvm": "[8.4.2, 8.4.2]",
+          "Flurl.Http": "[4.0.2, 4.0.2]",
           "MyAvaloniaManagement.Icons": "[3.4.1, 3.4.1]",
           "MyAvaloniaManagement.PluginSdk": "[3.4.1, 3.4.1]",
-          "MyAvaloniaManagement.PluginSdk.UI": "[3.4.1, 3.4.1]"
+          "MyAvaloniaManagement.PluginSdk.UI": "[3.4.1, 3.4.1]",
+          "QRCoder": "[1.8.0, 1.8.0]",
+          "System.Security.Cryptography.ProtectedData": "[10.0.0, 10.0.0]"
         }
       },
       "CommunityToolkit.Mvvm": {
@@ -248,6 +269,15 @@
         "requested": "[8.4.2, 8.4.2]",
         "resolved": "8.4.2",
         "contentHash": "WadCzGEc2U+3e20avRLng4qNtt4zoOGWrdUISqJWrHe3/FSnrYjuM5Sb4yQb09LhkBXrrI4Zt3dLKgRMbItsrg=="
+      },
+      "Flurl.Http": {
+        "type": "CentralTransitive",
+        "requested": "[4.0.2, 4.0.2]",
+        "resolved": "4.0.2",
+        "contentHash": "9vCqFFyceA11yplkFD8AbCFFTvG1Lrw3tpsgOpL5sLUc28p6zcvGszNleuT6nDymRvtt5eS+rqUX+bRztg1fhA==",
+        "dependencies": {
+          "Flurl": "4.0.0"
+        }
       },
       "MyAvaloniaManagement.Icons": {
         "type": "CentralTransitive",
@@ -259,13 +289,13 @@
         "type": "CentralTransitive",
         "requested": "[3.4.1, 3.4.1]",
         "resolved": "3.4.1",
-        "contentHash": "KtA5oySrPaiwFFrqMw1dHvXpFD6hr6x+5zMnvYcBALNieOi68OJYPi4xIgmFyOcGNLbkzBTFLRy6LlhYES1EvA=="
+        "contentHash": "0vEzhMhxnLhNzWR85UXt/dE2PkPEr+qvzYDC3XXh2nIBZ5FmZ8GsoSvqkmBltwVWctZloCQdw1lGO+d1GzRneQ=="
       },
       "MyAvaloniaManagement.PluginSdk.UI": {
         "type": "CentralTransitive",
         "requested": "[3.4.1, 3.4.1]",
         "resolved": "3.4.1",
-        "contentHash": "JY8cCQMhjye0TO5egqVtwysdKpHUJ5SpgxU3YORkFJjNdKRa6OyVMjQ2Xkm+1kP5lv1friX8JMqdNMAT4B65Tw==",
+        "contentHash": "uQ7DaNITDuoJB0FD+mQez5ddDNJRU4YlxlLFG0X5fKgvKkxj8N5buxXyEkWda8ICVeTsSppqyM1mKlZO9+L/0A==",
         "dependencies": {
           "Avalonia": "[12.1.2]",
           "Avalonia.Themes.Fluent": "[12.1.2]",
@@ -275,6 +305,21 @@
           "MyAvaloniaManagement.PluginSdk": "3.4.1",
           "Semi.Avalonia": "[12.1.0]"
         }
+      },
+      "QRCoder": {
+        "type": "CentralTransitive",
+        "requested": "[1.8.0, 1.8.0]",
+        "resolved": "1.8.0",
+        "contentHash": "RuvX3PEXU6pbY/I5ItAk800jm62r+YnoPLgyS2WTgwxkOnGkOfU9ORiipHUF0LkLyqM8rlroUCA319JjRYfRFQ==",
+        "dependencies": {
+          "System.Drawing.Common": "6.0.0"
+        }
+      },
+      "System.Security.Cryptography.ProtectedData": {
+        "type": "CentralTransitive",
+        "requested": "[10.0.0, 10.0.0]",
+        "resolved": "10.0.0",
+        "contentHash": "qy6C3gQRTrfhFfuiIYU1jNwWfFdJpBVo1BARW7jgMm1zTEm3LRzLLyOLJGaAuKE+nZCGkEP71y4rj9NWjqLGdQ=="
       }
     }
   }
