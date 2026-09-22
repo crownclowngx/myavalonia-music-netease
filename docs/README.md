@@ -15,6 +15,7 @@
 | 查看当前架构和接口 | [HTTP 与会话契约](reference/netease-http-session.md)：Flurl、协议、凭据与生命周期 |
 | 查看阶段进度 | [V1 实施计划](roadmap/netease-v1-flurl-login-plan.md)与[本轮记录](archive/records/netease-v1/login-implementation-20260922.md) |
 | 执行本地开发门禁 | [专用回归矩阵](maintenance/netease-login-verification.md)：实际用例映射、门禁自测、人工验证边界 |
+| 查看最近开发部署 | [2026-09-22 部署记录](archive/records/netease-v1/development-deploy-20260922.md)：已部署到指定 Controls，编译中间文件已清空；Host 加载待验证 |
 | 查看上游支持范围与后续扩容候选 | [api-enhanced 能力清单](roadmap/netease-api-enhanced-capabilities.md)：固定提交调研，含完整模块索引；不代表本插件已支持 |
 
 本阶段不使用 AIFLOW、Windows CI 或发布门禁。真实账号观察、自动测试、Host 验证、部署与发布分别留证；

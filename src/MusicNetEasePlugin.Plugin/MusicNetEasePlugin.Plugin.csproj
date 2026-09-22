@@ -28,5 +28,7 @@
   <ItemGroup>
     <None Include="../../THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md"
           CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
+    <!-- 普通输出复制不会自动进入干净插件目录；显式声明部署资产，确保上游许可随插件交付。 -->
+    <ManagedPluginAsset Include="../../THIRD-PARTY-NOTICES.md" TargetPath="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>
 </Project>
