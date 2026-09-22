@@ -1,0 +1,9 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj" />
+    <Project Path="src/MusicNetEasePlugin.Standalone/MusicNetEasePlugin.Standalone.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/MusicNetEasePlugin.Tests/MusicNetEasePlugin.Tests.csproj" />
+  </Folder>
+</Solution>
