@@ -19,7 +19,11 @@ internal static class NeteaseCookies
         {
             var value = context.Cookie(name, now);
             if (value.Length > 0)
-                container.Add(new Cookie(name, Uri.EscapeDataString(value), "/", ".music.163.com"));
+            {
+                var original = new Cookie(name, Uri.EscapeDataString(value), "/", ".music.163.com");
+                if (context.Cookies[name].Expires is { } expiry) original.Expires = expiry.UtcDateTime;
+                container.Add(original);
+            }
         }
         foreach (var header in headers)
         {
@@ -34,7 +38,7 @@ internal static class NeteaseCookies
             else
             {
                 var expires = cookie.Expires == DateTime.MinValue
-                    ? context.Cookies.GetValueOrDefault(name)?.Expires
+                    ? (DateTimeOffset?)null
                     : new DateTimeOffset(cookie.Expires.ToUniversalTime());
                 result[name] = new(Uri.UnescapeDataString(cookie.Value), expires);
             }

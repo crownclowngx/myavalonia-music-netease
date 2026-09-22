@@ -12,6 +12,32 @@ namespace MusicNetEasePlugin.Tests;
 
 public sealed class HttpTests
 {
+    private sealed class WaitingHandler : DelegatingHandler
+    {
+        public TaskCompletionSource Entered { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
+        protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
+        {
+            Entered.TrySetResult();
+            await Task.Delay(Timeout.InfiniteTimeSpan, cancellationToken);
+            throw new InvalidOperationException("受控 handler 不能落到真实网络。");
+        }
+    }
+
+    [Fact]
+    [Trait("Scenario", "H04")]
+    public async Task 取消令牌贯穿在途Flurl请求且无底层异常泄露()
+    {
+        var handler = new WaitingHandler();
+        var cache = new FlurlClientCache().Add("netease-eapi", "https://interfacepc.music.163.com", builder => builder.AddMiddleware(() => handler));
+        using var clients = new NeteaseFlurlClients(cache);
+        using var cancellation = new CancellationTokenSource();
+        var request = Api(clients).CreateKeyAsync(Context, cancellation.Token);
+        await handler.Entered.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        cancellation.Cancel();
+        var error = await Assert.ThrowsAnyAsync<OperationCanceledException>(() => request.WaitAsync(TimeSpan.FromSeconds(3)));
+        Assert.Null(error.InnerException);
+    }
+
     private static readonly AuthContext Context = AuthContext.Create();
     private static NeteaseAuthApi Api(NeteaseFlurlClients clients) => new(new(clients, TimeProvider.System));
 
@@ -115,6 +141,8 @@ public sealed class HttpTests
     [InlineData("{\"code\":200,\"account\":{\"id\":1},\"profile\":{\"userId\":2,\"nickname\":\"x\"}}", AuthError.Protocol)]
     [InlineData("{\"code\":200}", AuthError.SessionExpired)]
     [InlineData("{}", AuthError.Protocol)]
+    [InlineData("{\"code\":200,\"account\":[],\"profile\":{}}", AuthError.Protocol)]
+    [InlineData("{\"code\":200,\"account\":{\"id\":\"secret\"},\"profile\":{}}", AuthError.Protocol)]
     [Trait("Scenario", "P12")]
     public async Task 无效账号不能成为登录成功(string body, AuthError kind)
     {
@@ -147,5 +175,42 @@ public sealed class HttpTests
         cancellation.Cancel();
         stream.Position = 0;
         await Assert.ThrowsAnyAsync<OperationCanceledException>(() => NeteaseTransport.ReadBoundedAsync(stream, 32, cancellation.Token));
+    }
+
+    [Fact]
+    [Trait("Scenario", "H07")]
+    public void 未更新Cookie保留期限而新会话Cookie不继承旧期限()
+    {
+        var now = DateTimeOffset.UtcNow;
+        var context = Context with { Cookies = ImmutableDictionary<string, SessionCookie>.Empty.Add("MUSIC_U", new("old", now.AddDays(1))) };
+        var uri = new Uri("https://interfacepc.music.163.com/eapi/test");
+        var unchanged = NeteaseCookies.Merge(context, uri, [], now);
+        Assert.Equal(context.Cookies["MUSIC_U"].Expires, unchanged.Cookies["MUSIC_U"].Expires);
+        var updated = NeteaseCookies.Merge(context, uri, ["MUSIC_U=new; Path=/; Domain=.music.163.com"], now);
+        Assert.Null(updated.Cookies["MUSIC_U"].Expires);
+        Assert.Equal("new", updated.Cookie("MUSIC_U", now));
+    }
+
+    [Fact]
+    [Trait("Scenario", "H05,H09,U02")]
+    public async Task 限流保留重试间隔且头像请求不携带账号凭据()
+    {
+        using var http = new HttpTest();
+        http.RespondWith("", 429, new { Retry_After = "7" });
+        using var clients = new NeteaseFlurlClients(new FlurlClientCache());
+        var error = await Assert.ThrowsAsync<AuthException>(() => Api(clients).CreateKeyAsync(Context, default));
+        Assert.Equal(TimeSpan.FromSeconds(7), error.RetryAfter);
+        http.RespondWith("image");
+        var images = new AccountImageSource(clients);
+        Assert.NotNull(await images.LoadAsync("http://p1.music.126.net/fixture.jpg", default));
+        var call = http.CallLog.Last();
+        Assert.StartsWith("https://p1.music.126.net/", call.Request.Url.ToString());
+        Assert.False(call.HttpRequestMessage.Headers.Contains("Cookie"));
+        Assert.DoesNotContain("csrf", call.Request.Url.ToString());
+        Assert.Null(await images.LoadAsync("https://p1.music.126.net.evil.invalid/a", default));
+        Assert.Equal(2, http.CallLog.Count);
+        http.RespondWith("", 302, new { Location = "https://other.invalid/a" });
+        Assert.Null(await images.LoadAsync("https://p1.music.126.net/other", default));
+        Assert.Equal(3, http.CallLog.Count);
     }
 }

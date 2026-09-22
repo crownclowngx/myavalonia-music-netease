@@ -34,9 +34,10 @@ internal sealed class NeteaseAuthApi(NeteaseTransport transport) : INeteaseAuthA
         EnsureCode(reply.Body, 200);
         if (!reply.Body.TryGetProperty("account", out var account) || account.ValueKind == JsonValueKind.Null)
             throw new AuthException(AuthError.SessionExpired, "当前会话未登录，请重新扫码。", 200);
-        if (!reply.Body.TryGetProperty("profile", out var profile) || profile.ValueKind != JsonValueKind.Object ||
-            !account.TryGetProperty("id", out var id) || !id.TryGetInt64(out var number) || number <= 0 ||
-            !profile.TryGetProperty("userId", out var userId) || !userId.TryGetInt64(out var profileId) || profileId != number ||
+        if (account.ValueKind != JsonValueKind.Object ||
+            !reply.Body.TryGetProperty("profile", out var profile) || profile.ValueKind != JsonValueKind.Object ||
+            !account.TryGetProperty("id", out var id) || id.ValueKind != JsonValueKind.Number || !id.TryGetInt64(out var number) || number <= 0 ||
+            !profile.TryGetProperty("userId", out var userId) || userId.ValueKind != JsonValueKind.Number || !userId.TryGetInt64(out var profileId) || profileId != number ||
             !profile.TryGetProperty("nickname", out var name) || name.ValueKind != JsonValueKind.String ||
             string.IsNullOrWhiteSpace(name.GetString()))
             throw new AuthException(AuthError.Protocol, "网易账号资料不完整或身份不一致。");

@@ -76,4 +76,33 @@ public sealed class ProtocolTests
         Assert.Equal("https://music.163.com", weapi.Headers["Referer"]);
         Assert.Throws<ArgumentException>(() => NeteaseRequestEncoder.Encode("https://other.invalid", new(), NeteaseProtocol.Eapi, context, now));
     }
+
+    [Fact]
+    [Trait("Scenario", "P03")]
+    public void Unicode序列化不误修改字面反斜杠转义()
+    {
+        var value = new { text = "😀", literal = @"\uD83D\uDE00", mixed = @"\\" + "😀" };
+        var json = NeteaseCrypto.Json(value);
+        using var parsed = JsonDocument.Parse(json);
+        Assert.Equal(value.text, parsed.RootElement.GetProperty("text").GetString());
+        Assert.Equal(value.literal, parsed.RootElement.GetProperty("literal").GetString());
+        Assert.Equal(value.mixed, parsed.RootElement.GetProperty("mixed").GetString());
+        Assert.Contains("😀", json);
+    }
+
+    [Fact]
+    [Trait("Scenario", "P07")]
+    public void 加密压缩响应可读取且解压大小受限()
+    {
+        static byte[] Encode(byte[] plain)
+        {
+            using var output = new MemoryStream();
+            using (var gzip = new System.IO.Compression.GZipStream(output, System.IO.Compression.CompressionMode.Compress, true)) gzip.Write(plain);
+            using var aes = Aes.Create();
+            aes.Key = Encoding.ASCII.GetBytes("e82ckenh8dichen8");
+            return aes.EncryptEcb(output.ToArray(), PaddingMode.PKCS7);
+        }
+        Assert.Equal(200, NeteaseTransport.Code(NeteaseTransport.Decode(Encode(Encoding.UTF8.GetBytes("{\"code\":200}")), NeteaseProtocol.Eapi)));
+        Assert.Throws<AuthException>(() => NeteaseTransport.Decode(Encode(new byte[NeteaseTransport.MaximumResponseBytes + 1]), NeteaseProtocol.Eapi));
+    }
 }

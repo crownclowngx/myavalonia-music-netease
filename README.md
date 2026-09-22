@@ -1,37 +1,19 @@
 # MusicNetEasePlugin
 
-本项目用于开发 Avalonia 网易云音乐播放器。当前代码仍是由 `myavalonia-plugin` 创建的 Managed Plugin
-初始模板，网易接口与登录功能尚未实现。真实交付物是 `src/MusicNetEasePlugin.Plugin`；
-`Standalone` 只负责快速预览同一份 View、ViewModel 与业务代码。
-
-开发方向是以 api-enhanced 为主要协议上游，使用 C# 与 Flurl 统一请求，优先完成扫码登录最短路径：
-
-- [Flurl 接入与扫码登录实施计划](docs/roadmap/netease-v1-flurl-login-plan.md)
-- [扫码登录专用开发验证计划](docs/roadmap/netease-v1-login-verification.md)
-- [上游能力与完整模块清单](docs/roadmap/netease-api-enhanced-capabilities.md)
-
-以上为待实施计划。本阶段使用本地开发验证，不使用 AIFLOW、Windows CI 或发布门禁；正式发布时再按发布流程执行。
-
-> 第一次开始开发前，请先阅读 [项目文档与快速开始](docs/README.md)。其中说明了三个子项目和
-> Standalone 窗口的职责、接入真实 Host 的边界，以及临时部署和正式 ZIP 发布流程。
+Avalonia 网易云音乐插件，已实现第一阶段扫码登录：C# + Flurl 直连、二维码状态、取消、
+账号核验、受保护会话保存/恢复和退出。真实交付项目是 Plugin，Standalone 复用同一套服务和界面。
 
 ```powershell
-dotnet restore
-dotnet build -c Debug -warnaserror
-dotnet test -c Debug --no-build
-dotnet run --project src/MusicNetEasePlugin.Standalone
+pwsh -NoProfile -File tools/verify-development.ps1
+dotnet run --project src/MusicNetEasePlugin.Standalone -c Debug --no-build
 ```
 
-后续需要在真实 Host 中调试时，请显式提供 Host 的 `Controls` 目录；计划编写阶段不执行部署：
+- [文档总导航](docs/README.md)
+- [扫码登录快速开始](docs/quick-start/netease-login.md)
+- [HTTP 与会话契约](docs/reference/netease-http-session.md)
+- [专用开发验证矩阵](docs/maintenance/netease-login-verification.md)
+- [本阶段实现与验证记录](docs/archive/records/netease-v1/login-implementation-20260922.md)
+- [后续计划](docs/roadmap/netease-v1-flurl-login-plan.md)与[上游 440 个模块能力清单](docs/roadmap/netease-api-enhanced-capabilities.md)
 
-```powershell
-dotnet msbuild src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj `
-  -t:DeployManagedPlugin `
-  -p:ManagedPluginDeployRoot=C:\Path\To\Host\Controls
-```
-
-Standalone 只能验证界面和插件自身对象图；manifest、加载上下文、Document Scope、Dock、Tool 和
-生命周期必须使用真实 Host 做最终验收。
-
-模板包含一条不注册快捷键的最小 Document Command 示例。设计边界、Target 适配和测试清单见
-[Workbench Command 开发说明](docs/workbench-commands.md)。
+自动验证与无历史凭据 QR 探针已落地；真实手机授权、真实 Host 联调仍待人工验证。
+搜索、播放与歌单属于后续阶段。本轮不使用 AIFLOW、Windows CI、发布门禁或自动部署。

@@ -4,7 +4,9 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:views="using:MusicNetEasePlugin.Features.Main"
     Width="900"
-    Height="600"
-    Title="MusicNetEasePlugin Standalone">
+    Height="820"
+    MinWidth="540"
+    MinHeight="500"
+    Title="网易云音乐 · 独立预览">
   <views:MainView />
 </Window>

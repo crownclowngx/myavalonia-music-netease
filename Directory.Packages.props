@@ -4,6 +4,9 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageVersion Include="Microsoft.Extensions.DependencyInjection" Version="[10.0.0]" />
+    <PackageVersion Include="Avalonia.Headless" Version="[12.1.2]" />
+    <PackageVersion Include="Avalonia.Skia" Version="[12.1.2]" />
     <PackageVersion Include="Flurl.Http" Version="[4.0.2]" />
     <PackageVersion Include="QRCoder" Version="[1.8.0]" />
     <PackageVersion Include="System.Security.Cryptography.ProtectedData" Version="[10.0.0]" />
