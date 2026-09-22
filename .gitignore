@@ -1,18 +1,56 @@
-# Build and Release Folders
+# .NET / Avalonia 编译、中间文件与本地产物（目录规则匹配任意层级）
+[Bb]in/
+[Oo]bj/
 bin-debug/
 bin-release/
-[Oo]bj/
-[Bb]in/
+artifacts/
+publish/
+*.binlog
+*.nupkg
+*.snupkg
+/packages/
 
-# Other files and folders
+# 自动生成的测试结果、覆盖率与性能报告；正式验收记录放入 docs/archive/records。
+[Tt]est[Rr]esults/
+coverage/
+BenchmarkDotNet.Artifacts/
+*.trx
+*.coverage
+*.coveragexml
+coverage.cobertura.xml
+coverage.opencover.xml
+
+# Visual Studio / Rider 本地缓存和个人配置；保留可共享的编辑器配置。
+.vs/
+.idea/
 .settings/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.sln.iml
 
-# Executables
-*.swf
-*.air
-*.ipa
-*.apk
+# 本地环境和私有配置；示例文件可提交，不隐藏正常的应用配置。
+.env
+.env.*
+!.env.example
+!.env.*.example
+appsettings.Local.json
+appsettings.*.Local.json
 
-# Project files, i.e. `.project`, `.actionScriptProperties` and `.flexProperties`
-# should NOT be excluded as they contain compiler settings and other important
-# information for Eclipse / Flash Builder.
+# 运行日志、临时文件与编辑器备份。
+logs/
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*~
+
+# 操作系统生成的文件。
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# packages.lock.json、Directory.Packages.props、源码、文档及共享配置应提交。
+# 不全局忽略 DLL、EXE、ZIP，避免隐藏需要纳入版本控制的测试资产。
