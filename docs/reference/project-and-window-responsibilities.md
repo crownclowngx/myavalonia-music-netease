@@ -1,6 +1,7 @@
 # 项目、Host 与 Standalone 窗口职责
 
 > 用途：本插件的项目结构与宿主接入参考。当前只注册登录主页面，账号与登录协调器在插件容器中共享。
+> 后续设计：[V2 / M1](../roadmap/netease-v2-m1-playback-plan.md)拟增加账号设置 Tool 与共享音频服务；其[目录配置及 Dock 约定](../roadmap/netease-v2-libvlc-tool-and-dock-design.md)仍待实施，不属于当前注册事实。
 
 ## 项目结构
 

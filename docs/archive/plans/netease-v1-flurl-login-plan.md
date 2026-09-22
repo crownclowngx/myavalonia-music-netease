@@ -2,6 +2,7 @@
 
 > 归档状态：2026-09-22 已归档。用户确认登录可用，原 P4–P5 由[能力路线图](../../roadmap/netease-capability-roadmap.md)承接；剩余人工验证由[维护矩阵](../../maintenance/netease-login-verification.md)跟踪。
 > 下文保留原计划及当时的状态、约束和待办。现行行为以[HTTP 与会话契约](../../reference/netease-http-session.md)为准；阶段证据见[归档索引](../README.md)。
+> 2026-09-23 后续设计入口：[V2 / M1 实施方案](../../roadmap/netease-v2-m1-playback-plan.md)已纳入 LibVLC 内置优先/指定共享目录、账号设置 Tool 和 Dock 生命周期；详见[专项设计](../../roadmap/netease-v2-libvlc-tool-and-dock-design.md)。本页 V1 历史实现状态不因此改变。
 
 > 用途：以 api-enhanced 为主要协议上游，为 MusicNetEasePlugin 建立原生 C# 网络接入，先完成扫码登录最短闭环，再扩展播放器。
 > 状态：P0–P3 及微信默认登录已实现；2026-09-22 微信真实扫码、网易回调和账号核验通过，Host/重启恢复仍待验证。见[初期记录](../records/netease-v1/login-implementation-20260922.md)和[微信专项记录](../records/netease-v1/wechat-login-implementation-20260922.md)。P4–P5 保留为后续计划。
