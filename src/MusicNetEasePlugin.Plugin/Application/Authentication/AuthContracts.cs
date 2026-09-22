@@ -34,7 +34,8 @@ public sealed record QrKey(string Key, AuthContext Context)
     public override string ToString() => "[二维码登录凭据]";
 }
 
-public enum QrStatus { Expired = 800, WaitingForScan = 801, WaitingForConfirmation = 802, Authorized = 803 }
+// 前四项沿用网易码；Denied 是统一后的本地状态，不会作为业务码发送给任何远端。
+public enum QrStatus { Expired = 800, WaitingForScan = 801, WaitingForConfirmation = 802, Authorized = 803, Denied = 804 }
 public sealed record QrCheck(QrStatus Status, AuthContext Context);
 public sealed record AccountCheck(NeteaseAccount Account, AuthContext Context);
 

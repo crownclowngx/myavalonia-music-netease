@@ -3,6 +3,14 @@ using Flurl.Http.Configuration;
 using MusicNetEasePlugin.Application.Authentication;
 using MusicNetEasePlugin.Infrastructure.Http;
 
+if (args.Length > 0)
+{
+    if (args.Length == 3 && args[0] == "--wechat" && args[1] == "--output")
+        return await WeChatProbe.RunAsync(args[2]);
+    Console.Error.WriteLine("用法：不带参数运行未登录探针；或 --wechat --output <二维码图片绝对路径>");
+    return 2;
+}
+
 // 手动联网探针与默认离线测试分离。只输出状态，不记录二维码 key、Cookie 或账号完整正文。
 // 此时只创建一次二维码并检查一次，无需用户授权，也不访问已有账号文件。
 var cache = new FlurlClientCache();

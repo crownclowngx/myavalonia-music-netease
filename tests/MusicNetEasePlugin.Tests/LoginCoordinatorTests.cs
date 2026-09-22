@@ -9,7 +9,7 @@ public sealed class LoginCoordinatorTests
     private static readonly Guid Owner = Guid.NewGuid();
     private static readonly TimeSpan Step = TimeSpan.FromSeconds(2);
     private static LoginCoordinator Create(FakeAuthApi api, MemorySessionStore store, FakeTimeProvider time) =>
-        new(api, store, time, LoginOptions.Default);
+        TestLogin.Create(api, store, time, LoginOptions.Default);
 
     private static Task Stage(LoginCoordinator login, LoginStage stage)
     {
@@ -37,7 +37,7 @@ public sealed class LoginCoordinatorTests
         api.States.Enqueue(QrStatus.Authorized);
         var store = new MemorySessionStore();
         await using var login = Create(api, store, time);
-        var run = login.StartAsync(Owner, default);
+        var run = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         Assert.Equal(LoginStage.WaitingForScan, login.Snapshot.Stage);
         var confirming = Stage(login, LoginStage.WaitingForConfirmation);
         time.Advance(Step);
@@ -47,7 +47,7 @@ public sealed class LoginCoordinatorTests
         await run.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.Equal(LoginStage.SignedIn, login.Snapshot.Stage);
         Assert.True(login.Snapshot.Remembered);
-        Assert.Null(login.Snapshot.QrKey);
+        Assert.Null(login.Snapshot.QrImage);
         Assert.Equal(1, api.Accounts);
         Assert.Equal(1, store.Saves);
     }
@@ -60,7 +60,7 @@ public sealed class LoginCoordinatorTests
         var api = new FakeAuthApi { Check = (_, context, _) => Task.FromResult(new QrCheck(QrStatus.Authorized, context)) };
         var store = new MemorySessionStore();
         await using var login = Create(api, store, time);
-        var run = login.StartAsync(Owner, default);
+        var run = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         time.Advance(Step);
         await run.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.Equal(LoginStage.Failed, login.Snapshot.Stage);
@@ -78,12 +78,12 @@ public sealed class LoginCoordinatorTests
         var api = new FakeAuthApi();
         api.States.Enqueue(QrStatus.Expired);
         await using var login = Create(api, new(), time);
-        var run = login.StartAsync(Owner, default);
+        var run = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         time.Advance(serverExpiry ? Step : TimeSpan.FromMinutes(3));
         await run.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.Equal(LoginStage.Expired, login.Snapshot.Stage);
         Assert.Equal(1, api.Keys);
-        Assert.Null(login.Snapshot.QrKey);
+        Assert.Null(login.Snapshot.QrImage);
     }
 
     [Fact]
@@ -96,15 +96,15 @@ public sealed class LoginCoordinatorTests
         var api = new FakeAuthApi { Check = (_, ctx, _) => { entered.TrySetResult(ctx); return pending.Task; } };
         var store = new MemorySessionStore();
         await using var login = Create(api, store, time);
-        var old = login.StartAsync(Owner, default);
+        var old = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         time.Advance(Step);
         var oldContext = await entered.Task.WaitAsync(TimeSpan.FromSeconds(3));
-        var current = login.StartAsync(Owner, default);
+        var current = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         var waiting = Stage(login, LoginStage.WaitingForScan);
         pending.SetResult(new(QrStatus.Authorized, FakeAuthApi.Authorized(oldContext)));
         await old.WaitAsync(TimeSpan.FromSeconds(3));
         await waiting;
-        Assert.Equal("key-2", login.Snapshot.QrKey);
+        Assert.Equal(Infrastructure.Protocol.LoginQrCode.Render("key-2"), login.Snapshot.QrImage);
         Assert.Null(store.Saved);
         login.Cancel(Owner);
         await current.WaitAsync(TimeSpan.FromSeconds(3));
@@ -120,7 +120,7 @@ public sealed class LoginCoordinatorTests
         var release = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         var store = new MemorySessionStore { AfterCommit = () => { written.SetResult(); return release.Task; } };
         await using var login = Create(new(), store, time);
-        var run = login.StartAsync(Owner, default);
+        var run = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         time.Advance(Step);
         await written.Task.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.NotNull(store.Saved);
@@ -140,7 +140,7 @@ public sealed class LoginCoordinatorTests
         var api = new FakeAuthApi();
         var store = new MemorySessionStore { FailSave = true };
         await using var login = Create(api, store, time);
-        var run = login.StartAsync(Owner, default);
+        var run = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         time.Advance(Step);
         await run.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.NotNull(login.Snapshot.Account);
@@ -207,14 +207,14 @@ public sealed class LoginCoordinatorTests
         var time = new FakeTimeProvider();
         var api = new FakeAuthApi();
         var login = Create(api, new(), time);
-        var run = login.StartAsync(Owner, default);
+        var run = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         login.Cancel(Guid.NewGuid());
         Assert.Equal(LoginStage.WaitingForScan, login.Snapshot.Stage);
         await login.DisposeAsync();
         Assert.True(run.IsCompleted);
         Assert.Equal(0, api.Checks);
         await login.DisposeAsync();
-        await login.StartAsync(Owner, default);
+        await login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         Assert.Equal(1, api.Keys);
     }
 
@@ -225,9 +225,29 @@ public sealed class LoginCoordinatorTests
         var time = new FakeTimeProvider();
         await using var login = Create(new(), new(), time);
         login.Changed += (_, _) => throw new InvalidOperationException("fixture");
-        var run = login.StartAsync(Owner, default);
+        var run = login.StartAsync(Owner, default, LoginMethod.NeteaseApp);
         time.Advance(Step);
         await run.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.Equal(LoginStage.SignedIn, login.Snapshot.Stage);
+    }
+
+    [Fact]
+    [Trait("Scenario", "W02,W05")]
+    public async Task 手机拒绝授权会清除二维码并停止而不是持续等待()
+    {
+        var time = new FakeTimeProvider();
+        var api = new FakeAuthApi();
+        api.States.Enqueue(QrStatus.Denied);
+        var store = new MemorySessionStore();
+        await using var login = Create(api, store, time);
+        var run = login.StartAsync(Owner, default);
+        time.Advance(Step);
+        await run.WaitAsync(TimeSpan.FromSeconds(3));
+        Assert.Equal(LoginStage.Cancelled, login.Snapshot.Stage);
+        Assert.Null(login.Snapshot.QrImage);
+        Assert.Equal(0, api.Accounts);
+        Assert.Equal(0, store.Saves);
+        time.Advance(TimeSpan.FromSeconds(20));
+        Assert.Equal(1, api.Checks);
     }
 }

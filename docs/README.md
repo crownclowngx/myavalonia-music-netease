@@ -1,6 +1,6 @@
 # MusicNetEasePlugin 文档导航与开发快速开始
 
-> 用途：本插件唯一文档总导航。状态：扫码登录代码与本地开发门禁已实现，真实账号和 Host 待人工验证；核对日期：2026-09-22。
+> 用途：本插件唯一文档总导航。状态：默认微信登录已通过真实扫码与网易账号核验，Host 与重启恢复待人工验证；核对日期：2026-09-22。
 > 文档分类参考 host：roadmap 保留后续计划，reference/quick-start 为当前事实，maintenance 为复用验证，archive 为历史证据。
 
 本解决方案用于开发 `myavalonia.plugin.music.netease` Managed Plugin。它把真实插件、独立 Avalonia 开发窗口和
@@ -15,7 +15,7 @@
 | 查看当前架构和接口 | [HTTP 与会话契约](reference/netease-http-session.md)：Flurl、协议、凭据与生命周期 |
 | 查看阶段进度 | [V1 实施计划](roadmap/netease-v1-flurl-login-plan.md)与[本轮记录](archive/records/netease-v1/login-implementation-20260922.md) |
 | 执行本地开发门禁 | [专用回归矩阵](maintenance/netease-login-verification.md)：实际用例映射、门禁自测、人工验证边界 |
-| 查看最近开发部署 | [2026-09-22 部署记录](archive/records/netease-v1/development-deploy-20260922.md)：已部署到指定 Controls，编译中间文件已清空；Host 加载待验证 |
+| 查看微信登录和最近开发部署 | [微信登录专项记录](archive/records/netease-v1/wechat-login-implementation-20260922.md)：真实授权闭环、测试和部署；[此前 App 版部署](archive/records/netease-v1/development-deploy-20260922.md)保留为历史 |
 | 查看上游支持范围与后续扩容候选 | [api-enhanced 能力清单](roadmap/netease-api-enhanced-capabilities.md)：固定提交调研，含完整模块索引；不代表本插件已支持 |
 
 本阶段不使用 AIFLOW、Windows CI 或发布门禁。真实账号观察、自动测试、Host 验证、部署与发布分别留证；

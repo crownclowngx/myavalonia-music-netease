@@ -27,7 +27,7 @@ public sealed class MainDocumentTests
     [Trait("Scenario", "U01,U06")]
     public async Task 初始化保留Host标题且未登录页面可开始扫码()
     {
-        await using var login = new LoginCoordinator(new FakeAuthApi(), new MemorySessionStore(), new FakeTimeProvider(), LoginOptions.Default);
+        await using var login = TestLogin.Create(new FakeAuthApi(), new MemorySessionStore(), new FakeTimeProvider(), LoginOptions.Default);
         using var lifetime = new Lifetime();
         using var document = new MainDocument(login, new Dispatcher(), new Images(), lifetime);
         await document.InitializeAsync(new NewDocumentActivation("测试标题"), default);
@@ -44,7 +44,7 @@ public sealed class MainDocumentTests
     {
         var time = new FakeTimeProvider();
         var api = new FakeAuthApi();
-        await using var login = new LoginCoordinator(api, new MemorySessionStore(), time, LoginOptions.Default);
+        await using var login = TestLogin.Create(api, new MemorySessionStore(), time, LoginOptions.Default);
         using var firstLifetime = new Lifetime();
         using var secondLifetime = new Lifetime();
         using var first = new MainDocument(login, new Dispatcher(), new Images(), firstLifetime);
@@ -68,7 +68,7 @@ public sealed class MainDocumentTests
     public async Task 关闭页面不退出已提交的共享账号()
     {
         var store = new MemorySessionStore { Saved = FakeAuthApi.Authorized(AuthContext.Create()) };
-        await using var login = new LoginCoordinator(new FakeAuthApi(), store, TimeProvider.System, LoginOptions.Default);
+        await using var login = TestLogin.Create(new FakeAuthApi(), store, TimeProvider.System, LoginOptions.Default);
         using var lifetime = new Lifetime();
         using var document = new MainDocument(login, new Dispatcher(), new Images(), lifetime);
         await document.InitializeAsync(new NewDocumentActivation("账号"), default);
@@ -86,7 +86,7 @@ public sealed class MainDocumentTests
     public async Task 已取消的Document初始化不发起网络请求()
     {
         var api = new FakeAuthApi();
-        await using var login = new LoginCoordinator(api, new MemorySessionStore(), TimeProvider.System, LoginOptions.Default);
+        await using var login = TestLogin.Create(api, new MemorySessionStore(), TimeProvider.System, LoginOptions.Default);
         using var lifetime = new Lifetime();
         using var document = new MainDocument(login, new Dispatcher(), new Images(), lifetime);
         using var cancellation = new CancellationTokenSource();
@@ -95,5 +95,28 @@ public sealed class MainDocumentTests
             await document.InitializeAsync(new NewDocumentActivation("未创建"), cancellation.Token));
         Assert.Equal(0, api.Accounts);
         Assert.Equal(0, api.Keys);
+    }
+
+    [Fact]
+    [Trait("Scenario", "W01,W09,U01")]
+    public async Task 默认微信入口可切换网易App且文案与图片同步()
+    {
+        var api = new FakeAuthApi();
+        await using var login = TestLogin.Create(api, new(), new FakeTimeProvider(), LoginOptions.Default);
+        using var lifetime = new Lifetime();
+        using var document = new MainDocument(login, new Dispatcher(), new Images(), lifetime);
+        Assert.Contains("微信", document.QrInstruction);
+        var wechat = document.StartLoginCommand.ExecuteAsync(null);
+        Assert.Equal(LoginMethod.WeChat, login.Snapshot.Method);
+        Assert.True(document.StartNeteaseLoginCommand.CanExecute(null));
+        var app = document.StartNeteaseLoginCommand.ExecuteAsync(null);
+        await wechat.WaitAsync(TimeSpan.FromSeconds(3));
+        Assert.Equal(LoginMethod.NeteaseApp, login.Snapshot.Method);
+        Assert.Contains("网易云音乐 App", document.QrInstruction);
+        Assert.Equal(Infrastructure.Protocol.LoginQrCode.Render("key-2"), document.QrImageBytes);
+        document.CancelLoginCommand.Execute(null);
+        await app.WaitAsync(TimeSpan.FromSeconds(3));
+        Assert.Null(document.QrImageBytes);
+        Assert.True(document.StartLoginCommand.CanExecute(null));
     }
 }

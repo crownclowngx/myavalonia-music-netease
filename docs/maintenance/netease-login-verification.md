@@ -1,7 +1,7 @@
 # 网易云音乐扫码登录专用开发验证
 
 > 用途：为[Flurl 与登录方案](../roadmap/netease-v1-flurl-login-plan.md)提供可追溯的测试矩阵、本地开发门禁和人工验证范围。
-> 状态：已转为当前维护矩阵；核对日期：2026-09-22。编号映射见第 10 节，执行证据见[阶段记录](../archive/records/netease-v1/login-implementation-20260922.md)。人工项未验证，不能从自动测试外推。
+> 状态：当前维护矩阵；核对日期：2026-09-22。原场景映射见第 10 节，微信矩阵见第 12 节；真实微信扫码已验证，其他人工项以[微信专项记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)的边界为准。
 > 约束：SOLID 优先、模式朴素、详细中文注释；不使用 AIFLOW、Windows CI、seal、发布 Windows Smoke、发布覆盖率或发布重复性门禁。
 
 ## 1. 测试分层与夹具原则
@@ -120,7 +120,7 @@ S11 中平台相关测试在支持的本地开发环境执行；这不构成 Win
 
 ## 7. M：人工验证清单
 
-全部尚未执行。人工验证使用拥有者自己的账号和明确选择的独立开发数据目录，不把凭据、二维码原图或账号完整响应提交到仓库。
+2026-09-22 通过显式微信探针完成 M01 的微信授权及账号核验部分；探针未保存会话，未完成 M04/M06。原网易 App 真实 803 及 M02–M08 仍待人工执行。不把凭据、二维码原图或账号完整响应提交到仓库。
 
 | 编号 | 操作 | 观察与留证 |
 | --- | --- | --- |
@@ -133,7 +133,7 @@ S11 中平台相关测试在支持的本地开发环境执行；这不构成 Win
 | M07 | 头像慢/失败、保存目录不可写、退出清理失败 | 登录与图片、内存与持久化、远端与本地退出结果分别显示 |
 | M08 | 真实 Host 内打开/关闭/重开页面及 Host 退出 | 使用公开 SDK 生命周期；没有后台轮询或已释放视图回调 |
 
-M08 属于后续手动开发联调观察；本次不部署，不运行 Windows CI、发布 Smoke 或其他发布门禁。Standalone 通过不代表真实 Host 已验收；若本阶段尚无 Host 联调证据，记录“未验证”。
+M08 属于手动开发联调观察；文件已按用户指定路径进行开发部署，不运行 Windows CI、发布 Smoke 或其他发布门禁。部署通过不代表真实 Host 已验收；尚无 Host 联调证据时记录“未验证”。
 
 ## 8. 本地开发门禁入口与判定
 
@@ -197,7 +197,7 @@ git diff --check
 | U01、U06 | MainDocumentTests、UiCompositionTests：标题/取消回归、按钮、QR/账号切换 | 自动；模板替换说明见阶段记录 |
 | A01–A04 | [当前契约](../reference/netease-http-session.md)与阶段记录 | 代码审查，不用源码字符串测试代替 |
 | G01–G07 | verify-development.ps1、自测、本矩阵、文档检查及日期记录 | 自动校验与审查结合；结论见当轮记录 |
-| M01–M08 | 第 7 节人工清单 | 真实账号与 Host 尚未执行 |
+| M01–M08 | 第 7 节人工清单及微信专项记录 | M01 微信授权与账号核验已通过；其余边界见第 7 节 |
 
 Trait 便于检索，不能替代实际断言。默认自动测试没有真实账号，不扫描个人数据目录。
 
@@ -219,4 +219,23 @@ git diff --check
 ```
 
 每轮生成 TRX、Headless 页面图（虚构 QR）和 verification.json；记录基线 revision、工作树状态、环境与测试数。
-真实账号/Host 未验证与发布门禁未执行明确记录为 false，不以单元测试结果替代。
+自动门禁不登录真实账号，因此其 verification.json 中 realAccountVerified/hostVerified/releaseGateExecuted 为 false；这表示该次门禁未执行对应活动。独立手机扫码证据另外记录，不用单元测试结果替代。
+
+## 12. W：微信登录专项矩阵
+
+网络层由 [WeChatLoginTests](../../tests/MusicNetEasePlugin.Tests/WeChatLoginTests.cs)执行真实 Flurl 编排与解析器，用固定响应隔离外网；共享状态和界面测试继续运行生产协调器。
+
+| 编号 | 关键断言 | 实际入口 |
+| --- | --- | --- |
+| W01 | 默认微信，网易 App 作为独立备用，页面文案与图片匹配 | WeChatLoginTests、MainDocumentTests |
+| W02 | 408/404/403/402 分别等待、确认、取消、过期；已扫描时 408 不回退 | WeChatLoginTests、LoginCoordinatorTests 手机拒绝用例 |
+| W03 | 原始 state 正确编码；405 后经网易回调取得 MUSIC_U，同源重定向受限 | WeChatLoginTests |
+| W04 | 不继承旧账号 Cookie，网易 Cookie 不发往微信，尝试之间隔离 | WeChatLoginTests |
+| W05 | 微信确认不代表账号有效；网易账号核验前不发布、不保存 | WeChatLoginTests 真实 Provider + 协调器用例 |
+| W06 | 入口/图片/回调限定域名与 HTTPS；拒绝重复 state 和任意脚本 | WeChatLoginTests |
+| W07 | 缺 code、未知状态、无会话、绑定要求、回调超时均终止；一次性 code 不重放 | WeChatLoginTests |
+| W08 | 取消贯穿正在等待的长轮询；释放后不再请求且丢弃图片 | WeChatLoginTests 真实取消 handler |
+| W09 | 微信切换 App 先取消旧尝试；无旧图片或状态覆盖 | MainDocumentTests；共享 L04–L08 迟到响应/提交补偿用例 |
+
+真实微信探针已观察 WaitingForScan → WaitingForConfirmation → Verifying → SignedIn，且用户确认手机显示成功。
+仅记录脱敏布尔结果；长期可用性、账号绑定/风控真实分支、Host 与持久恢复不由本次成功推断。

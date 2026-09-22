@@ -32,10 +32,11 @@
                 <Image x:Name="QrImage" Stretch="Uniform" />
               </Grid>
             </Border>
-            <TextBlock Text="使用网易云音乐 App 扫码，并在手机上确认登录。" Foreground="#667085" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding QrInstruction}" Foreground="#667085" TextWrapping="Wrap" />
             <WrapPanel HorizontalAlignment="Center">
-              <Button Content="获取 / 更新二维码" Command="{Binding StartLoginCommand}" Margin="4"
-                      Background="#D92D40" Foreground="White" Padding="18,10" />
+              <Button Content="微信扫码登录 / 更新" Command="{Binding StartLoginCommand}" Margin="4"
+                      Background="#07A35A" Foreground="White" Padding="18,10" />
+              <Button Content="网易云 App 扫码" Command="{Binding StartNeteaseLoginCommand}" Margin="4" Padding="18,10" />
               <Button Content="取消" Command="{Binding CancelLoginCommand}" Margin="4" Padding="18,10" />
               <Button Content="重试恢复" Command="{Binding RestoreCommand}" Margin="4" Padding="18,10" />
             </WrapPanel>

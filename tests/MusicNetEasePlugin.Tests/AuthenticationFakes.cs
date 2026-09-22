@@ -1,7 +1,26 @@
 using System.Collections.Immutable;
 using MusicNetEasePlugin.Application.Authentication;
+using MusicNetEasePlugin.Infrastructure.Http;
 
 namespace MusicNetEasePlugin.Tests;
+
+/// <summary>
+/// UI 测试只替换微信协议边界，仍运行真实协调器与网易 App 适配器。
+/// 微信的实际 HTTP 往返另由 WeChatLoginTests 验证，避免测试依赖外网与手机操作。
+/// </summary>
+internal static class TestLogin
+{
+    public static LoginCoordinator Create(FakeAuthApi api, MemorySessionStore store, TimeProvider time,
+        LoginOptions options) => new(api, store, time, options,
+            [new NeteaseAppQrLoginProvider(api), new FakeWeChatProvider(api)]);
+
+    private sealed class FakeWeChatProvider(FakeAuthApi api) : IQrLoginProvider
+    {
+        public LoginMethod Method => LoginMethod.WeChat;
+        public Task<IQrLoginAttempt> CreateAsync(AuthContext context, CancellationToken cancellationToken) =>
+            new NeteaseAppQrLoginProvider(api).CreateAsync(context, cancellationToken);
+    }
+}
 
 internal sealed class MemorySessionStore : ILoginSessionStore
 {

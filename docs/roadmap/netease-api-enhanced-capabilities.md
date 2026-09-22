@@ -1,13 +1,16 @@
 # api-enhanced 上游能力清单与移植边界
 
 > 用途：为[Flurl 登录与扩容计划](netease-v1-flurl-login-plan.md)提供选型依据、能力范围和固定源码索引。
-> 状态：上游源码/文档调研完成；登录子集已实现并离线验证；真实账号未验证，其他模块未移植。核对日期：2026-09-22。
+> 状态：上游登录子集已实现并离线验证；独立补充的微信登录已通过真实账号核验，其他模块未移植。核对日期：2026-09-22。
 > 基线：[a8c781fd64faab17fedfd46e0615a2609307f163](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/tree/a8c781fd64faab17fedfd46e0615a2609307f163)，提交日期 2026-09-11 UTC。
 > 统计：该提交 `module/` 下共有 **440 个直接子级 JavaScript 模块**。包括业务接口、本地包装和工具；不等于 440 个独立网易 HTTP 接口，更不代表 440 项当前可用能力。
 
 主要事实源为[固定提交的接口文档](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/blob/a8c781fd64faab17fedfd46e0615a2609307f163/public/docs/home.md)、[module 源码目录](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/tree/a8c781fd64faab17fedfd46e0615a2609307f163/module)、[请求核心](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/blob/a8c781fd64faab17fedfd46e0615a2609307f163/util/request.js)与[加密实现](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/blob/a8c781fd64faab17fedfd46e0615a2609307f163/util/crypto.js)。下述分组及接入优先级由本项目整理；实际权限、字段和可用性以接入时逐项验证为准。
 
 ## 1. 对我们项目的接入分层
+
+微信登录是本插件按网易 SNS/微信网站授权链补充的能力，不属于下列 440 个上游模块。
+默认微信、备用网易云 App；真实微信验证不能外推上游 App 二维码或其他模块的真实可用性，见[微信记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)。
 
 | 优先级 | 范围 | 状态 |
 | --- | --- | --- |

@@ -14,7 +14,10 @@ internal sealed class NeteaseFlurlClients : IDisposable
         Web = cache.GetOrAdd("netease-web", "https://music.163.com");
         Eapi = cache.GetOrAdd("netease-eapi", "https://interfacepc.music.163.com");
         Images = cache.GetOrAdd("netease-images");
-        foreach (var client in new[] { Web, Eapi, Images })
+        Social = cache.GetOrAdd("netease-social", "https://music.163.com");
+        WeChat = cache.GetOrAdd("netease-wechat", "https://open.weixin.qq.com");
+        WeChatPoll = cache.GetOrAdd("netease-wechat-poll");
+        foreach (var client in new[] { Web, Eapi, Images, Social, WeChat, WeChatPoll })
         {
             client.Settings.Timeout = TimeSpan.FromSeconds(15);
             client.Settings.Redirects.Enabled = false;
@@ -24,6 +27,9 @@ internal sealed class NeteaseFlurlClients : IDisposable
     public IFlurlClient Web { get; }
     public IFlurlClient Eapi { get; }
     public IFlurlClient Images { get; }
+    public IFlurlClient Social { get; }
+    public IFlurlClient WeChat { get; }
+    public IFlurlClient WeChatPoll { get; }
 
     // Flurl 4 的缓存本身不实现 IDisposable，因此由这个拥有者显式移除并释放命名客户端。
     public void Dispose()

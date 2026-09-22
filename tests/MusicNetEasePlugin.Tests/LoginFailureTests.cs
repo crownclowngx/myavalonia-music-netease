@@ -35,7 +35,7 @@ public sealed class LoginFailureTests
     {
         var clock = new Clock();
         var api = new FakeAuthApi { Check = (_, _, _) => throw new AuthException(error, "fixture", retryAfter: retrySeconds is { } seconds ? TimeSpan.FromSeconds(seconds) : null) };
-        await using var login = new LoginCoordinator(api, new MemorySessionStore(), clock, LoginOptions.Default);
+        await using var login = TestLogin.Create(api, new MemorySessionStore(), clock, LoginOptions.Default);
         var run = login.StartAsync(Guid.NewGuid(), default);
         await clock.AdvanceNext(2);
         await clock.AdvanceNext(retrySeconds ?? 2);
@@ -57,7 +57,7 @@ public sealed class LoginFailureTests
     {
         var clock = new Clock();
         var api = new FakeAuthApi { Check = (_, _, _) => throw new AuthException(error, "fixture") };
-        await using var login = new LoginCoordinator(api, new MemorySessionStore(), clock, LoginOptions.Default);
+        await using var login = TestLogin.Create(api, new MemorySessionStore(), clock, LoginOptions.Default);
         var run = login.StartAsync(Guid.NewGuid(), default);
         await clock.AdvanceNext(2);
         await run.WaitAsync(TimeSpan.FromSeconds(3));
@@ -74,7 +74,7 @@ public sealed class LoginFailureTests
         var api = new FakeAuthApi { Account = (context, _) => { entered.TrySetResult(context); return release.Task; } };
         var clock = new Clock();
         var store = new MemorySessionStore();
-        await using var login = new LoginCoordinator(api, store, clock, LoginOptions.Default);
+        await using var login = TestLogin.Create(api, store, clock, LoginOptions.Default);
         var run = login.StartAsync(Guid.NewGuid(), default);
         await clock.AdvanceNext(2);
         var context = await entered.Task.WaitAsync(TimeSpan.FromSeconds(3));

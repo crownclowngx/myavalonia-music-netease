@@ -1,7 +1,6 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MusicNetEasePlugin.Application.Authentication;
-using MusicNetEasePlugin.Infrastructure.Protocol;
 using MyAvaloniaManagement.PluginSdk;
 
 namespace MusicNetEasePlugin.Features.Main;
@@ -23,7 +22,6 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     private Task _avatarWork = Task.CompletedTask;
     private long _avatarGeneration;
     private string? _avatarAddress;
-    private string? _qrKey;
     private int _closed;
     private int _disposed;
     private LoginSnapshot _snapshot = new(-1, LoginStage.SignedOut, "");
@@ -35,7 +33,10 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     {
         (_login, _dispatcher, _images) = (login, dispatcher, images);
         StartLoginCommand = new AsyncRelayCommand(() => _login.StartAsync(_owner, _closing.Token),
-            () => !Closed && !IsSignedIn && _snapshot.Stage is not (LoginStage.CreatingQr or LoginStage.Restoring or LoginStage.Verifying or LoginStage.SigningOut),
+            CanStart,
+            AsyncRelayCommandOptions.AllowConcurrentExecutions);
+        StartNeteaseLoginCommand = new AsyncRelayCommand(() => _login.StartAsync(_owner, _closing.Token, LoginMethod.NeteaseApp),
+            CanStart,
             AsyncRelayCommandOptions.AllowConcurrentExecutions);
         CancelLoginCommand = new RelayCommand(() => _login.Cancel(_owner),
             () => !Closed && _snapshot.IsBusy && _login.IsOwnedBy(_owner));
@@ -53,6 +54,7 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     public DocumentPresentationState Presentation => _presentation;
     public event EventHandler? PresentationChanged;
     public IAsyncRelayCommand StartLoginCommand { get; }
+    public IAsyncRelayCommand StartNeteaseLoginCommand { get; }
     public IRelayCommand CancelLoginCommand { get; }
     public IAsyncRelayCommand RestoreCommand { get; }
     public IAsyncRelayCommand RetrySaveCommand { get; }
@@ -61,6 +63,8 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     public string AccountName => _snapshot.Account?.Nickname ?? "还未登录";
     public string AccountId => _snapshot.Account is { } account ? $"网易账号 · {account.Id}" : "使用手机扫码连接你的音乐账号";
     public string StatusMessage => _snapshot.Message;
+    public string QrInstruction => _snapshot.Method == LoginMethod.WeChat
+        ? "使用微信扫一扫，并确认授权登录网易云音乐。" : "使用网易云音乐 App 扫码，并在手机上确认登录。";
     public bool IsBusy => _snapshot.IsBusy;
     public bool NeedsSaveRetry => IsSignedIn && !_snapshot.Remembered;
     public bool NeedsCleanup => _snapshot.CleanupRequired;
@@ -68,6 +72,8 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     public byte[]? QrImageBytes { get => _qrImageBytes; private set => SetProperty(ref _qrImageBytes, value); }
     public byte[]? AvatarImageBytes { get => _avatarImageBytes; private set => SetProperty(ref _avatarImageBytes, value); }
     private bool Closed => Volatile.Read(ref _closed) != 0;
+    private bool CanStart() => !Closed && !IsSignedIn && _snapshot.Stage is not
+        (LoginStage.CreatingQr or LoginStage.Restoring or LoginStage.Verifying or LoginStage.SigningOut);
 
     public ValueTask InitializeAsync(DocumentActivation activation, CancellationToken cancellationToken)
     {
@@ -89,25 +95,17 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     {
         if (Closed || snapshot.Revision <= _snapshot.Revision) return;
         _snapshot = snapshot;
-        if (_qrKey != snapshot.QrKey)
-        {
-            _qrKey = snapshot.QrKey;
-            try { QrImageBytes = _qrKey is null ? null : LoginQrCode.Render(_qrKey); }
-            catch (Exception)
-            {
-                QrImageBytes = null;
-                _login.Cancel(_owner);
-            }
-        }
+        QrImageBytes = snapshot.QrImage;
         if (_avatarAddress != snapshot.Account?.AvatarUrl)
         {
             _avatarAddress = snapshot.Account?.AvatarUrl;
             StartAvatar(_avatarAddress);
         }
         foreach (var property in new[] { nameof(IsSignedIn), nameof(AccountName), nameof(AccountId), nameof(StatusMessage),
-            nameof(IsBusy), nameof(NeedsSaveRetry), nameof(NeedsCleanup), nameof(SessionHint) })
+            nameof(IsBusy), nameof(NeedsSaveRetry), nameof(NeedsCleanup), nameof(SessionHint), nameof(QrInstruction) })
             OnPropertyChanged(property);
         StartLoginCommand.NotifyCanExecuteChanged();
+        StartNeteaseLoginCommand.NotifyCanExecuteChanged();
         CancelLoginCommand.NotifyCanExecuteChanged();
         RestoreCommand.NotifyCanExecuteChanged();
         RetrySaveCommand.NotifyCanExecuteChanged();

@@ -10,6 +10,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
     private readonly ILoginSessionStore _store;
     private readonly TimeProvider _time;
     private readonly LoginOptions _options;
+    private readonly IReadOnlyDictionary<LoginMethod, IQrLoginProvider> _providers;
     private readonly object _sync = new();
     private readonly CancellationTokenSource _shutdown = new();
     private Operation? _current;
@@ -29,11 +30,13 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
         public TaskCompletionSource Completion { get; } = new(TaskCreationOptions.RunContinuationsAsynchronously);
     }
 
-    public LoginCoordinator(INeteaseAuthApi api, ILoginSessionStore store, TimeProvider time, LoginOptions options)
+    public LoginCoordinator(INeteaseAuthApi api, ILoginSessionStore store, TimeProvider time, LoginOptions options,
+        IEnumerable<IQrLoginProvider> providers)
     {
         if (options.PollInterval <= TimeSpan.Zero || options.AttemptBudget <= TimeSpan.Zero || options.NetworkRetries < 0)
             throw new ArgumentException("登录时间和重试策略无效。", nameof(options));
         (_api, _store, _time, _options) = (api, store, time, options);
+        _providers = providers.ToDictionary(provider => provider.Method);
     }
 
     public LoginSnapshot Snapshot { get { lock (_sync) return _snapshot; } }
@@ -59,7 +62,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
     }
 
     /// <summary>显式登录或换一个二维码；每个尝试从空账号 Cookie 开始，不复用旧二维码授权状态。</summary>
-    public Task StartAsync(Guid owner, CancellationToken ct)
+    public Task StartAsync(Guid owner, CancellationToken ct, LoginMethod method = LoginMethod.WeChat)
     {
         return Begin(owner, LoginStage.CreatingQr, "正在准备二维码…", async op =>
         {
@@ -71,9 +74,9 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
                 lock (_sync) context = _context;
             }
             context = context with { Cookies = context.Cookies.Clear() };
-            var key = await _api.CreateKeyAsync(context, op.Token).ConfigureAwait(false);
-            context = key.Context;
-            Update(op, LoginStage.WaitingForScan, "请使用网易云音乐 App 扫描二维码。", key: key.Key);
+            using var attempt = await _providers[method].CreateAsync(context, op.Token).ConfigureAwait(false);
+            var scanMessage = method == LoginMethod.WeChat ? "请使用微信扫描二维码，授权登录网易云音乐。" : "请使用网易云音乐 App 扫描二维码。";
+            Update(op, LoginStage.WaitingForScan, scanMessage, image: attempt.Image);
             var failures = 0;
             while (Active(op))
             {
@@ -81,12 +84,12 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
                 QrCheck check;
                 try
                 {
-                    check = await _api.CheckQrAsync(key.Key, context, op.Token).ConfigureAwait(false);
+                    check = await attempt.CheckAsync(op.Token).ConfigureAwait(false);
                     failures = 0;
                 }
                 catch (AuthException ex) when (Retryable(ex) && failures++ < _options.NetworkRetries)
                 {
-                    Update(op, LoginStage.WaitingForScan, "网络暂时不可用，正在有限重试…", key: key.Key);
+                    Update(op, LoginStage.WaitingForScan, "网络暂时不可用，正在有限重试…", image: attempt.Image);
                     var delay = ex.RetryAfter ?? TimeSpan.FromSeconds(Math.Pow(2, failures));
                     await Task.Delay(delay, _time, op.Token).ConfigureAwait(false);
                     continue;
@@ -97,11 +100,14 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
                     case QrStatus.Expired:
                         Update(op, LoginStage.Expired, "二维码已过期，请重新生成。");
                         return;
+                    case QrStatus.Denied:
+                        Update(op, LoginStage.Cancelled, "已在手机上取消授权，可重新获取二维码。");
+                        return;
                     case QrStatus.WaitingForScan:
-                        Update(op, LoginStage.WaitingForScan, "请使用网易云音乐 App 扫描二维码。", key: key.Key);
+                        Update(op, LoginStage.WaitingForScan, scanMessage, image: attempt.Image);
                         break;
                     case QrStatus.WaitingForConfirmation:
-                        Update(op, LoginStage.WaitingForConfirmation, "已扫码，请在手机上确认登录。", key: key.Key);
+                        Update(op, LoginStage.WaitingForConfirmation, "已扫码，请在手机上确认登录。", image: attempt.Image);
                         break;
                     case QrStatus.Authorized:
                         if (!context.HasAccount(_time.GetUtcNow()))
@@ -114,7 +120,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
                         throw new AuthException(AuthError.Protocol, "网易返回了未知的扫码状态。");
                 }
             }
-        }, ct, canBegin: () => _snapshot.Account is null);
+        }, ct, canBegin: () => _snapshot.Account is null, prepare: () => _snapshot = _snapshot with { Method = method });
     }
 
     public Task RetrySaveAsync(Guid owner, CancellationToken ct)
@@ -175,7 +181,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
             {
                 Revision = _snapshot.Revision + 1,
                 Stage = _snapshot.Account is null ? LoginStage.Cancelled : LoginStage.SignedIn,
-                Message = "当前操作已取消。", QrKey = null
+                Message = "当前操作已取消。", QrImage = null
             };
             snapshot = _snapshot;
         }
@@ -210,7 +216,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
             _tail = operation.Completion.Task;
             _snapshot = _snapshot with
             {
-                Revision = _snapshot.Revision + 1, Stage = stage, Message = message, QrKey = null,
+                Revision = _snapshot.Revision + 1, Stage = stage, Message = message, QrImage = null,
                 Account = clearAccount ? null : _snapshot.Account,
                 Remembered = clearAccount ? false : _snapshot.Remembered,
                 CleanupRequired = clearAccount || _snapshot.CleanupRequired
@@ -291,7 +297,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
             {
                 _context = account.Context;
                 _snapshot = new(_snapshot.Revision + 1, LoginStage.SignedIn, message,
-                    account.Account, Remembered: remembered);
+                    account.Account, Remembered: remembered, Method: _snapshot.Method);
                 snapshot = _snapshot;
             }
         }
@@ -316,7 +322,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
     private bool Active(Operation op) { lock (_sync) return ActiveLocked(op); }
     private bool ActiveLocked(Operation op) => !_stopping && op.Generation == _generation && !op.Token.IsCancellationRequested;
 
-    private void Update(Operation op, LoginStage stage, string message, string? key = null,
+    private void Update(Operation op, LoginStage stage, string message, byte[]? image = null,
         bool cleanup = false, bool allowCancelled = false, bool cleanupCompleted = false)
     {
         LoginSnapshot snapshot;
@@ -324,7 +330,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
         {
             if (_stopping || op.Generation != _generation || (!allowCancelled && op.Token.IsCancellationRequested)) return;
             _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Stage = stage,
-                Message = message, QrKey = key, CleanupRequired = cleanup || (!cleanupCompleted && stage != LoginStage.SignedOut && _snapshot.CleanupRequired) };
+                Message = message, QrImage = image, CleanupRequired = cleanup || (!cleanupCompleted && stage != LoginStage.SignedOut && _snapshot.CleanupRequired) };
             snapshot = _snapshot;
         }
         Notify(snapshot);

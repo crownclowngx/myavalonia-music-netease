@@ -22,6 +22,8 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<NeteaseFlurlClients>();
         services.TryAddSingleton<NeteaseTransport>();
         services.TryAddSingleton<INeteaseAuthApi, NeteaseAuthApi>();
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IQrLoginProvider, NeteaseAppQrLoginProvider>());
+        services.TryAddEnumerable(ServiceDescriptor.Singleton<IQrLoginProvider, WeChatQrLoginProvider>());
         services.TryAddSingleton<IAccountImageSource, AccountImageSource>();
         services.TryAddSingleton<ISessionProtector, CurrentUserSessionProtector>();
         services.TryAddSingleton<ILoginSessionStore>(provider =>

@@ -1,6 +1,6 @@
 # 网易登录 HTTP 与会话契约
 
-> 状态：P0–P3 当前实现；核对日期：2026-09-22。自动验证与人工验证分别见[专用回归矩阵](../maintenance/netease-login-verification.md)及[阶段记录](../archive/records/netease-v1/login-implementation-20260922.md)。
+> 状态：P0–P3 加微信默认登录；核对日期：2026-09-22。自动验证见[专用回归矩阵](../maintenance/netease-login-verification.md)，真实微信闭环见[微信专项记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)。
 
 ## 1. 接入范围与来源
 
@@ -10,10 +10,11 @@
 
 | C# 入口 | 上游模块 | 原生行为 | 验证边界 |
 | --- | --- | --- | --- |
+| WeChatQrLoginProvider | 独立补充，非上游模块 | 网易 SNS 入口 → 微信 QR 长轮询 → 网易 `/back/weichat` | 真实微信确认、网易回调和账号核验成功 |
 | NeteaseAuthApi.CreateKeyAsync | login_qr_key | eapi POST `/api/login/qrcode/unikey`，type=3 | 离线契约与无历史 Cookie 联网成功 |
 | LoginQrCode.Render | login_qr_create | 本地 pc 登录链接，QRCoder 生成 PNG | 编码、图片、实际 Avalonia 渲染；无额外 HTTP |
 | NeteaseAuthApi.CheckQrAsync | login_qr_check | eapi POST `/api/login/qrcode/client/login` | 800–803 离线测试；联网观测 801 |
-| NeteaseAuthApi.CheckAccountAsync | login_status | weapi POST `/api/w/nuser/account/get` | 账号/profile 一致性离线测试；联网未登录结果 |
+| NeteaseAuthApi.CheckAccountAsync | login_status | weapi POST `/api/w/nuser/account/get` | 一致性离线测试、联网未登录和真实微信授权账号核验 |
 | ProtectedLoginSessionStore | 本地能力 | DPAPI 保存、加载、清除 | 隔离文件测试与本机 CurrentUser 保护测试 |
 | NeteaseAuthApi.LogoutAsync | logout | eapi POST `/api/logout` | 离线流程；真实账号远端退出待验证 |
 
@@ -24,9 +25,10 @@ eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全
 
 - `MainDocument` 负责页面状态投影和命令；依赖登录服务、UI 调度、头像端口与公开 `IDocumentLifetime`。不操作 Flurl、Cookie 或文件。
 - `LoginCoordinator` 负责单账号状态、轮询、操作代次、保存和退出顺序；网络、存储和时间分别注入。
+- `IQrLoginProvider` 只负责创建扫码尝试；`IQrLoginAttempt` 拥有二维码图片、私有状态与释放责任。微信与网易 App 各实现一次创建/检查，共享后续账号核验与保存；View 不接触 UUID、codekey、code 或 state。
 - `NeteaseAuthApi` 解释四个端点；`NeteaseTransport` 执行 HTTP、限制响应大小并转换安全异常；`NeteaseRequestEncoder`/`NeteaseCrypto` 负责协议。
 - `ProtectedLoginSessionStore` 只处理文件；`ISessionProtector` 只处理当前用户保护。平台保护失败不能降级为明文。
-- `AddMusicNetEasePluginServices` 是唯一组合入口。服务容器复用三个命名 Client：web、eapi、images；`NeteaseFlurlClients.Dispose` 清空私有缓存并释放 Client。没有静态 CookieJar 或全局 Flurl 修改。
+- `AddMusicNetEasePluginServices` 是唯一组合入口。服务容器复用六个命名 Client：web、eapi、images、social、wechat、wechat-poll；`NeteaseFlurlClients.Dispose` 清空私有缓存并释放 Client。没有静态 CookieJar 或全局 Flurl 修改。
 - `MainView` 拥有解码后的二维码/头像 Bitmap，替换、解绑、视觉树拆卸时释放。暂时离开视觉树不代表 Document 关闭。
 - Host 生命周期先异步停止登录，再由容器释放依赖；同时支持 SDK 当前使用的同步 Dispose。Standalone 使用相同服务与 View，仅提供关闭令牌及独立目录。
 
@@ -34,7 +36,7 @@ eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全
 
 ## 3. HTTP、编码与失败
 
-请求始终使用 Flurl 表单编码，eapi 的 params 和 weapi 的 params/encSecKey 只编码一次。
+eapi/weapi POST 使用 Flurl 表单编码，params 和 encSecKey 只编码一次；微信授权链使用 Flurl GET 与查询参数编码。
 JSON 属性顺序、中文、emoji、布尔/空值和长整数与固定上游向量对照；emoji 还原不会修改字面的反斜杠转义。
 weapi 使用两层 AES-CBC 与协议规定的原始 RSA 运算，不能替换成默认 RSA OAEP；eapi 使用协议规定的摘要拼接和 AES-ECB。
 
@@ -90,3 +92,32 @@ Standalone 可用 `--data-dir` 指定独立开发目录；不要与正在运行�
 
 执行[本地开发门禁](../maintenance/netease-login-verification.md)。协议向量由 [generate-protocol-vectors.cjs](../../tools/generate-protocol-vectors.cjs)调用固定提交的原始 crypto 模块产生，并校验源码 SHA-256；Node 仅用于开发时重建向量。
 升级先比较四个登录模块、request、crypto、config 和必要初始化逻辑，再更新向量、契约及记录，不能直接用最新版覆盖所有 C# 行为。
+
+## 7. 微信网站登录协议
+
+此流程以网易现有公开登录页面为入口，不是网易向第三方承诺稳定的开放平台 API，也不在上游 440 个模块中。
+应用不申请另一套 AppID、不持有 AppSecret，授权码由网易回调兑换。官方页面或风控规则变化时可能需要适配。
+
+1. GET `https://music.163.com/api/sns/authorize?snsType=10&clientType=web2&callbackType=Login&forcelogin=true`，读取网易发出的微信重定向。
+2. 仅接受 `https://open.weixin.qq.com/connect/qrconnect`、`snsapi_login` 与网易 `/back/weichat` 回调；保留本次 state。
+3. 读取微信页面 `/connect/qrcode/{uuid}` 图片。只解析有限 HTML 字段，轮询响应只解析简单赋值，不执行 JavaScript。
+4. 按页面标记选择 `lp.open.weixin.qq.com` 或 `long.open.weixin.qq.com` 的 `/connect/l/qrconnect`。已扫描后附 `last=404`。
+5. 405 带 code 才进入网易 `/back/weichat?code=…&state=…`，限制最多 5 次同源 HTTPS 请求；获得 MUSIC_U 后再复用账号核验与安全保存。
+
+| 微信状态 | 本地行为 |
+| --- | --- |
+| 408 | 未扫码时等待扫码；已扫码时继续等待手机确认 |
+| 404 | 已扫码，等待确认 |
+| 403 | 手机取消，终止并清除二维码 |
+| 402 | 二维码过期，终止等待 |
+| 405 + code | 完成网易回调；不直接宣告已登录 |
+| 其他状态/畸形正文 | 受控失败，提示重试或使用网易云 App |
+
+微信长轮询及正文读取预算为 35 秒，普通请求 15 秒；整个尝试仍限 3 分钟。
+授权页/回调响应上限 1 MiB，二维码 2 MiB，轮询 16 KiB；图片检查 PNG/JPEG 文件头。
+每次尝试持有单独 CookieJar，按域名和路径发送，既有网易会话不会进入新授权链。
+只有网易响应的白名单 Cookie 转为候选账号；微信临时 Cookie、UUID、state、code 不落盘、不写日志。
+回调是一次性兑换，失败后终止，禁止被普通轮询重试重放。无 MUSIC_U 时明确提示绑定或额外验证，不一直等待。
+取消、切换方式、关闭页面或超时使旧代次失效；旧回调即使迟到也不能提交账号。
+
+协议依据：[网易 SNS 登录入口](https://music.163.com/api/sns/authorize?snsType=10&clientType=web2&callbackType=Login&forcelogin=true)与该入口当次返回的微信网站授权页（2026-09-22 观察）。不把易变页面协议宣称为官方 SDK 契约。

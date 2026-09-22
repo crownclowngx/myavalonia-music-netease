@@ -9,7 +9,7 @@ public enum LoginStage
 /// <summary>只读界面投影。Revision 让 UI 丢弃跨线程迟到通知；二维码凭据只在当前等待期间存在。</summary>
 public sealed record LoginSnapshot(
     long Revision, LoginStage Stage, string Message, NeteaseAccount? Account = null,
-    string? QrKey = null, bool Remembered = false, bool CleanupRequired = false)
+    byte[]? QrImage = null, bool Remembered = false, bool CleanupRequired = false, LoginMethod Method = LoginMethod.WeChat)
 {
     public bool IsBusy => Stage is LoginStage.Restoring or LoginStage.CreatingQr or LoginStage.WaitingForScan
         or LoginStage.WaitingForConfirmation or LoginStage.Verifying or LoginStage.SigningOut;

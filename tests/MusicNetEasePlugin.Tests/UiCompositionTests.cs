@@ -46,7 +46,7 @@ public sealed class UiCompositionTests
         {
             var time = new FakeTimeProvider();
             var api = new FakeAuthApi { Account = (ctx, _) => Task.FromResult(new AccountCheck(new(123, "测试账号", "https://p1.music.126.net/avatar"), ctx)) };
-            await using var login = new LoginCoordinator(api, new MemorySessionStore(), time, LoginOptions.Default);
+            await using var login = TestLogin.Create(api, new MemorySessionStore(), time, LoginOptions.Default);
             using var lifetime = new Lifetime();
             using var document = new MainDocument(login, new Infrastructure.Ui.LoginUiDispatcher(), new Images(), lifetime);
             var view = new MainView { DataContext = document };
