@@ -2,7 +2,7 @@
 
 > 用途：开发部署与正式发布的可复用操作参考。当前目标为 Windows x64；本文不表示已完成正式发布或 Host 验收。
 
-最近一次有完整记录的开发部署见[微信登录实现与部署记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)第 5 节，包含指定目录、文件摘要与中间文件清理结果。[此前 App 版部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
+最近一次开发部署见[M1 公共 LibVLC 配置与部署记录](../archive/records/netease-v2/shared-libvlc-deployment-20260923.md)，包含指定目录、文件摘要、Host 实际加载来源与清理剩余项。[此前微信部署](../archive/records/netease-v1/wechat-login-implementation-20260922.md)和[App 版部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
 
 部署分为开发期临时联调和正式 ZIP 发布。两者都必须使用 Build 包筛选出的干净插件目录，不能直接复制
 普通 `bin/Debug` 或 `bin/Release`，因为普通输出可能包含 Host 应当统一提供的共享程序集。
@@ -49,9 +49,12 @@ NuGet 包收集托管 DLL 和当前 `win-x64` RID 资产；漏写时 Standalone 
 
 ### 方式一：直接部署
 
-已知 Host 的 `Controls` 目录时，在解决方案根目录执行：
+已知 Host 的 `Controls` 目录时，在解决方案根目录先还原、编译，再部署。`DeployManagedPlugin` 不代替编译：
 
 ```powershell
+dotnet restore MusicNetEasePlugin.slnx --locked-mode
+dotnet build src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj -c Debug --no-restore -warnaserror
+# 确认上一步构建成功后执行部署。
 dotnet msbuild src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj `
   -t:DeployManagedPlugin `
   -p:Configuration=Debug `
@@ -73,7 +76,7 @@ dotnet msbuild src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj `
 
 ### 方式二：生成暂存目录后手工复制和改名
 
-需要先检查产物或用资源管理器复制时，先部署到一个独立暂存根：
+需要先检查产物或用资源管理器复制时，完成上述还原和编译后，再部署到一个独立暂存根。使用共享 LibVLC 的构建、暂存和实际部署必须保持相同的 `IncludeLibVlcRuntime=false` 与独立 `OutputPath`，完整步骤见[播放快速开始](../quick-start/netease-playback.md)：
 
 ```powershell
 dotnet msbuild src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj `

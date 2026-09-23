@@ -42,9 +42,9 @@
 
 完整入口见[归档索引](archive/README.md)。原 V1 登录计划已经归档，后续能力由当前路线图承接；尚未覆盖的验证项继续在维护矩阵跟踪。
 
-最近一次有完整仓库记录的开发部署是[微信登录实现与验证记录](archive/records/netease-v1/wechat-login-implementation-20260922.md)，其中同时记录微信授权、自动验证、部署与清理。早期 App 版记录保留在归档中。
+最近一次开发部署见[M1 公共 LibVLC 配置与部署记录](archive/records/netease-v2/shared-libvlc-deployment-20260923.md)：已部署到指定 Controls，配置 Common 路径并确认 Host 实际加载该库；标准清理完成，批量删除受自动审批限制的剩余文件单独列明。此前微信与 App 版记录保留在归档中。
 
-最新功能实施见[V2 / M1 实现与验证记录](archive/records/netease-v2/m1-implementation-20260923.md)，包括本地门禁、真实 MP3 解码、共享目录与两种开发暂存产物；本次没有替换正在运行的 Host 插件。
+最新功能实施见[V2 / M1 实现与验证记录](archive/records/netease-v2/m1-implementation-20260923.md)，包括本地门禁、真实 MP3 解码、共享目录与两种开发暂存产物；后续实际部署另见上述专用记录。
 
 ## 文档目录与维护约定
 
