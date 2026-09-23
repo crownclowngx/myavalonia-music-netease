@@ -1,0 +1,160 @@
+{
+  "completedUtc": "2026-09-23T20:18:20.4172866+08:00",
+  "target": "D:\\data\\avalonia\\Controls\\MusicNetEasePlugin",
+  "fileCount": 12,
+  "files": [
+    {
+      "name": "BouncyCastle.Cryptography.dll",
+      "bytes": 4924576,
+      "sha256": "E5EEAF6D263C493619982FD3638E6135077311D08C961E1FE128F9107D29EBC6"
+    },
+    {
+      "name": "Flurl.dll",
+      "bytes": 39936,
+      "sha256": "7FF7965161F6ACC809F7154CD3BA1F56E0290974D4FCFC5944BD4C9030996383"
+    },
+    {
+      "name": "Flurl.Http.dll",
+      "bytes": 113152,
+      "sha256": "CB204C6865563BC7F023F4655977CF5263536A75069B0E7E1D72A900A66F1EB5"
+    },
+    {
+      "name": "LibVLCSharp.dll",
+      "bytes": 229888,
+      "sha256": "EA886CA99677A28C2B15D11F8DDD52EF5F22D7E17600F1A31C0F6DD91DC9E4FE"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.deps.json",
+      "bytes": 16843,
+      "sha256": "3F828A0007BB1C6D18AE668B2918DFAC988888E1D2566E70BE03FABC65257D00"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.dll",
+      "bytes": 841728,
+      "sha256": "FC5CB37573653602B9AB4AC9A4B3EB5DE26A14F2F73B67E935AA93936E28805F"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.pdb",
+      "bytes": 200892,
+      "sha256": "FD786F74B10AEB200AF98ED24658D13BC0D97338C2276D53F8245513CC35FA94"
+    },
+    {
+      "name": "MyAvaloniaManagement.Icons.dll",
+      "bytes": 8192,
+      "sha256": "52AB55FB828C3F6CF404814BC22F1B7A3B8045B762C56A9E6610799C6BE922E9"
+    },
+    {
+      "name": "plugin.manifest.json",
+      "bytes": 298,
+      "sha256": "97B99D057395F9200CB4555A2C73744A67EBFC405130BCDD7CCCAD436B37D0FD"
+    },
+    {
+      "name": "QRCoder.dll",
+      "bytes": 204288,
+      "sha256": "5CACB8E071EF6B355615E8CAE1D02D94B9D191EC33DB12A05D82099CDDB16E9A"
+    },
+    {
+      "name": "System.Security.Cryptography.ProtectedData.dll",
+      "bytes": 40208,
+      "sha256": "7CCC461B061D8E45ACF41219809C8773028274037906180C77495571A305734B"
+    },
+    {
+      "name": "THIRD-PARTY-NOTICES.md",
+      "bytes": 2333,
+      "sha256": "2CAB65847EC2386946992054968F7B841F1E33DBCFB6E9D93CAA6C01513679E0"
+    }
+  ],
+  "stagingMatchesTarget": true,
+  "includeLibVlcRuntime": false,
+  "nativeFilesPresent": false,
+  "managedLibVlcSharpRetained": true,
+  "backupCreated": false,
+  "pluginIdentityCount": 1,
+  "hostExeSha256": "B8F8653192E6B8CF979F1FC4C5F6285F99B9190B7F9E487210DF31B001774879",
+  "boundaryRootCount": 14,
+  "revision": "f46672a1093afe67cd2aa46934e7c6f389d03429",
+  "sourceSha256": "515199B9CBE13DF57F7FB20C6101BDDCB0787DFA839176C5431B81616A82AE19",
+  "configuration": "Debug",
+  "gateRunId": "20260923-121550-d3e724d6",
+  "testsPassed": 326,
+  "gateSelfChecksPassed": 310,
+  "boundaries": [
+    {
+      "directory": "D:\\data\\avalonia\\Common",
+      "files": 425,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\BaiduDiskPlugin",
+      "files": 7,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\BiliDownloader",
+      "files": 15,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\ClassicGamePlugin",
+      "files": 4,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\DaTang",
+      "files": 10,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\FractalArtPlugin",
+      "files": 4,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\ImageLabPlugin",
+      "files": 5,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\LayerUnpackPlugin",
+      "files": 11,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\MyPlugTest",
+      "files": 12,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\NovelGeneratePlugin",
+      "files": 11,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\VideoSecurityPlayer",
+      "files": 432,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\WorkflowStudio",
+      "files": 4,
+      "unchanged": true
+    },
+    {
+      "directory": "D:\\data\\avalonia\\Controls\\XianCaiWorkerPlugin",
+      "files": 10,
+      "unchanged": true
+    },
+    {
+      "directory": "C:\\Users\\crown\\AppData\\Local\\MyAvaloniaManagement\\Plugins\\myavalonia.plugin.music.netease",
+      "files": 4,
+      "unchanged": true
+    }
+  ],
+  "windowsCiExecuted": false,
+  "releaseGateExecuted": false,
+  "postCleanupFilesVerified": true,
+  "postCleanupExternalBoundaryCount": 13,
+  "postCleanupExternalBoundariesVerified": true,
+  "postCleanupVerifiedUtc": "2026-09-23T12:22:28.1047714+00:00",
+  "userDataVerificationScope": "用户数据在部署和隔离启动后已整体核对未变；清理后的第二次检查遇到使用中的 media-buffer/.owner，不再重复扫描活动用户数据。"
+}

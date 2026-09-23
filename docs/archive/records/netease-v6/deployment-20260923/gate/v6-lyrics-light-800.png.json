@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v6-lyrics-light-800.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "6A798BED9CD91CE9AE8838B72CA13B3BDBA4E6B974EB221C7408694289C0D69E",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-121550-d3e724d6",
+    "revision": "f46672a1093afe67cd2aa46934e7c6f389d03429",
+    "sourceSha256": "515199B9CBE13DF57F7FB20C6101BDDCB0787DFA839176C5431B81616A82AE19"
+  }
+}

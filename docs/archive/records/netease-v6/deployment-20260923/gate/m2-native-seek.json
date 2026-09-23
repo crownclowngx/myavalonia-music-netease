@@ -1,0 +1,18 @@
+{
+  "schemaVersion": 1,
+  "ActiveVersion": "3.0.23 Vetinari",
+  "sampleSha256": "D6E4B6233DFE20725598CA071C5234CC9C6AD16910439FCDD939AF4C3792BF8A",
+  "startPositionMs": 4000,
+  "firstOutputMatchesStart": true,
+  "PositionMs": 1000,
+  "forwardPositionMs": 4500,
+  "pausedAfterSeek": true,
+  "fileReleased": true,
+  "actualDeviceOutput": false,
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-121550-d3e724d6",
+    "revision": "f46672a1093afe67cd2aa46934e7c6f389d03429",
+    "sourceSha256": "515199B9CBE13DF57F7FB20C6101BDDCB0787DFA839176C5431B81616A82AE19"
+  }
+}

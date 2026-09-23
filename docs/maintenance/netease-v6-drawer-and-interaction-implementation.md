@@ -1,7 +1,7 @@
 # V6 · 歌词抽屉与交互专用实施记录
 
 > 2026-09-23：V6-01～18 已实现，本地开发验证通过。范围依据用户批准的 [专用修改方案](../roadmap/netease-v6-drawer-and-interaction-change-plan.md)；场景依据 [验证矩阵](netease-v6-drawer-and-interaction-verification-plan.md)。
-> 未使用 AIFLOW、Windows CI 或发布门禁；未推送、部署或发布。真实 Host、物理输入设备和声卡验收单独保留，不由自动结果替代。
+> 实施阶段未使用 AIFLOW、Windows CI 或发布门禁，未推送、部署或发布；后续按用户要求完成 [V6 指定 Controls 部署与启动复测](../archive/records/netease-v6/deployment-20260923.md)。物理输入设备、Dock 和声卡完整验收单独保留，不由启动与自动结果替代。
 
 ## 1. 全量范围与落地
 
@@ -86,7 +86,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V6
 
 ## 5. 实机验收及历史问题
 
-V6 的实现与本地自动验证完成；实际 Host 的 Dock 拖离/重挂、跨显示器 DPI、物理中文输入法、读屏顺序、真实声卡和用户体验验收本轮未执行。没有启动 Host、部署插件或输出系统音频。既有 V1–V4 用户验收不自动覆盖 V6。
+V6 的实现与本地自动验证完成；实际 Host 的 Dock 拖离/重挂、跨显示器 DPI、物理中文输入法、读屏顺序、真实声卡和用户体验验收在实施阶段未执行。实施阶段没有启动 Host、部署插件或输出系统音频；后续部署及有限启动验证见[独立记录](../archive/records/netease-v6/deployment-20260923.md)，不修改本节原始自动报告。既有 V1–V4 用户验收不自动覆盖 V6。
 
 V5 的 C01～C08 由 V6 恢复提示、精确反馈、忙碌态、紧凑布局、歌单头、空态延迟、焦点与完整资料承接。原 [V5 复核](netease-v5-completion-audit-20260923.md)是历史证据，不重写当时结论。D01 的暂停可见 CPU 差值超目标与 D02～D05 实机待验仍保留；本轮有界缓存、隐藏寿命、静态资源及 Headless 采样通过，不等于已证明实机性能目标达标。
 

@@ -59,7 +59,8 @@ V1–V4 方案统一移入 [archive/plans](archive/README.md)，设计细节保�
 - [验收收口与文档整理记录](archive/records/netease-v1-v4-acceptance-20260923.md)：本次用户确认、文档归位与漂移修正。
 - [V4 分阶段实施记录](archive/records/netease-v4/m2-implementation-20260923.md)：功能、自动门禁、截图和当时的验证边界。
 - [V4 历史开发部署与清理记录](archive/records/netease-v4/redeployment-20260923-1609.md)：无原生 libVLC 的 12 文件部署与备份；标准清理约 1.91 GiB，另列受自动审批限制的剩余项。
-- [V5 修复版最新部署与清理](archive/records/netease-v5/redeployment-20260923.md)：12 文件无原生库部署、实际启动复测及受限清理结果。
+- [V6 最新部署与清理](archive/records/netease-v6/deployment-20260923.md)：完整本地门禁重跑、12 文件无原生库部署、实际 Host 启动与标准清理；未新增备份，剩余项受自动审批限制。
+- [V5 修复版历史部署与清理](archive/records/netease-v5/redeployment-20260923.md)：12 文件无原生库部署、实际启动复测及当次受限清理结果。
 - [完整归档索引](archive/README.md)：V1 登录、V2 播放、V3 界面与 V4 日常播放器的方案及记录。
 
 旧记录中的“未验收”“未启动 Host”等描述仅代表当次操作，不覆盖后续用户验收结论；原始测试报告和部署摘要保持原样。

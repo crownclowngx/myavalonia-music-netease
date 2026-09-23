@@ -1,0 +1,18 @@
+{
+  "startedUtc": "2026-09-23T12:18:57.1920637+00:00",
+  "completedUtc": "2026-09-23T12:18:59.7710316+00:00",
+  "executable": "D:\\data\\avalonia\\MyAvaloniaManagement.exe",
+  "hostExeSha256": "B8F8653192E6B8CF979F1FC4C5F6285F99B9190B7F9E487210DF31B001774879",
+  "exitCode": 0,
+  "stdout": "Startup firstFrameMs=884 readyMs=2254\r\n",
+  "stderr": null,
+  "diagnosticFileCount": 1,
+  "diagnosticCount": 0,
+  "diagnostics": [],
+  "isolatedHostData": true,
+  "automaticClose": true,
+  "fullUiAcceptance": false,
+  "audibleOutputVerified": false,
+  "windowsCiExecuted": false,
+  "releaseGateExecuted": false
+}

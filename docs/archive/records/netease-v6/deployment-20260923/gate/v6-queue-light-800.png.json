@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v6-queue-light-800.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "77A888BE56D72F0CC381D5D2C12AC712C461C913785868838BBF1B965A20FD11",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-121550-d3e724d6",
+    "revision": "f46672a1093afe67cd2aa46934e7c6f389d03429",
+    "sourceSha256": "515199B9CBE13DF57F7FB20C6101BDDCB0787DFA839176C5431B81616A82AE19"
+  }
+}

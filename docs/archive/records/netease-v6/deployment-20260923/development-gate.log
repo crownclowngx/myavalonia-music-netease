@@ -1,0 +1,21 @@
+文档检查通过：3 个文件；0 个邻仓参考单列，不要求邻仓存在。
+门禁自测通过：310 项判定。
+  正在确定要还原的项目…
+  所有项目均是最新的，无法还原。
+  MusicNetEasePlugin.Plugin -> D:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\src\MusicNetEasePlugin.Plugin\bin\Debug\net10.0\MusicNetEasePlugin.Plugin.dll
+  MusicNetEasePlugin.LoginProbe -> D:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\tools\MusicNetEasePlugin.LoginProbe\bin\Debug\net10.0\MusicNetEasePlugin.LoginProbe.dll
+  MusicNetEasePlugin.Standalone -> D:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\src\MusicNetEasePlugin.Standalone\bin\Debug\net10.0\MusicNetEasePlugin.Standalone.dll
+  MusicNetEasePlugin.Tests -> D:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\tests\MusicNetEasePlugin.Tests\bin\Debug\net10.0\MusicNetEasePlugin.Tests.dll
+
+已成功生成。
+    0 个警告
+    0 个错误
+
+已用时间 00:00:07.50
+D:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\tests\MusicNetEasePlugin.Tests\bin\Debug\net10.0\MusicNetEasePlugin.Tests.dll (.NETCoreApp,Version=v10.0)的测试运行
+总共 1 个测试文件与指定模式相匹配。
+结果文件: D:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\TestResults\NetEaseV6\20260923-121550-d3e724d6\netease-login-development.trx
+
+已通过! - 失败:     0，通过:   326，已跳过:     0，总计:   326，持续时间: 25 s - MusicNetEasePlugin.Tests.dll (net10.0)
+文档检查通过：49 个文件；16 个邻仓参考单列，不要求邻仓存在。
+本地开发门禁通过：326 项测试；证据目录 D:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\TestResults\NetEaseV6\20260923-121550-d3e724d6

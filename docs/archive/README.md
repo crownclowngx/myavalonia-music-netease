@@ -1,6 +1,6 @@
 # 已完成方案与历史记录
 
-V6 全量实现及本地开发证据见 [V6 专用实施记录](../maintenance/netease-v6-drawer-and-interaction-implementation.md)和[本轮原始验证报告](records/netease-v6/gate-20260923/verification.json)：326 项测试通过，保留 TRX、14 张 V6 截图及来源摘要；真实 Host/输入设备/声卡验收尚未执行，未部署或发布。
+V6 全量实现及本地开发证据见 [V6 专用实施记录](../maintenance/netease-v6-drawer-and-interaction-implementation.md)和[实施阶段原始验证报告](records/netease-v6/gate-20260923/verification.json)。后续 [V6 部署与清理记录](records/netease-v6/deployment-20260923.md)承接指定 Controls 部署：重新通过 326 项测试及 310 项门禁自测，保留新的 TRX、截图与摘要；实际 Host 启动通过。Dock、输入设备与声卡完整验收仍单列，未执行正式 ZIP 发布。
 
 > 更新日期：2026-09-23。V1–V4 已实现并由用户确认手工验收完成，详见[验收收口记录](records/netease-v1-v4-acceptance-20260923.md)。
 > 当前入口：[文档总导航](../README.md) · [能力路线图](../roadmap/netease-capability-roadmap.md) · [日常播放器契约](../reference/netease-daily-player.md)。

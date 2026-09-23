@@ -2,7 +2,9 @@
 
 > 用途：开发部署与正式发布的可复用操作参考。当前目标为 Windows x64；现有 V1–V4 手工验收已由用户确认完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)；本文不表示已完成正式发布。
 
-最近一次开发部署见[V5 修复版重新编译与清理记录](../archive/records/netease-v5/redeployment-20260923.md)：使用 `IncludeLibVlcRuntime=false` 重编译部署 12 个文件，实际 Host 启动 ready、退出码 0、诊断 0 条。标准清理 83.32 MiB；旧副本及剩余中间目录的删除仍被自动审批拒绝，剩余约 179.35 MiB 已列明。启动故障根因与修复见[专项记录](../archive/records/netease-v5/startup-fix-20260923.md)，V5 整体状态仍以[完成度复核](netease-v5-completion-audit-20260923.md)为准。
+最近一次开发部署见[V6 部署与清理记录](../archive/records/netease-v6/deployment-20260923.md)：重新通过 326 项测试与 310 项门禁自测，使用 `IncludeLibVlcRuntime=false` 独立构建并部署 12 个文件；实际 Host 启动 ready、退出码 0、诊断 0 条。未新增备份，标准清理约 1.92 GiB；递归删除被自动审批拒绝，剩余约 224.48 MiB 已逐目录列明。清理后部署文件、Common 与其他插件摘要再次核对一致。
+
+[V5 修复版部署](../archive/records/netease-v5/redeployment-20260923.md)保留为历史。启动故障根因与修复见[专项记录](../archive/records/netease-v5/startup-fix-20260923.md)，V5 整体状态仍以[完成度复核](netease-v5-completion-audit-20260923.md)为准。
 
 此前[V4 Common LibVLC 部署与清理记录](../archive/records/netease-v4/common-deployment-20260923.md)保留旧部署及中间产物清理结果，该次后续手工验收已由用户确认完成。[V3 部署](../archive/records/netease-v3/common-deployment-20260923.md)、[M1 公共库配置记录](../archive/records/netease-v2/shared-libvlc-deployment-20260923.md)、[微信部署](../archive/records/netease-v1/wechat-login-implementation-20260922.md)和[App 部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
 

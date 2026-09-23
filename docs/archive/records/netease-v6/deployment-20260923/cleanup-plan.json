@@ -1,0 +1,112 @@
+[
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Plugin\\bin",
+    "filesBefore": 842,
+    "bytesBefore": 191842309
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Plugin\\obj",
+    "filesBefore": 24,
+    "bytesBefore": 1900770
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Standalone\\bin",
+    "filesBefore": 935,
+    "bytesBefore": 789916914
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Standalone\\obj",
+    "filesBefore": 24,
+    "bytesBefore": 630787
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\bin",
+    "filesBefore": 1008,
+    "bytesBefore": 777514405
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\obj",
+    "filesBefore": 23,
+    "bytesBefore": 1719497
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tools\\MusicNetEasePlugin.LoginProbe\\bin",
+    "filesBefore": 881,
+    "bytesBefore": 207896538
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tools\\MusicNetEasePlugin.LoginProbe\\obj",
+    "filesBefore": 22,
+    "bytesBefore": 593901
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\TestResults",
+    "filesBefore": 1140,
+    "bytesBefore": 37606337
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\development-deployment-20260923-160902",
+    "filesBefore": 34,
+    "bytesBefore": 12866663
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\m1-common-deployment-20260923",
+    "filesBefore": 13,
+    "bytesBefore": 5971808
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\m1-development-20260923",
+    "filesBefore": 450,
+    "bytesBefore": 117717519
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\ui-review",
+    "filesBefore": 1,
+    "bytesBefore": 34684
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v3-common-deployment-20260923-104516",
+    "filesBefore": 31,
+    "bytesBefore": 12108890
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v4-common-deployment-20260923-140214",
+    "filesBefore": 32,
+    "bytesBefore": 12516374
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-baseline-20260923",
+    "filesBefore": 3,
+    "bytesBefore": 7970
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-deployment-20260923",
+    "filesBefore": 32,
+    "bytesBefore": 13007329
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-observation-20260923",
+    "filesBefore": 2,
+    "bytesBefore": 7181
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-redeploy-20260923",
+    "filesBefore": 26,
+    "bytesBefore": 6551571
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-startup-fix-20260923",
+    "filesBefore": 33,
+    "bytesBefore": 6557773
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-work",
+    "filesBefore": 74,
+    "bytesBefore": 2383462
+  },
+  {
+    "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v6-deployment-20260923",
+    "filesBefore": 444,
+    "bytesBefore": 92897960
+  }
+]
