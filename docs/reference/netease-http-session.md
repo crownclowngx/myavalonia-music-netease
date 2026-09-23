@@ -21,6 +21,8 @@
 eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全新进程证明网易云 App 路径获取 QR 和 801 不需要匿名 Cookie 或 xeapi 初始化；该路径的真实 803 授权仍缺单独验证记录。微信路径已完成真实授权、回调与账号核验。
 未实现短信/密码登录、扫码 Cookie 刷新和多账号。V2 已新增 xeapi、搜索、详情和单曲播放，端点、媒体与引擎契约见[音乐与播放当前契约](netease-music-playback.md)。
 
+V4.1 已新增当前账号歌单、n=0 详情与分批曲目读取；账号 ID 在提交者锁内随 epoch 捕获，新增端点复用受控提交和响应预算。协议及浏览约定见[日常播放器当前实现](netease-daily-player.md)。
+
 ## 2. 职责与资源所有权
 
 - `MainDocument` 负责页面状态投影和命令；依赖登录服务、UI 调度、头像端口与公开 `IDocumentLifetime`。不操作 Flurl、Cookie 或文件。

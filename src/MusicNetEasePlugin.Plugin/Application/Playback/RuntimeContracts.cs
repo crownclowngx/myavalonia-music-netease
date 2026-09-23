@@ -41,7 +41,7 @@ public interface IPlaybackRuntimeStatus
     Task<RuntimeSelection> PreviewAsync(CancellationToken ct);
 }
 
-public enum MusicError { Network, Timeout, Protocol, SignedOut, Restricted, Runtime, Decode, Storage, Device, AddressExpired }
+public enum MusicError { Network, Timeout, Protocol, SignedOut, Restricted, Runtime, Decode, Storage, Device, AddressExpired, RateLimited, Unavailable }
 /// <summary>面向用例的稳定失败；禁止附带含 Cookie/签名地址的底层异常。</summary>
 public sealed class MusicException(MusicError kind, string message, TimeSpan? retryAfter = null) : Exception(message)
 {

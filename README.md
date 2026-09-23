@@ -8,7 +8,7 @@ Avalonia 网易云音乐插件，使用 C# + Flurl 直连。当前提供微信�
 
 - [文档总导航](docs/README.md)
 - [能力路线图](docs/roadmap/netease-capability-roadmap.md)：搜索播放 → 歌单、队列与歌词 → 音乐库管理 → 推荐发现
-- [V4：M2 日常播放器实施指导](docs/roadmap/netease-v4-m2-daily-player-plan.md)与[专用验证矩阵](docs/maintenance/netease-v4-m2-daily-player-verification.md)：待实施；歌单、共享队列、四模式、定位、歌词及按账号恢复，按 SOLID 分阶段推进
+- [V4：M2 日常播放器实施指导](docs/roadmap/netease-v4-m2-daily-player-plan.md)与[专用验证矩阵](docs/maintenance/netease-v4-m2-daily-player-verification.md)：V4.0/V4.1 已完成，后续实施中；歌单、共享队列、四模式、定位、歌词及按账号恢复，按 SOLID 分阶段推进
 - [V3：Document / Tool 紧凑桌面界面改造](docs/roadmap/netease-v3-desktop-ui-and-theme-plan.md)：实现完成，深浅主题、紧凑布局与轻量动效已纳入本地开发验证
 - [V3 当前界面契约](docs/reference/netease-desktop-ui.md)、[专项验证](docs/maintenance/netease-v3-ui-verification.md)与[实施记录](docs/archive/records/netease-v3/ui-implementation-20260923.md)：局部主题、减少动态效果、截图与剩余实机验收
 - [搜索播放快速开始](docs/quick-start/netease-playback.md)与[当前播放契约](docs/reference/netease-music-playback.md)：内置优先、可配置共享 LibVLC、单曲控制和边界

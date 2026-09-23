@@ -1,7 +1,7 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Music.MusicView" x:Name="MusicRoot"
  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:vm="using:MusicNetEasePlugin.Features.Music" xmlns:models="using:MusicNetEasePlugin.Application.Playback"
- xmlns:conv="using:Avalonia.Data.Converters" x:DataType="vm:MusicWorkspace"
+ xmlns:conv="using:Avalonia.Data.Converters" xmlns:library="using:MusicNetEasePlugin.Features.Library" x:DataType="vm:MusicWorkspace"
  Background="{DynamicResource NeteaseDocumentBackgroundBrush}" Foreground="{DynamicResource NeteaseTextBrush}" FontSize="13">
  <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
   <ResourceInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseThemeResources.axaml" />
@@ -13,7 +13,12 @@
   <Style Selector="vm|MusicView.narrow TextBlock.netease-artist-column"><Setter Property="IsVisible" Value="False" /></Style>
   <Style Selector="vm|MusicView.narrow TextBlock.netease-artist-inline"><Setter Property="IsVisible" Value="True" /></Style>
  </UserControl.Styles>
- <Grid RowDefinitions="Auto,Auto,Auto,*,Auto,Auto">
+ <Grid RowDefinitions="Auto,*,Auto">
+  <StackPanel Orientation="Horizontal" Spacing="6" Margin="12,4,12,0">
+   <Button Content="搜索" Classes="netease-button" Command="{Binding ShowSearchCommand}" />
+   <Button Content="我的歌单" Classes="netease-button" Command="{Binding ShowLibraryCommand}" />
+  </StackPanel>
+  <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,*,Auto" IsVisible="{Binding !IsLibrary}">
   <Grid ColumnDefinitions="*,Auto" Margin="12,10,12,6" ColumnSpacing="8">
    <TextBox x:Name="SearchInput" Classes="netease-input" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索歌名或歌手" KeyDown="SearchKeyDown" AutomationProperties.Name="搜索歌名或歌手" />
    <Button x:Name="SearchButton" Grid.Column="1" Classes="netease-button primary" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="搜索" Command="{Binding SearchCommand}" />
@@ -53,7 +58,9 @@
     <Button Classes="netease-button" Content="下一页" Command="{Binding NextCommand}" />
    </StackPanel>
   </Grid>
-  <Border x:Name="PlaybackBar" Grid.Row="5" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="0,1,0,0" Padding="12,8">
+  </Grid>
+  <Grid Grid.Row="1" IsVisible="{Binding IsLibrary}"><library:PlaylistView DataContext="{Binding Playlists}" /></Grid>
+  <Border x:Name="PlaybackBar" Grid.Row="2" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="0,1,0,0" Padding="12,8">
    <Grid x:Name="PlaybackLayout" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="6" ColumnSpacing="12">
     <Grid ColumnDefinitions="44,*" ColumnSpacing="8">
      <Border Width="44" Height="44" CornerRadius="3" ClipToBounds="True" Background="{DynamicResource NeteaseDocumentBackgroundBrush}">

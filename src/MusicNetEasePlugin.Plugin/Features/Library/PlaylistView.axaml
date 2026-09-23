@@ -1,0 +1,40 @@
+<UserControl x:Class="MusicNetEasePlugin.Features.Library.PlaylistView"
+ xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Library" xmlns:model="using:MusicNetEasePlugin.Application.Library"
+ x:DataType="vm:PlaylistBrowser">
+ <Grid RowDefinitions="Auto,Auto,*" Margin="12,4">
+  <WrapPanel Orientation="Horizontal">
+   <Button Content="刷新歌单" Command="{Binding RefreshCommand}" Margin="0,0,6,4" />
+   <Button Content="更多歌单" Command="{Binding MoreCommand}" Margin="0,0,6,4" />
+   <Button Content="打开所选歌单" Command="{Binding OpenCommand}" Margin="0,0,6,4" />
+  </WrapPanel>
+  <TextBlock Grid.Row="1" Text="{Binding Message}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Message}" AutomationProperties.LiveSetting="Polite" />
+  <TabControl Grid.Row="2" Margin="0,4,0,0" SelectedIndex="{Binding TabIndex, Mode=TwoWay}">
+   <TabItem Header="歌单">
+    <ListBox x:Name="PlaylistList" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}" AutomationProperties.Name="我的歌单" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+     <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+     <ListBox.ItemTemplate><DataTemplate x:DataType="model:MusicPlaylist">
+      <StackPanel Spacing="3"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Summary}" FontSize="12" /></StackPanel>
+     </DataTemplate></ListBox.ItemTemplate>
+    </ListBox>
+   </TabItem>
+   <TabItem Header="曲目">
+    <Grid RowDefinitions="Auto,*,Auto">
+     <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+     <ListBox x:Name="PlaylistTrackList" Grid.Row="1" ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" AutomationProperties.Name="歌单曲目" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+      <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+      <ListBox.ItemTemplate><DataTemplate x:DataType="vm:PlaylistTrackRow">
+       <StackPanel Spacing="3"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Detail}" FontSize="12" TextTrimming="CharacterEllipsis" /></StackPanel>
+      </DataTemplate></ListBox.ItemTemplate>
+     </ListBox>
+     <WrapPanel Grid.Row="2" Orientation="Horizontal">
+      <Button Content="上一页" Command="{Binding PreviousTracksCommand}" Margin="0,4,6,0" />
+      <TextBlock Text="{Binding PageText}" VerticalAlignment="Center" Margin="0,4,6,0" />
+      <Button Content="下一页" Command="{Binding NextTracksCommand}" Margin="0,4,6,0" />
+      <Button Content="重试资料" Command="{Binding RetryTracksCommand}" Margin="0,4,0,0" />
+     </WrapPanel>
+    </Grid>
+   </TabItem>
+  </TabControl>
+ </Grid>
+</UserControl>

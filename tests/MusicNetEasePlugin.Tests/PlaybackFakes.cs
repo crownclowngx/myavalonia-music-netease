@@ -11,8 +11,9 @@ internal sealed class MusicSessions : IMusicSessionAccessor, IDisposable
     private CancellationTokenSource _revoked = new();
     public long Epoch { get; private set; } = 1;
     public bool SignedIn { get; set; } = true;
+    public long AccountId { get; set; } = 123;
     public int Commits { get; private set; }
-    public MusicSession Capture() => SignedIn ? new(Epoch, 1, FakeAuthApi.Authorized(AuthContext.Create()), _revoked.Token)
+    public MusicSession Capture() => SignedIn ? new(Epoch, 1, FakeAuthApi.Authorized(AuthContext.Create()), _revoked.Token, AccountId)
         : throw new MusicException(MusicError.SignedOut, "请先登录。");
     public bool IsCurrent(MusicSession session) => SignedIn && session.Epoch == Epoch && !session.Revoked.IsCancellationRequested;
     public Task CommitAsync(MusicSession session, AuthContext context, CancellationToken ct)

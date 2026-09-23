@@ -3,10 +3,10 @@
 > 对象：`myavalonia-music-netease` / `myavalonia.plugin.music.netease`。
 > 更新日期：2026-09-23。登录基线：`c469f91`；V2 实施依据：`cb061f3`，当前事实见[本轮记录](../archive/records/netease-v2/m1-implementation-20260923.md)。
 > 起点：用户已确认登录没有问题，后续以登录可用为前提推进音乐能力。
-> 状态：M1 核心实现与自动/联网解码已完成，真实听感和 Host/Dock 验收待完成；M2 已进入 V4 方案准备，功能尚未实施，M3–M5 尚未实施。里程碑编号不代表插件版本或交付日期。
+> 状态：M1 核心实现与自动/联网解码已完成，真实听感和 Host/Dock 验收待完成；M2 已完成 V4.0/V4.1，后续功能实施中，M3–M5 尚未实施。里程碑编号不代表插件版本或交付日期。
 > M1 专项：[V2 搜索与单曲播放实施方案](netease-v2-m1-playback-plan.md)与[专用开发验证矩阵](../maintenance/netease-v2-m1-playback-verification.md)已编写，实施状态由专项方案跟踪。
 > 当前界面优化：[V3：Document / Tool 紧凑桌面界面改造](netease-v3-desktop-ui-and-theme-plan.md)已实现已有 M1 的现代紧凑布局、双色主题及轻量动效；真实 Host/缩放/性能验收由 V3 专项矩阵承接，不代表 M2 能力已经实现。
-> M2 专项：[V4：日常播放器实施指导](netease-v4-m2-daily-player-plan.md)与[专用开发验证矩阵](../maintenance/netease-v4-m2-daily-player-verification.md)已编写；明确 SOLID 分工、队列与生命周期迁移、V4.0–V4.6 实施顺序和本地门禁。本次仅完成文档准备。
+> M2 专项：[V4：日常播放器实施指导](netease-v4-m2-daily-player-plan.md)与[专用开发验证矩阵](../maintenance/netease-v4-m2-daily-player-verification.md)已编写；明确 SOLID 分工、队列与生命周期迁移、V4.0–V4.6 实施顺序和本地门禁。当前 V4.0/V4.1 完成，阶段证据见 V4 专用记录。
 
 **建议主线：登录可用 → 搜歌并播放一首 → 歌单连续播放与歌词 → 管理自己的音乐 → 推荐发现。**
 
@@ -222,7 +222,7 @@ M1 的实施过程和未完成实机验收继续由[V2 方案](netease-v2-m1-pla
 
 - [x] M0：用户确认登录可用，作为后续能力基线。
 - [ ] M1：歌曲搜索与单曲真实播放闭环。
-- [ ] M2：歌单、连续播放、队列、歌词与恢复；V4 方案与专用矩阵已编写，功能尚未实施。
+- [ ] M2：歌单、连续播放、队列、歌词与恢复；V4.0/V4.1 完成，其余功能与完整验收实施中。
 - [ ] M3：喜欢、收藏与歌单管理。
 - [ ] M4：推荐、榜单、歌手/专辑与私人 FM。
 - [ ] M5：按实际需求选择一个分支，另写专项验收范围。

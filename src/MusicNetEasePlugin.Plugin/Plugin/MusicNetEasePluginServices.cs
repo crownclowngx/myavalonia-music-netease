@@ -10,6 +10,8 @@ using MusicNetEasePlugin.Infrastructure.Audio;
 using MusicNetEasePlugin.Infrastructure.Media;
 using MusicNetEasePlugin.Features.Music;
 using MusicNetEasePlugin.Application.Appearance;
+using MusicNetEasePlugin.Application.Library;
+using MusicNetEasePlugin.Features.Library;
 
 namespace MusicNetEasePlugin.Plugin;
 
@@ -47,6 +49,9 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<IMusicSessionAccessor, LoginMusicSession>();
         services.TryAddSingleton<XeapiTransport>();
         services.TryAddSingleton<NeteaseMusicApi>();
+        services.TryAddSingleton<MusicRequestExecutor>();
+        services.TryAddSingleton<IPlaylistCatalogApi, NeteasePlaylistApi>();
+        services.TryAddScoped<PlaylistBrowser>();
         services.TryAddSingleton<IMusicCatalogApi>(provider => provider.GetRequiredService<NeteaseMusicApi>());
         services.TryAddSingleton<IPlaybackResourceResolver>(provider => provider.GetRequiredService<NeteaseMusicApi>());
         services.TryAddSingleton<IMediaBuffer>(provider => new FlurlMediaBuffer(provider.GetRequiredService<NeteaseFlurlClients>(), Path.Combine(root, "media-buffer"), MediaLimits.Default));
@@ -57,7 +62,7 @@ public static class MusicNetEasePluginServices
             provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<PlaybackCoordinator>(),
             provider.GetRequiredService<LoginCoordinator>(), provider.GetRequiredService<ILoginUiDispatcher>(),
             provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>(),
-            provider.GetRequiredService<UiPreferences>()));
+            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>()));
         return services;
     }
 }

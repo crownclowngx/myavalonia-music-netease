@@ -5,6 +5,7 @@ using MusicNetEasePlugin.Application.Authentication;
 using MusicNetEasePlugin.Application.Playback;
 using MyAvaloniaManagement.PluginSdk;
 using MusicNetEasePlugin.Application.Appearance;
+using MusicNetEasePlugin.Features.Library;
 
 namespace MusicNetEasePlugin.Features.Music;
 
@@ -45,11 +46,18 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     private MusicTrack? _selected;
     private PlaybackSnapshot _snapshot = new(0, PlaybackState.Idle);
     public MusicWorkspace(IMusicCatalogApi catalog, IMusicSessionAccessor sessions, PlaybackCoordinator playback,
-        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null)
+        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null)
     {
         (_catalog, _sessions, _playback, _login, _ui) = (catalog, sessions, playback, login, ui);
         _images = images;
         Preferences = preferences;
+        Playlists = playlists;
+        ShowSearchCommand = new RelayCommand(() => IsLibrary = false);
+        ShowLibraryCommand = new AsyncRelayCommand(async () =>
+        {
+            IsLibrary = true;
+            if (Playlists is not null && Playlists.Playlists.Count == 0) await Playlists.LoadPlaylistsAsync(true);
+        });
         SearchCommand = new AsyncRelayCommand(() => SearchAsync(0, Keyword), AsyncRelayCommandOptions.AllowConcurrentExecutions);
         NextCommand = new AsyncRelayCommand(() => SearchAsync(_offset + 30, _searchedKeyword), () => HasMore && !IsLoading);
         PreviousCommand = new AsyncRelayCommand(() => SearchAsync(Math.Max(0, _offset - 30), _searchedKeyword), () => _offset > 0 && !IsLoading);
@@ -65,6 +73,11 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     }
     public ObservableCollection<MusicTrack> Tracks { get; } = [];
     public UiPreferences? Preferences { get; }
+    public PlaylistBrowser? Playlists { get; }
+    private bool _isLibrary;
+    public bool IsLibrary { get => _isLibrary; private set => SetProperty(ref _isLibrary, value); }
+    public IRelayCommand ShowSearchCommand { get; }
+    public IAsyncRelayCommand ShowLibraryCommand { get; }
     public bool IsPaused => _snapshot.State == PlaybackState.Paused;
     public string Keyword { get => _keyword; set => SetProperty(ref _keyword, value); }
     public MusicTrack? SelectedTrack { get => _selected; set { if (SetProperty(ref _selected, value)) PlayCommand.NotifyCanExecuteChanged(); } }
@@ -219,6 +232,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
             _stopWork = completion.Task;
         }
         _closing.Cancel();
+        Playlists?.Dispose();
         _login.Changed -= LoginChanged;
         _playback.Changed -= PlaybackChanged;
         _ = CompleteCloseAsync();

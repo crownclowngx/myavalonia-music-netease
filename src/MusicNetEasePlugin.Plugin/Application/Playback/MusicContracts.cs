@@ -3,7 +3,7 @@ using MusicNetEasePlugin.Application.Authentication;
 namespace MusicNetEasePlugin.Application.Playback;
 
 /// <summary>音乐请求获得的内部快照；不可放进 ViewModel。账号代次区别于登录界面的刷新序号。</summary>
-public sealed record MusicSession(long Epoch, long CredentialVersion, AuthContext Context, CancellationToken Revoked)
+public sealed record MusicSession(long Epoch, long CredentialVersion, AuthContext Context, CancellationToken Revoked, long AccountId = 0)
 {
     public override string ToString() => "[音乐会话快照]";
 }

@@ -20,6 +20,7 @@ public sealed class MusicSessionTests
         Assert.Throws<MusicException>(login.CaptureMusicSession);
         release.SetResult(); await restore;
         var session = login.CaptureMusicSession();
+        Assert.Equal(123, session.AccountId);
         Assert.True(login.IsMusicSessionCurrent(session));
         Assert.False(login.Snapshot.Remembered);
         store.FailSave = false;

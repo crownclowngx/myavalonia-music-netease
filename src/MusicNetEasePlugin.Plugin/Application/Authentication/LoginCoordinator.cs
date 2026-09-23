@@ -53,7 +53,8 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
         {
             if (_stopping || _snapshot.Account is null || !_context.HasAccount(_time.GetUtcNow()))
                 throw new MusicException(MusicError.SignedOut, "请先登录网易云音乐。");
-            return new(_accountEpoch, _credentialVersion, _context, _accountLifetime.Token);
+            // 账号身份与代次在同一把锁下取得；不能把页面较早显示的账号与更新后的凭据拼接。
+            return new(_accountEpoch, _credentialVersion, _context, _accountLifetime.Token, _snapshot.Account.Id);
         }
     }
     internal bool IsMusicSessionCurrent(MusicSession request)
