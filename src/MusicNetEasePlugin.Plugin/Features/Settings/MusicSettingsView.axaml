@@ -23,6 +23,8 @@
    </StackPanel>
    <StackPanel x:Name="RuntimeSection" Grid.Row="1" Spacing="6">
     <Border Classes="netease-divider" Padding="0,0,0,6"><TextBlock Classes="netease-section" Text="播放运行库" /></Border>
+    <TextBlock Text="{Binding RuntimeSummary}" TextWrapping="Wrap" />
+    <Expander x:Name="RuntimeDetails" Header="运行库与诊断" IsExpanded="{Binding AdvancedExpanded, Mode=TwoWay}" HorizontalAlignment="Stretch"><StackPanel Spacing="6">
     <TextBlock Classes="netease-secondary" Text="自定义目录 · 有效内置库优先" TextWrapping="Wrap" />
     <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
      <TextBox x:Name="DirectoryInput" Classes="netease-input" Text="{Binding DirectoryPath, Mode=TwoWay}" PlaceholderText="LibVLC 目录" AutomationProperties.Name="LibVLC 目录草稿" />
@@ -42,9 +44,12 @@
      <Button Classes="netease-button" Content="刷新状态" Command="{Binding ReloadCommand}" />
      <Button Classes="netease-button" Content="清空配置" Command="{Binding ClearCommand}" />
     </StackPanel>
+    </StackPanel></Expander>
    </StackPanel>
    <StackPanel x:Name="AppearanceSection" Grid.Row="2" Spacing="4">
     <Border Classes="netease-divider" Padding="0,0,0,6"><TextBlock Classes="netease-section" Text="界面" /></Border>
+    <CheckBox Content="显示封面与头像" IsChecked="{Binding Preferences.ShowArtwork, Mode=TwoWay}" />
+    <CheckBox Content="显示歌词翻译" IsChecked="{Binding Preferences.ShowTranslation, Mode=TwoWay}" />
     <CheckBox x:Name="ReduceMotionToggle" Content="减少动态效果" IsChecked="{Binding Preferences.ReduceMotion, Mode=TwoWay}" FontSize="13" MinHeight="28" />
     <TextBlock Classes="netease-secondary" Text="{Binding Preferences.Message}" TextWrapping="Wrap" />
     <Button Classes="netease-button" Content="重试保存界面偏好" Command="{Binding Preferences.RetrySaveCommand}" HorizontalAlignment="Left" IsVisible="{Binding Preferences.Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

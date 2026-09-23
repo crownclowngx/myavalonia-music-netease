@@ -39,6 +39,8 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     private PlaylistTrackRow? _selectedTrack;
     private PlaylistTracks? _snapshot;
     private int _tabIndex;
+    private int _filter;
+    private long? _currentTrack;
     public PlaylistBrowser(IPlaylistCatalogApi api, IMusicSessionAccessor sessions, ILoginUiDispatcher ui, IPlayerSession? player = null)
     {
         (_api, _sessions, _ui) = (api, sessions, ui);
@@ -53,14 +55,26 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
         PlayFromHereCommand = new AsyncRelayCommand(() => QueueAsync(true, true, false), () => CanReplace && SelectedTrack is not null);
         AppendCommand = new AsyncRelayCommand(() => QueueAsync(false, true, false), () => CanAdd);
         PlayNextCommand = new AsyncRelayCommand(() => QueueAsync(false, true, true), () => CanAdd);
+        PlayNowCommand = new AsyncRelayCommand(PlayNowAsync, () => CanAdd);
+        BackCommand = new RelayCommand(() => TabIndex = 0);
+        if (player is not null) { player.Changed += PlayerChanged; PlayerChanged(player, player.Snapshot); }
     }
     public ObservableCollection<MusicPlaylist> Playlists { get; } = [];
+    public ObservableCollection<MusicPlaylist> VisiblePlaylists { get; } = [];
+    public string[] Filters { get; } = ["全部已加载", "自建", "收藏"];
+    public int FilterIndex { get => _filter; set { if (value is >= 0 and <= 2 && SetProperty(ref _filter, value)) Filter(); } }
+    public long? CurrentTrackId { get => _currentTrack; private set => SetProperty(ref _currentTrack, value); }
     public ObservableCollection<PlaylistTrackRow> Tracks { get; } = [];
     public MusicPlaylist? SelectedPlaylist { get => _selected; set { SetProperty(ref _selected, value); OpenCommand.NotifyCanExecuteChanged(); } }
     public PlaylistTrackRow? SelectedTrack { get => _selectedTrack; set { SetProperty(ref _selectedTrack, value); CommandsChanged(); } }
     public PlaylistTracks? Snapshot { get => _snapshot; private set { SetProperty(ref _snapshot, value); OnPropertyChanged(nameof(Title)); } }
     public string Title => Snapshot?.Name ?? "尚未打开歌单";
-    public int TabIndex { get => _tabIndex; set => SetProperty(ref _tabIndex, value); }
+    public int TabIndex { get => _tabIndex; set { if (SetProperty(ref _tabIndex, value)) { OnPropertyChanged(nameof(IsList)); OnPropertyChanged(nameof(IsDetail)); } } }
+    public bool IsList => TabIndex == 0;
+    public bool IsDetail => TabIndex == 1;
+    public bool IsEmpty => VisiblePlaylists.Count == 0;
+    public string EmptyText => Playlists.Count == 0 ? "还没有歌单，刷新后读取当前账号。" : "已加载的歌单没有匹配项，可切换筛选或继续加载。";
+    public string ReplaceHint => Snapshot is { IsComplete: false } s ? s.Message : "播放全部 / 从这里播放会替换当前队列";
     public string PageText => Snapshot is null ? "" : $"第 {_trackOffset / 50 + 1} 页 · {Snapshot.TrackIds.Count} 首";
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
     public bool IsLoading { get => _loading; private set { SetProperty(ref _loading, value); CommandsChanged(); } }
@@ -76,8 +90,25 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     public IAsyncRelayCommand PlayFromHereCommand { get; }
     public IAsyncRelayCommand AppendCommand { get; }
     public IAsyncRelayCommand PlayNextCommand { get; }
+    public IAsyncRelayCommand PlayNowCommand { get; }
+    public IRelayCommand BackCommand { get; }
     private bool CanReplace => _player is not null && !IsLoading && Snapshot is { IsComplete: true, TrackIds.Count: > 0 };
     private bool CanAdd => _player is not null && !IsLoading && SelectedTrack is not null;
+
+    /// <summary>歌单行的播放图标只试听该曲；替换整单仍由明确的“播放全部/从这里播放”命令负责。</summary>
+    private async Task PlayNowAsync()
+    {
+        if (_player is null || SelectedTrack is not { } row || Snapshot is not { } snapshot) return;
+        try
+        {
+            var session = _sessions.Capture();
+            if (session.Epoch != _accountEpoch) return;
+            using var acceptance = CancellationTokenSource.CreateLinkedTokenSource(_closing.Token, session.Revoked);
+            await _player.PlayNowAsync(new(Guid.NewGuid(), row.TrackId, "歌单", snapshot.PlaylistId, row.Track), acceptance.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) { }
+        catch (MusicException ex) { _ui.Post(() => { if (!_closed) Message = ex.Message; }); }
+    }
 
     /// <summary>整单操作取完整 ID 快照；资料缓存仅用于展示，不能把当前 50 行误当成完整歌单。</summary>
     public async Task QueueAsync(bool replace, bool fromSelected, bool next)
@@ -114,6 +145,7 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
             Message = Playlists.Count == 0 ? "当前账号没有可访问的歌单。" :
                 page.HasMore && added == 0 ? "分页没有取得新歌单，请刷新后重试。" :
                 Playlists.Count >= 1000 ? "已达到 1,000 个歌单显示上限。" : $"已加载 {Playlists.Count} 个歌单。";
+            Filter();
         });
     });
 
@@ -159,6 +191,7 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
         { var id = snapshot.TrackIds[index]; Tracks.Add(new(index, id, details.GetValueOrDefault(id))); }
         Message = snapshot.IsComplete ? Tracks.Count == 0 ? "这个歌单还没有歌曲。" : "资料缺失的歌曲仍保留原位置。" : snapshot.Message;
         OnPropertyChanged(nameof(PageText)); CommandsChanged();
+        OnPropertyChanged(nameof(ReplaceHint));
     }
     private async Task RunAsync(Func<MusicSession, long, CancellationToken, Task> work)
     {
@@ -171,13 +204,14 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
         var old = Interlocked.Exchange(ref _operation, operation);
         try { old?.Cancel(); } catch (ObjectDisposedException) { }
         _account.Dispose();
-        if (_accountEpoch != session.Epoch) { Playlists.Clear(); ClearTracks(); _offset = 0; HasMore = false; }
+        if (_accountEpoch != session.Epoch) { Playlists.Clear(); Filter(); TabIndex = 0; ClearTracks(); _offset = 0; HasMore = false; }
         _accountEpoch = session.Epoch;
         _account = session.Revoked.Register(() => _ui.Post(() =>
         {
             if (_closed || _accountEpoch != session.Epoch) return;
             Interlocked.Increment(ref _generation); Playlists.Clear(); SelectedPlaylist = null; ClearTracks();
             HasMore = false; IsLoading = false; _offset = 0; Message = "请先登录网易云音乐。";
+            Filter(); TabIndex = 0;
         }));
         Apply(session, generation, () => { IsLoading = true; Message = "正在加载…"; });
         try { await work(session, generation, operation.Token).ConfigureAwait(false); }
@@ -193,12 +227,20 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     private void Apply(MusicSession session, long generation, Action action) => _ui.Post(() =>
     { if (!_closed && generation == Interlocked.Read(ref _generation) && _sessions.IsCurrent(session)) action(); });
     private void ClearTracks() { Snapshot = null; Tracks.Clear(); SelectedTrack = null; lock (_cache) _cache.Clear(); _trackOffset = 0; OnPropertyChanged(nameof(PageText)); CommandsChanged(); }
+    private void Filter()
+    {
+        VisiblePlaylists.Clear();
+        foreach (var item in Playlists.Where(item => FilterIndex == 0 || item.IsOwned == (FilterIndex == 1))) VisiblePlaylists.Add(item);
+        OnPropertyChanged(nameof(IsEmpty)); OnPropertyChanged(nameof(EmptyText));
+    }
+    private void PlayerChanged(object? sender, PlayerSessionSnapshot snapshot) { if (CurrentTrackId != snapshot.Playback.Track?.Id) _ui.Post(() => { if (!_closed) CurrentTrackId = snapshot.Playback.Track?.Id; }); }
     private void CommandsChanged()
-    { MoreCommand.NotifyCanExecuteChanged(); OpenCommand.NotifyCanExecuteChanged(); NextTracksCommand.NotifyCanExecuteChanged(); PreviousTracksCommand.NotifyCanExecuteChanged(); RetryTracksCommand.NotifyCanExecuteChanged(); PlayAllCommand.NotifyCanExecuteChanged(); PlayFromHereCommand.NotifyCanExecuteChanged(); AppendCommand.NotifyCanExecuteChanged(); PlayNextCommand.NotifyCanExecuteChanged(); }
+    { MoreCommand.NotifyCanExecuteChanged(); OpenCommand.NotifyCanExecuteChanged(); NextTracksCommand.NotifyCanExecuteChanged(); PreviousTracksCommand.NotifyCanExecuteChanged(); RetryTracksCommand.NotifyCanExecuteChanged(); PlayAllCommand.NotifyCanExecuteChanged(); PlayFromHereCommand.NotifyCanExecuteChanged(); AppendCommand.NotifyCanExecuteChanged(); PlayNextCommand.NotifyCanExecuteChanged(); PlayNowCommand.NotifyCanExecuteChanged(); }
     public void Dispose()
     {
         if (_closed) return;
         _closed = true; Interlocked.Increment(ref _generation); _closing.Cancel(); _account.Dispose(); _closing.Dispose();
+        if (_player is not null) _player.Changed -= PlayerChanged;
         Playlists.Clear(); Tracks.Clear(); lock (_cache) _cache.Clear();
     }
 }

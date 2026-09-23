@@ -23,6 +23,7 @@ public sealed class ViewMotion : ObservableObject
     private UiPreferences? _preferences;
     private bool _attached;
     private bool _enabled;
+    private bool _active;
     private long _themeRevision;
     private CancellationTokenSource? _fade;
     private readonly List<Visual> _ancestors = [];
@@ -36,6 +37,8 @@ public sealed class ViewMotion : ObservableObject
     }
 
     public bool IsEnabled { get => _enabled; private set => SetProperty(ref _enabled, value); }
+    /// <summary>可见工作许可与动画偏好分开；关闭动画不应关闭封面，隐藏窗口则两者都停止。</summary>
+    public bool IsActive { get => _active; private set => SetProperty(ref _active, value); }
     internal bool HasActiveFade => _fade is not null;
 
     public void Bind(UiPreferences? preferences)
@@ -91,8 +94,8 @@ public sealed class ViewMotion : ObservableObject
 
     private void Refresh()
     {
-        IsEnabled = _attached && _ancestors.All(visual => visual.IsVisible) && _window?.WindowState != WindowState.Minimized
-            && _preferences?.ReduceMotion != true;
+        IsActive = _attached && _ancestors.All(visual => visual.IsVisible) && _window?.WindowState != WindowState.Minimized;
+        IsEnabled = IsActive && _preferences?.ReduceMotion != true;
         if (!IsEnabled) CancelFade();
     }
 

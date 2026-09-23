@@ -1,0 +1,50 @@
+<UserControl x:Class="MusicNetEasePlugin.Features.Music.PlaybackBarView" x:Name="BarRoot"
+ xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:MusicWorkspace">
+ <Border x:Name="PlaybackBar" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="0,1,0,0" Padding="12,6">
+  <Grid x:Name="PlaybackLayout" ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,26,Auto" ColumnSpacing="8" RowSpacing="2">
+   <Grid ColumnDefinitions="40,*" ColumnSpacing="8">
+    <Button Classes="netease-button" Width="40" Height="40" Padding="0" Command="{Binding ShowLyricsCommand}" ToolTip.Tip="打开正在播放与歌词" AutomationProperties.Name="打开正在播放与歌词">
+     <Border Width="40" Height="40" CornerRadius="6" ClipToBounds="True" Background="{DynamicResource NeteaseSelectionBrush}">
+      <Grid><PathIcon Width="20" Height="20" Foreground="{DynamicResource NeteaseAccentBrush}" Data="{StaticResource NeteaseMusicIcon}" /><ui:ArtworkImage Bytes="{Binding Player.CoverBytes}" x:Name="CoverImage" Stretch="UniformToFill" /></Grid>
+     </Border>
+    </Button>
+    <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
+     <TextBlock Text="{Binding Player.TrackName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.CurrentTrack}" />
+     <StackPanel Orientation="Horizontal" Spacing="6">
+      <TextBlock x:Name="PlaybackState" Classes="netease-secondary" Text="{Binding Player.StateText}" />
+      <TextBlock Text="试听" IsVisible="{Binding Player.IsTrial}" FontSize="12" Foreground="{DynamicResource NeteaseWarningBrush}" />
+      <Button x:Name="PlaybackNotice" Classes="netease-button" MinHeight="32" Padding="2,0" FontSize="11" Content="查看提示" IsVisible="{Binding Player.PlaybackMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" AutomationProperties.Name="查看播放提示">
+       <Button.Flyout><Flyout><StackPanel MaxWidth="320" Spacing="8"><TextBlock Text="{Binding Player.PlaybackMessage}" TextWrapping="Wrap" /><Button Content="继续 / 重试播放" Command="{Binding Player.ResumeCommand}" /></StackPanel></Flyout></Button.Flyout>
+      </Button>
+     </StackPanel>
+    </StackPanel>
+   </Grid>
+   <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+    <Button x:Name="PreviousTrackButton" Classes="netease-button icon" Command="{Binding Queue.PreviousCommand}" ToolTip.Tip="上一首" AutomationProperties.Name="上一首"><PathIcon Width="18" Height="18" Data="{StaticResource NeteasePreviousIcon}" /></Button>
+    <Button x:Name="PauseButton" Classes="netease-button primary transport" Command="{Binding Player.PauseCommand}" IsVisible="{Binding !Player.IsPaused}" ToolTip.Tip="暂停" AutomationProperties.Name="暂停"><PathIcon Width="20" Height="20" Data="{StaticResource NeteasePauseIcon}" /></Button>
+    <Button x:Name="ResumeButton" Classes="netease-button primary transport" Command="{Binding Player.ResumeCommand}" IsVisible="{Binding Player.IsPaused}" ToolTip.Tip="继续播放" AutomationProperties.Name="继续"><PathIcon Width="20" Height="20" Data="{StaticResource NeteasePlayIcon}" /></Button>
+    <Button x:Name="NextTrackButton" Classes="netease-button icon" Command="{Binding Queue.NextCommand}" ToolTip.Tip="下一首" AutomationProperties.Name="下一首"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseNextIcon}" /></Button>
+   </StackPanel>
+   <StackPanel x:Name="AuxiliaryControls" Grid.Column="2" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+    <ComboBox x:Name="ModePicker" Width="112" MinHeight="30" Padding="6,2" FontSize="12" ItemsSource="{Binding Queue.Modes}" SelectedIndex="{Binding Queue.ModeIndex, Mode=TwoWay}" AutomationProperties.Name="播放模式" />
+    <Slider x:Name="WideVolume" Width="90" Margin="4,0" Minimum="0" Maximum="100" Value="{Binding Player.Volume, Mode=TwoWay}" ToolTip.Tip="{Binding Player.VolumeText}" AutomationProperties.Name="音量" />
+    <Button x:Name="VolumeButton" Classes="netease-button" Content="音量" ToolTip.Tip="{Binding Player.VolumeText}" AutomationProperties.Name="调整音量">
+     <Button.Flyout><Flyout><StackPanel Spacing="6" Width="190"><TextBlock Text="{Binding Player.VolumeText}" /><Slider x:Name="VolumeSlider" Value="{Binding Player.Volume, Mode=TwoWay}" Minimum="0" Maximum="100" AutomationProperties.Name="音量" /><Button Content="静音 / 恢复音量" Command="{Binding Player.MuteCommand}" /></StackPanel></Flyout></Button.Flyout>
+    </Button>
+    <Button Classes="netease-button" Content="歌词" Classes.selected="{Binding Navigation.IsLyrics}" Command="{Binding ShowLyricsCommand}" />
+    <Button Classes="netease-button" Content="{Binding Queue.ButtonText}" Classes.selected="{Binding Navigation.IsQueue}" Command="{Binding ShowQueueCommand}" ToolTip.Tip="{Binding Queue.CountText}" AutomationProperties.Name="播放队列" />
+    <Button Classes="netease-button icon" ToolTip.Tip="更多播放操作" AutomationProperties.Name="更多播放操作"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseMoreIcon}" />
+     <Button.Flyout><MenuFlyout><MenuItem Header="停止并回到开头" Command="{Binding Player.StopCommand}" /></MenuFlyout></Button.Flyout>
+    </Button>
+   </StackPanel>
+   <Grid Grid.Row="1" Grid.ColumnSpan="3" ColumnDefinitions="*,100" ColumnSpacing="8">
+    <Slider x:Name="PlaybackProgress" Value="{Binding Player.Timeline.Position, Mode=TwoWay}" Minimum="0" Maximum="{Binding Player.Timeline.Maximum}" IsEnabled="{Binding Player.Timeline.CanSeek}" SmallChange="5000" LargeChange="15000" Height="26" MinHeight="26" AutomationProperties.Name="播放进度定位" ToolTip.Tip="{Binding Player.Timeline.DraftText}">
+     <Slider.Resources><GridLength x:Key="SliderPreContentMargin">3</GridLength><GridLength x:Key="SliderPostContentMargin">3</GridLength></Slider.Resources>
+    </Slider>
+    <TextBlock Grid.Column="1" Classes="netease-secondary" Text="{Binding Player.PositionText}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="11" />
+   </Grid>
+   <StackPanel Grid.Row="3" Grid.ColumnSpan="3"><TextBlock Text="{Binding Player.Notice.Text}" IsVisible="{Binding Player.Notice.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Classes="netease-secondary" AutomationProperties.LiveSetting="Polite" /><TextBlock x:Name="BufferStatus" Text="{Binding Player.Timeline.BufferText}" IsVisible="{Binding Player.IsLoading}" FontSize="12" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.Timeline.BufferText}" /></StackPanel>
+  </Grid>
+ </Border>
+</UserControl>

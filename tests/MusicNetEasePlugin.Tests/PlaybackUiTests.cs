@@ -41,19 +41,19 @@ public sealed class PlaybackUiTests
                 tool.DirectoryPath = "尚未保存的共享目录";
                 await document.SearchAsync(0, "音乐"); Dispatcher.UIThread.RunJobs();
                 document.SelectedTrack = document.Tracks[0]; await document.PlayCommand.ExecuteAsync(null); Dispatcher.UIThread.RunJobs();
-                Assert.True(music.FindControl<Button>("PauseButton")!.IsEnabled);
+                Assert.True(music.GetVisualDescendants().OfType<Button>().Single(c => c.Name == "PauseButton")!.IsEnabled);
                 for (var i = 0; i < 20; i++)
                 {
                     window.Content = null; window.Content = grid; Dispatcher.UIThread.RunJobs();
                     Assert.Equal(PlaybackState.Playing, f.Player.Snapshot.State);
                 }
-                await document.PauseCommand.ExecuteAsync(null); Dispatcher.UIThread.RunJobs();
+                await document.Player.PauseCommand.ExecuteAsync(null); Dispatcher.UIThread.RunJobs();
                 window.Content = null;
                 grid.Children.Remove(settingsView); settingsView = new MusicSettingsView { DataContext = tool }; Grid.SetColumn(settingsView, 1); grid.Children.Add(settingsView);
                 window.Content = grid; Dispatcher.UIThread.RunJobs();
                 Assert.Equal("尚未保存的共享目录", tool.DirectoryPath); Assert.Equal(1, settings.Loads);
                 Assert.False(runtime.LoadAttempted); Assert.Single(f.Audio.Opened); Assert.Equal(PlaybackState.Paused, f.Player.Snapshot.State);
-                Assert.Null(music.FindControl<Image>("CoverImage")!.Source);
+                Assert.Null(music.GetVisualDescendants().OfType<Image>().Single(c => c.Name == "CoverImage")!.Source);
                 var artifacts = Environment.GetEnvironmentVariable("NETEASE_TEST_ARTIFACTS");
                 if (!string.IsNullOrEmpty(artifacts))
                 {

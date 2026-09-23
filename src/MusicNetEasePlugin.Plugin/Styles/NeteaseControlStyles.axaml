@@ -1,20 +1,33 @@
 <Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <!-- 类选择器使密度调整只影响显式加入的控件；不复制第三方主题模板。 -->
   <Style Selector="Button.netease-button">
-    <Setter Property="MinHeight" Value="30" />
-    <Setter Property="Padding" Value="10,3" />
+    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="Padding" Value="10,4" />
     <Setter Property="FontSize" Value="13" />
-    <Setter Property="CornerRadius" Value="3" />
-    <Setter Property="Background" Value="{DynamicResource NeteasePanelBrush}" />
+    <Setter Property="CornerRadius" Value="6" />
+    <Setter Property="BorderThickness" Value="0" />
+    <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource NeteaseTextBrush}" />
   </Style>
   <Style Selector="Button.netease-button:pointerover">
     <Setter Property="Background" Value="{DynamicResource NeteaseHoverBrush}" />
   </Style>
   <Style Selector="Button.netease-button.primary">
+    <Setter Property="Background" Value="{DynamicResource NeteaseAccentBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource NeteaseAccentTextBrush}" />
     <Setter Property="BorderBrush" Value="{DynamicResource NeteaseAccentBrush}" />
     <Setter Property="FontWeight" Value="SemiBold" />
   </Style>
+  <Style Selector="Button.netease-button.selected">
+    <Setter Property="Background" Value="{DynamicResource NeteaseSelectionBrush}" />
+    <Setter Property="Foreground" Value="{DynamicResource NeteaseAccentBrush}" />
+    <Setter Property="FontWeight" Value="SemiBold" />
+  </Style>
+  <Style Selector="Button.netease-button:pressed"><Setter Property="Opacity" Value="0.8" /></Style>
+  <Style Selector="Button.netease-button:focus-visible"><Setter Property="BorderThickness" Value="2" /><Setter Property="BorderBrush" Value="{DynamicResource NeteaseAccentBrush}" /></Style>
+  <Style Selector="Button.netease-button:disabled"><Setter Property="Opacity" Value="0.45" /></Style>
+  <Style Selector="Button.netease-button.icon"><Setter Property="Width" Value="32" /><Setter Property="Padding" Value="7" /></Style>
+  <Style Selector="Button.netease-button.transport"><Setter Property="Width" Value="40" /><Setter Property="Height" Value="40" /><Setter Property="CornerRadius" Value="20" /></Style>
   <Style Selector="Button.netease-button.netease-motion">
     <Setter Property="Transitions"><Transitions><BrushTransition Property="Background" Duration="0:0:0.1" /></Transitions></Setter>
   </Style>
@@ -22,7 +35,7 @@
     <Setter Property="MinHeight" Value="30" />
     <Setter Property="Padding" Value="8,4" />
     <Setter Property="FontSize" Value="13" />
-    <Setter Property="CornerRadius" Value="3" />
+    <Setter Property="CornerRadius" Value="6" />
   </Style>
   <Style Selector="TextBlock.netease-secondary, SelectableTextBlock.netease-secondary">
     <Setter Property="Foreground" Value="{DynamicResource NeteaseSecondaryTextBrush}" />
@@ -37,14 +50,18 @@
     <Setter Property="BorderThickness" Value="0,0,0,1" />
   </Style>
   <Style Selector="ListBox.netease-results">
+    <Style.Resources>
+      <SolidColorBrush x:Key="ListBoxItemBackgroundSelected" Color="Transparent" />
+      <SolidColorBrush x:Key="ListBoxItemBackgroundSelectedPointerOver" Color="Transparent" />
+    </Style.Resources>
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="BorderThickness" Value="0" />
   </Style>
   <Style Selector="ListBox.netease-results ListBoxItem">
-    <Setter Property="MinHeight" Value="32" />
+    <Setter Property="MinHeight" Value="44" />
     <Setter Property="Padding" Value="8,5" />
     <Setter Property="Margin" Value="0" />
-    <Setter Property="CornerRadius" Value="2" />
+    <Setter Property="CornerRadius" Value="6" />
     <Setter Property="HorizontalContentAlignment" Value="Stretch" />
     <Setter Property="Background" Value="Transparent" />
     <Setter Property="Foreground" Value="{DynamicResource NeteaseTextBrush}" />
@@ -58,5 +75,8 @@
   <Style Selector="ListBox.netease-results ListBoxItem:selected">
     <Setter Property="Background" Value="{DynamicResource NeteaseSelectionBrush}" />
     <Setter Property="Foreground" Value="{DynamicResource NeteaseSelectionTextBrush}" />
+  </Style>
+  <Style Selector="ListBox.netease-results ListBoxItem:selected /template/ ContentPresenter#PART_ContentPresenter">
+    <Setter Property="Background" Value="{DynamicResource NeteaseSelectionBrush}" />
   </Style>
 </Styles>

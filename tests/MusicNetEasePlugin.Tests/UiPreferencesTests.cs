@@ -11,12 +11,12 @@ public sealed class UiPreferencesTests
     {
         using var directory = new TestDirectory();
         var store = new UiPreferencesStore(directory.Path);
-        Assert.False(await store.LoadReduceMotionAsync(default));
-        await store.SaveReduceMotionAsync(true, default);
-        Assert.True(await new UiPreferencesStore(directory.Path).LoadReduceMotionAsync(default));
+        Assert.False((await store.LoadAsync(default)).ReduceMotion);
+        await store.SaveAsync(new(true), default);
+        Assert.True((await new UiPreferencesStore(directory.Path).LoadAsync(default)).ReduceMotion);
         using var cancelled = new CancellationTokenSource(); cancelled.Cancel();
-        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => store.SaveReduceMotionAsync(false, cancelled.Token));
-        Assert.True(await store.LoadReduceMotionAsync(default));
+        await Assert.ThrowsAnyAsync<OperationCanceledException>(() => store.SaveAsync(new(false), cancelled.Token));
+        Assert.True((await store.LoadAsync(default)).ReduceMotion);
         Assert.Equal("ui-preferences.json", Path.GetFileName(Assert.Single(Directory.GetFiles(directory.Path))));
     }
 
@@ -81,13 +81,13 @@ internal sealed class MemoryUiPreferences : IUiPreferencesStore
     private int _writing;
     public Func<Task<bool>>? Read { get; init; }
     public Func<bool, CancellationToken, Task>? Write { get; set; }
-    public Task<bool> LoadReduceMotionAsync(CancellationToken cancellationToken)
-    { Reads++; return Read?.Invoke() ?? Task.FromResult(Value); }
-    public async Task SaveReduceMotionAsync(bool reduceMotion, CancellationToken cancellationToken)
+    public async Task<UiPreferencesData> LoadAsync(CancellationToken cancellationToken)
+    { Reads++; return new(Read is null ? Value : await Read()); }
+    public async Task SaveAsync(UiPreferencesData preferences, CancellationToken cancellationToken)
     {
         var active = Interlocked.Increment(ref _writing);
         MaxConcurrentWrites = Math.Max(MaxConcurrentWrites, active);
-        try { if (Write is not null) await Write(reduceMotion, cancellationToken); Value = reduceMotion; }
+        try { if (Write is not null) await Write(preferences.ReduceMotion, cancellationToken); Value = preferences.ReduceMotion; }
         finally { Interlocked.Decrement(ref _writing); }
     }
 }

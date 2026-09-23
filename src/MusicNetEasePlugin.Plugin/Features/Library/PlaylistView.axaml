@@ -1,47 +1,30 @@
-<UserControl x:Class="MusicNetEasePlugin.Features.Library.PlaylistView"
- xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- xmlns:vm="using:MusicNetEasePlugin.Features.Library" xmlns:model="using:MusicNetEasePlugin.Application.Library"
- x:DataType="vm:PlaylistBrowser">
- <Grid RowDefinitions="Auto,Auto,*" Margin="12,4">
-  <WrapPanel Orientation="Horizontal">
-   <Button Content="刷新歌单" Command="{Binding RefreshCommand}" Margin="0,0,6,4" />
-   <Button Content="更多歌单" Command="{Binding MoreCommand}" Margin="0,0,6,4" />
-   <Button Content="打开所选歌单" Command="{Binding OpenCommand}" Margin="0,0,6,4" />
-  </WrapPanel>
-  <TextBlock Grid.Row="1" Text="{Binding Message}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Message}" AutomationProperties.LiveSetting="Polite" />
-  <TabControl Grid.Row="2" Margin="0,4,0,0" SelectedIndex="{Binding TabIndex, Mode=TwoWay}">
-   <TabItem Header="歌单">
-    <ListBox x:Name="PlaylistList" ItemsSource="{Binding Playlists}" SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}" AutomationProperties.Name="我的歌单" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+<UserControl x:Class="MusicNetEasePlugin.Features.Library.PlaylistView" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:vm="using:MusicNetEasePlugin.Features.Library" xmlns:music="using:MusicNetEasePlugin.Features.Music" xmlns:model="using:MusicNetEasePlugin.Application.Library" x:DataType="vm:PlaylistBrowser">
+ <UserControl.Resources><music:TrackDurationConverter x:Key="Duration" /></UserControl.Resources>
+ <Grid RowDefinitions="Auto,*" RowSpacing="6">
+  <TextBlock Text="{Binding Message}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Message}" Classes="netease-secondary" AutomationProperties.LiveSetting="Polite" />
+  <Grid Grid.Row="1" IsVisible="{Binding IsList}" RowDefinitions="Auto,*,Auto" RowSpacing="6">
+   <Grid ColumnDefinitions="*,Auto"><ComboBox Width="150" HorizontalAlignment="Left" ItemsSource="{Binding Filters}" SelectedIndex="{Binding FilterIndex, Mode=TwoWay}" AutomationProperties.Name="筛选已加载歌单" /><Button Grid.Column="1" Classes="netease-button" Content="刷新歌单" Command="{Binding RefreshCommand}" /></Grid>
+   <Grid Grid.Row="1">
+    <ListBox x:Name="PlaylistList" Classes="netease-results" ItemsSource="{Binding VisiblePlaylists}" SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" KeyDown="PlaylistKeyDown" AutomationProperties.Name="我的歌单">
      <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
-     <ListBox.ItemTemplate><DataTemplate x:DataType="model:MusicPlaylist">
-      <StackPanel Spacing="3"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Summary}" FontSize="12" /></StackPanel>
-     </DataTemplate></ListBox.ItemTemplate>
+     <ListBox.ItemTemplate><DataTemplate x:DataType="model:MusicPlaylist"><Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="10" MinHeight="52">
+      <Border Width="40" Height="40" CornerRadius="6" Background="{DynamicResource NeteaseSelectionBrush}"><Grid><PathIcon Width="20" Height="20" Data="{DynamicResource NeteaseMusicIcon}" Foreground="{DynamicResource NeteaseAccentBrush}" /><ui:ArtworkImage Address="{Binding Cover}" Stretch="UniformToFill" /></Grid></Border>
+      <StackPanel Grid.Column="1" VerticalAlignment="Center" Spacing="2"><Button Classes="netease-button" HorizontalAlignment="Stretch" HorizontalContentAlignment="Left" Padding="0" MinHeight="24" Click="OpenPlaylist" ToolTip.Tip="打开歌单"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /></Button><TextBlock Text="{Binding Summary}" Classes="netease-secondary" /></StackPanel>
+      <TextBlock Grid.Column="2" Text="›" Classes="netease-secondary" VerticalAlignment="Center" />
+     </Grid></DataTemplate></ListBox.ItemTemplate>
     </ListBox>
-   </TabItem>
-   <TabItem Header="曲目">
-    <Grid RowDefinitions="Auto,*,Auto">
-     <StackPanel><TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
-      <WrapPanel>
-       <Button Content="播放全部" Command="{Binding PlayAllCommand}" Margin="0,4,6,0" />
-       <Button Content="从这里播放" Command="{Binding PlayFromHereCommand}" Margin="0,4,6,0" />
-       <Button Content="下一首播" Command="{Binding PlayNextCommand}" Margin="0,4,6,0" />
-       <Button Content="追加所选" Command="{Binding AppendCommand}" Margin="0,4,0,0" />
-      </WrapPanel>
-     </StackPanel>
-     <ListBox x:Name="PlaylistTrackList" Grid.Row="1" ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" AutomationProperties.Name="歌单曲目" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-      <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
-      <ListBox.ItemTemplate><DataTemplate x:DataType="vm:PlaylistTrackRow">
-       <StackPanel Spacing="3"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Detail}" FontSize="12" TextTrimming="CharacterEllipsis" /></StackPanel>
-      </DataTemplate></ListBox.ItemTemplate>
-     </ListBox>
-     <WrapPanel Grid.Row="2" Orientation="Horizontal">
-      <Button Content="上一页" Command="{Binding PreviousTracksCommand}" Margin="0,4,6,0" />
-      <TextBlock Text="{Binding PageText}" VerticalAlignment="Center" Margin="0,4,6,0" />
-      <Button Content="下一页" Command="{Binding NextTracksCommand}" Margin="0,4,6,0" />
-      <Button Content="重试资料" Command="{Binding RetryTracksCommand}" Margin="0,4,0,0" />
-     </WrapPanel>
-    </Grid>
-   </TabItem>
-  </TabControl>
+    <TextBlock Text="{Binding EmptyText}" IsVisible="{Binding IsEmpty}" TextWrapping="Wrap" Margin="24" HorizontalAlignment="Center" VerticalAlignment="Center" />
+   </Grid>
+   <Button Grid.Row="2" Content="加载更多歌单" Command="{Binding MoreCommand}" IsVisible="{Binding HasMore}" Classes="netease-button" HorizontalAlignment="Center" />
+  </Grid>
+  <Grid Grid.Row="1" IsVisible="{Binding IsDetail}" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="4">
+   <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"><Button Classes="netease-button" Content="‹ 我的歌单" Command="{Binding BackCommand}" Click="ReturnToPlaylists" /><TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><Button Grid.Column="2" Content="播放全部" Classes="netease-button primary" Command="{Binding PlayAllCommand}" ToolTip.Tip="替换当前队列并从头播放" /></Grid>
+   <TextBlock Grid.Row="1" Text="{Binding ReplaceHint}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ReplaceHint}" />
+   <music:SongListBox x:Name="PlaylistTrackList" Grid.Row="2" Classes="netease-results" ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ActivateCommand="{Binding PlayNowCommand}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="歌单歌曲">
+    <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+    <ListBox.ItemTemplate><DataTemplate x:DataType="vm:PlaylistTrackRow"><music:SongRowView Title="{Binding Name}" Subtitle="{Binding Detail}" Artist="{Binding Track.Artists}" Album="{Binding Track.Album}" TrackId="{Binding TrackId}" CurrentTrackId="{Binding $parent[vm:PlaylistView].Model.CurrentTrackId}" Duration="{Binding Track.DurationMs, Converter={StaticResource Duration}}" PlayCommand="{Binding $parent[vm:PlaylistView].Model.PlayNowCommand}" NextCommand="{Binding $parent[vm:PlaylistView].Model.PlayNextCommand}" AppendCommand="{Binding $parent[vm:PlaylistView].Model.AppendCommand}" FromHereCommand="{Binding $parent[vm:PlaylistView].Model.PlayFromHereCommand}" /></DataTemplate></ListBox.ItemTemplate>
+   </music:SongListBox>
+   <Grid Grid.Row="3" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="4"><Button Content="重载资料" Command="{Binding RetryTracksCommand}" Classes="netease-button" HorizontalAlignment="Left" /><Button Grid.Column="1" Content="上一页" Command="{Binding PreviousTracksCommand}" Classes="netease-button" /><TextBlock Grid.Column="2" Text="{Binding PageText}" Classes="netease-secondary" VerticalAlignment="Center" /><Button Grid.Column="3" Content="下一页" Command="{Binding NextTracksCommand}" Classes="netease-button" /></Grid>
+  </Grid>
  </Grid>
 </UserControl>

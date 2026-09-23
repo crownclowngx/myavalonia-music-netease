@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "realHost": false,
+  "environment": "Windows x64 / Avalonia Headless \u002B Skia / fake audio and network",
+  "seconds": 1,
+  "rounds": 1,
+  "processId": 55176,
+  "processorCount": 14,
+  "framework": "10.0.10",
+  "width": 1200,
+  "height": 720,
+  "queueEntries": 10000,
+  "lyricLines": 1000,
+  "observations": [
+    {
+      "round": 0,
+      "scenario": "paused-visible",
+      "elapsedMs": 1040.265,
+      "privateBytes": 122245120,
+      "peakPrivateBytes": 121765888,
+      "allocatedBytes": 84808,
+      "cpuOneCorePercent": 58.32857372171764,
+      "visibleRows": 7,
+      "navigationSamples": 100,
+      "navigationPairP50Ms": 13.7931,
+      "navigationPairP95Ms": 16.0042
+    },
+    {
+      "round": 0,
+      "scenario": "lyrics-visible",
+      "elapsedMs": 1084.7361,
+      "privateBytes": 120152064,
+      "peakPrivateBytes": 122245120,
+      "allocatedBytes": 192352,
+      "cpuOneCorePercent": 93.17866569343416,
+      "visibleRows": 7,
+      "navigationSamples": 100,
+      "navigationPairP50Ms": 13.7931,
+      "navigationPairP95Ms": 16.0042
+    },
+    {
+      "round": 0,
+      "scenario": "playing-hidden",
+      "elapsedMs": 1059.8689,
+      "privateBytes": 120152064,
+      "peakPrivateBytes": 120152064,
+      "allocatedBytes": 38952,
+      "cpuOneCorePercent": 13.21174922620253,
+      "visibleRows": 0,
+      "navigationSamples": 100,
+      "navigationPairP50Ms": 13.7931,
+      "navigationPairP95Ms": 16.0042
+    }
+  ],
+  "provenance": {
+    "runId": "20260923-093716-a76d8003",
+    "revision": "a9b85f02c8516acf8a24236fb1e61ec0ca8bbc87",
+    "sourceSha256": "DCA795554C7D4A5844243C41435F7E1DE7BBF8AA361F518FBF1C02CC8CAAE563"
+  }
+}

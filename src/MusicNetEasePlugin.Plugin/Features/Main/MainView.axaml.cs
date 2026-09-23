@@ -14,7 +14,6 @@ public partial class MainView : UserControl
 {
     private MainDocument? _document;
     private Bitmap? _qr;
-    private Bitmap? _avatar;
     private bool _signedIn;
     private bool? _narrow;
     public ViewMotion Motion { get; }
@@ -22,9 +21,12 @@ public partial class MainView : UserControl
     public MainView()
     {
         Motion = new(this);
+        Motion.PropertyChanged += (_, e) => { if (e.PropertyName == nameof(ViewMotion.IsActive)) _document?.SetVisible(Motion.IsActive); };
         InitializeComponent();
         DataContextChanged += (_, _) => { if (VisualRoot is not null) BindDocument(); };
         SizeChanged += (_, _) => ApplyWidth();
+        AddHandler(KeyDownEvent, (_, e) =>
+        { if (e.Key == Avalonia.Input.Key.Escape && SettingsOverlay.IsVisible) { SettingsOverlay.IsVisible = false; MusicContent.IsVisible = true; AccountMenuButton.Focus(); e.Handled = true; } }, Avalonia.Interactivity.RoutingStrategies.Bubble);
     }
 
     protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs e)
@@ -37,7 +39,6 @@ public partial class MainView : UserControl
     {
         UnbindDocument();
         SetImage(QrImage, ref _qr, null);
-        SetImage(AvatarImage, ref _avatar, null);
         base.OnDetachedFromVisualTree(e);
     }
 
@@ -46,15 +47,16 @@ public partial class MainView : UserControl
         UnbindDocument();
         _document = DataContext as MainDocument;
         Motion.Bind(_document?.Preferences);
+        _document?.SetVisible(Motion.IsActive);
         _signedIn = _document?.IsSignedIn == true;
         if (_document is not null) _document.PropertyChanged += OnModelChanged;
         SetImage(QrImage, ref _qr, _document?.QrImageBytes);
-        SetImage(AvatarImage, ref _avatar, _document?.AvatarImageBytes);
     }
 
     private void UnbindDocument()
     {
         if (_document is not null) _document.PropertyChanged -= OnModelChanged;
+        _document?.SetVisible(false);
         _document = null;
         Motion.Bind(null);
     }
@@ -63,14 +65,23 @@ public partial class MainView : UserControl
     {
         if (args.PropertyName == nameof(MainDocument.QrImageBytes))
             SetImage(QrImage, ref _qr, _document?.QrImageBytes);
-        else if (args.PropertyName == nameof(MainDocument.AvatarImageBytes))
-            SetImage(AvatarImage, ref _avatar, _document?.AvatarImageBytes);
         else if (args.PropertyName == nameof(MainDocument.IsSignedIn) && _signedIn != (_document?.IsSignedIn == true))
         {
             _signedIn = _document?.IsSignedIn == true;
             if (_signedIn) Motion.FadeIn(MusicContent);
         }
     }
+
+    private Avalonia.Input.IInputElement? _returnFocus;
+    private async void OpenSettings(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    {
+        _returnFocus = AccountMenuButton;
+        SettingsOverlay.IsVisible = true; MusicContent.IsVisible = false;
+        if (_document?.Settings is { } settings) await settings.EnsureLoadedAsync();
+        SettingsOverlay.GetVisualDescendants().OfType<Button>().FirstOrDefault()?.Focus();
+    }
+    private void CloseSettings(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
+    { SettingsOverlay.IsVisible = false; MusicContent.IsVisible = true; _returnFocus?.Focus(); }
 
     private void ApplyWidth()
     {

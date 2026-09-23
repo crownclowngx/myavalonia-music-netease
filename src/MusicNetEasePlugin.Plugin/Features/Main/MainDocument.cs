@@ -23,6 +23,7 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     private Task _avatarWork = Task.CompletedTask;
     private long _avatarGeneration;
     private string? _avatarAddress;
+    private bool _visible = true;
     private int _closed;
     private int _disposed;
     private LoginSnapshot _snapshot = new(-1, LoginStage.SignedOut, "");
@@ -32,15 +33,18 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     private DocumentPresentationState _presentation = new("网易云音乐");
 
     public MainDocument(LoginCoordinator login, ILoginUiDispatcher dispatcher, IAccountImageSource images, IDocumentLifetime lifetime,
-        Music.MusicWorkspace? music = null, UiPreferences? preferences = null)
+        Music.MusicWorkspace? music = null, UiPreferences? preferences = null, Settings.MusicSettingsTool? settings = null, MusicNetEasePlugin.Infrastructure.Ui.ArtworkContext? artwork = null)
     {
-        Music = music;
+        Music = music; Settings = settings; Artwork = artwork;
+        (_login, _dispatcher, _images) = (login, dispatcher, images);
+        LoginCommand = new AsyncRelayCommand(() => _login.StartAsync(_owner, _closing.Token, LoginMethodIndex == 0 ? LoginMethod.WeChat : LoginMethod.NeteaseApp), CanStart, AsyncRelayCommandOptions.AllowConcurrentExecutions);
         Preferences = preferences;
+        if (preferences is not null) preferences.PropertyChanged += PreferencesChanged;
         (_login, _dispatcher, _images) = (login, dispatcher, images);
         StartLoginCommand = new AsyncRelayCommand(() => _login.StartAsync(_owner, _closing.Token),
             CanStart,
             AsyncRelayCommandOptions.AllowConcurrentExecutions);
-        StartNeteaseLoginCommand = new AsyncRelayCommand(() => _login.StartAsync(_owner, _closing.Token, LoginMethod.NeteaseApp),
+        StartNeteaseLoginCommand = new AsyncRelayCommand(() => { LoginMethodIndex = 1; return _login.StartAsync(_owner, _closing.Token, LoginMethod.NeteaseApp); },
             CanStart,
             AsyncRelayCommandOptions.AllowConcurrentExecutions);
         CancelLoginCommand = new RelayCommand(() => _login.Cancel(_owner),
@@ -56,6 +60,13 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
         _lifetimeRegistration = lifetime.ClosingToken.Register(Close);
     }
 
+    public Settings.MusicSettingsTool? Settings { get; }
+    public MusicNetEasePlugin.Infrastructure.Ui.ArtworkContext? Artwork { get; }
+    public string[] LoginMethods { get; } = ["微信扫码", "网易云音乐 App"];
+    private int _loginMethodIndex;
+    public int LoginMethodIndex { get => _loginMethodIndex; set { if (SetProperty(ref _loginMethodIndex, value)) { _login.Cancel(_owner); OnPropertyChanged(nameof(QrInstruction)); } } }
+    public IAsyncRelayCommand LoginCommand { get; }
+    public string LoginAction => _snapshot.Stage switch { LoginStage.CreatingQr => "正在生成…", LoginStage.Expired => "刷新二维码", LoginStage.WaitingForScan or LoginStage.WaitingForConfirmation => "刷新二维码", _ => "生成二维码" };
     public DocumentPresentationState Presentation => _presentation;
     public UiPreferences? Preferences { get; }
     public event EventHandler? PresentationChanged;
@@ -69,7 +80,7 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     public string AccountName => _snapshot.Account?.Nickname ?? "还未登录";
     public string AccountId => _snapshot.Account is { } account ? $"网易账号 · {account.Id}" : "使用手机扫码连接你的音乐账号";
     public string StatusMessage => _snapshot.Message;
-    public string QrInstruction => _snapshot.Method == LoginMethod.WeChat
+    public string QrInstruction => LoginMethodIndex == 0
         ? "使用微信扫一扫，并确认授权登录网易云音乐。" : "使用网易云音乐 App 扫码，并在手机上确认登录。";
     public bool IsBusy => _snapshot.IsBusy;
     public bool NeedsSaveRetry => IsSignedIn && !_snapshot.Remembered;
@@ -110,6 +121,8 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
         foreach (var property in new[] { nameof(IsSignedIn), nameof(AccountName), nameof(AccountId), nameof(StatusMessage),
             nameof(IsBusy), nameof(NeedsSaveRetry), nameof(NeedsCleanup), nameof(SessionHint), nameof(QrInstruction) })
             OnPropertyChanged(property);
+        LoginCommand.NotifyCanExecuteChanged();
+        OnPropertyChanged(nameof(LoginAction));
         StartLoginCommand.NotifyCanExecuteChanged();
         StartNeteaseLoginCommand.NotifyCanExecuteChanged();
         CancelLoginCommand.NotifyCanExecuteChanged();
@@ -118,6 +131,9 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
         LogoutCommand.NotifyCanExecuteChanged();
     }
 
+    public void SetVisible(bool visible) { if (_visible == visible) return; _visible = visible; StartAvatar(_avatarAddress); }
+    private void PreferencesChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    { if (e.PropertyName == nameof(UiPreferences.ShowArtwork)) StartAvatar(_avatarAddress); }
     private void StartAvatar(string? address)
     {
         lock (_imageSync)
@@ -128,7 +144,7 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
             _avatarCancellation = CancellationTokenSource.CreateLinkedTokenSource(_closing.Token);
             var generation = ++_avatarGeneration;
             AvatarImageBytes = null;
-            _avatarWork = LoadAvatarAsync(_avatarWork, address, generation, _avatarCancellation.Token);
+            _avatarWork = LoadAvatarAsync(_avatarWork, _visible && Preferences?.ShowArtwork != false ? address : null, generation, _avatarCancellation.Token);
         }
     }
 
@@ -152,6 +168,8 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     {
         if (Interlocked.Exchange(ref _closed, 1) != 0) return;
         _login.Changed -= OnLoginChanged;
+        if (Preferences is not null) Preferences.PropertyChanged -= PreferencesChanged;
+        AvatarImageBytes = null;
         _closing.Cancel();
         _login.Cancel(_owner);
     }

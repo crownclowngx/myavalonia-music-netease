@@ -52,6 +52,10 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
         _runtime.Changed += RuntimeChanged;
         ApplyLogin(login.Snapshot);
     }
+    private bool _advancedExpanded;
+    private string _runtimeSummary = "首次播放时检查运行库";
+    public bool AdvancedExpanded { get => _advancedExpanded; set => SetProperty(ref _advancedExpanded, value); }
+    public string RuntimeSummary { get => _runtimeSummary; private set => SetProperty(ref _runtimeSummary, value); }
     public string DirectoryPath { get => _directory; set { if (SetProperty(ref _directory, value ?? "")) Interlocked.Increment(ref _editVersion); } }
     public string PlaybackStorageMessage { get => _playbackStorageMessage; private set => SetProperty(ref _playbackStorageMessage, value); }
     public IAsyncRelayCommand RetryPlaybackStorageCommand { get; }
@@ -105,11 +109,11 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
         try
         {
             var selection = await Task.Run(() => _runtime.PreviewAsync(_closing.Token)).ConfigureAwait(false);
-            Post(() => CandidateRuntime = $"下次加载：{selection.Summary}\n{selection.Directory}\n" +
+            Post(() => { RuntimeSummary = selection.IsReady ? "播放库可用" : "播放库不可用，请配置目录"; if (!selection.IsReady) AdvancedExpanded = true; CandidateRuntime = $"下次加载：{selection.Summary}\n{selection.Directory}\n" +
                 (selection.BuiltIn.IsValid ? "" : selection.BuiltIn.Summary) +
-                (selection.Configured is { IsValid: false } configured ? "\n" + configured.Summary : ""));
+                (selection.Configured is { IsValid: false } configured ? "\n" + configured.Summary : ""); });
         }
-        catch (MusicException ex) { Post(() => CandidateRuntime = ex.Message); }
+        catch (MusicException ex) { Post(() => { CandidateRuntime = ex.Message; RuntimeSummary = "运行库检查失败"; AdvancedExpanded = true; }); }
         catch (OperationCanceledException) { }
     }
     private async Task CheckAsync()
@@ -150,7 +154,7 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
         finally { _writes.Release(); }
     }
     private void LoginChanged(object? sender, LoginSnapshot snapshot) => Post(() => ApplyLogin(snapshot));
-    private void RuntimeChanged(object? sender, EventArgs args) => Post(() => OnPropertyChanged(nameof(ActiveRuntime)));
+    private void RuntimeChanged(object? sender, EventArgs args) => Post(() => { OnPropertyChanged(nameof(ActiveRuntime)); RuntimeSummary = _runtime.ActiveDirectory is not null ? "播放库已就绪" : "播放库加载失败，请检查配置"; if (_runtime.ActiveDirectory is null) AdvancedExpanded = true; });
     private void ApplyLogin(LoginSnapshot snapshot)
     {
         if (snapshot.Revision <= _loginRevision) return;

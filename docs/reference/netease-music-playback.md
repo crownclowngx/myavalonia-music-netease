@@ -1,4 +1,4 @@
-# 音乐与播放当前契约（V4 / M2）
+# 音乐与播放当前契约（V5 / M2）
 
 > 更新：2026-09-23。V1–V4 已实现并由用户确认手工验收完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。历史 MP3 解码及运行库来源证据见[V2 实施记录](../archive/records/netease-v2/m1-implementation-20260923.md)，当前增量见[日常播放器](netease-daily-player.md)。
 

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v5-detail-light-1200.png",
+  "width": 1200,
+  "height": 720,
+  "sha256": "337A53A33946E18E820EEAFE04F11F7234E014E4375CBFD83339DDB980049861",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-093716-a76d8003",
+    "revision": "a9b85f02c8516acf8a24236fb1e61ec0ca8bbc87",
+    "sourceSha256": "DCA795554C7D4A5844243C41435F7E1DE7BBF8AA361F518FBF1C02CC8CAAE563"
+  }
+}

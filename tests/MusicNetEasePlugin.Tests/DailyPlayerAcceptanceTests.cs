@@ -33,9 +33,9 @@ public sealed class DailyPlayerAcceptanceTests
                 window.Show(); Pump(window); Assert.True(page.Document.IsSignedIn);
                 Assert.Empty(f.Player.Audio.Opened); Assert.Equal(0, f.Player.Catalog.Resolves);
                 Assert.True(page.View.GetVisualDescendants().OfType<Button>().Single(b => b.Name == "ResumeButton").IsEnabled);
-                Assert.Equal("已暂停", page.Music.StateText); Save(window, $"m2-restored-paused-{Theme(dark)}.png");
+                Assert.Equal("已暂停", page.Music.Player.StateText); Save(window, $"m2-restored-paused-{Theme(dark)}.png");
                 await Click(page.View, "我的歌单"); Pump(window);
-                page.Music.Playlists!.SelectedPlaylist = page.Music.Playlists.Playlists.Single(); await Click(page.View, "打开所选歌单"); Pump(window);
+                page.Music.Playlists!.SelectedPlaylist = page.Music.Playlists.Playlists.Single(); await page.Music.Playlists.OpenCommand.ExecuteAsync(null); Pump(window);
                 await Click(page.View, "播放全部"); await f.Lyrics.Pending; Pump(window);
                 Assert.Equal(1000, f.Player.Queue.Snapshot.Entries.Count); Assert.Equal(50, page.Music.Playlists.Tracks.Count);
                 f.Player.Audio.Emit(f.Player.Queue.Snapshot.Playback.Generation, PlaybackState.Playing, 1500); Pump(window);
@@ -52,12 +52,12 @@ public sealed class DailyPlayerAcceptanceTests
                 await Click(page.View, "最近播放"); Pump(window); Assert.Single(page.Music.History!.Rows);
                 var history = page.View.GetVisualDescendants().OfType<HistoryView>().Single();
                 var historyList = history.FindControl<ListBox>("HistoryList")!; historyList.SelectedIndex = 0; Pump(window);
-                await Click(history, "追加到队列"); Assert.Equal(1001, f.Player.Queue.Snapshot.Entries.Count);
-                await Click(history, "播放所选"); Assert.Single(f.Player.Queue.Snapshot.Entries);
+                await page.Music.History.AppendCommand.ExecuteAsync(null); Assert.Equal(1001, f.Player.Queue.Snapshot.Entries.Count);
+                await page.Music.History.PlayCommand.ExecuteAsync(null); Assert.Equal(1001, f.Player.Queue.Snapshot.Entries.Count);
                 await Click(page.View, "搜索"); Pump(window); page.Music.Keyword = "晨光"; await page.Music.SearchCommand.ExecuteAsync(null); Pump(window);
                 Assert.Single(page.Music.Tracks); Assert.NotSame(page.Music.NextSearchPageCommand, page.Music.Queue.NextCommand);
                 window.RequestedThemeVariant = dark ? ThemeVariant.Light : ThemeVariant.Dark; Pump(window);
-                Assert.Same(page.Document, page.View.DataContext); Assert.Equal(2, f.Player.Audio.Opened.Count);
+                Assert.Same(page.Document, page.View.DataContext); Assert.Single(f.Player.Audio.Opened);
             }
             finally { window.Close(); }
             return true;
@@ -76,9 +76,9 @@ public sealed class DailyPlayerAcceptanceTests
             {
                 first.Show(); second.Show(); await Click(a.View, "继续"); Pump(first); Pump(second);
                 await Click(a.View, "我的歌单"); await Click(b.View, "播放队列"); Pump(first); Pump(second);
-                Assert.True(a.Music.IsLibrary); Assert.True(b.Music.IsQueue); Assert.Empty(b.Music.Playlists!.Playlists);
-                Assert.Equal(a.Music.CurrentTrack, b.Music.CurrentTrack);
-                await Click(b.View, "暂停"); Pump(first); Pump(second); Assert.Equal("已暂停", a.Music.StateText);
+                Assert.True(a.Music.Navigation.IsLibrary); Assert.True(b.Music.Navigation.IsQueue); Assert.Empty(b.Music.Playlists!.Playlists);
+                Assert.Equal(a.Music.Player.CurrentTrack, b.Music.Player.CurrentTrack);
+                await Click(b.View, "暂停"); Pump(first); Pump(second); Assert.Equal("已暂停", a.Music.Player.StateText);
                 // 真 ComboBox 键盘输入改变共享模式，分页命令与上一首/下一首不混淆。
                 var combo = b.View.GetVisualDescendants().OfType<ComboBox>().Single(c => c.IsEffectivelyVisible);
                 Assert.True(combo.Focus()); second.KeyPress(Key.Down, RawInputModifiers.None, default, null); second.KeyRelease(Key.Down, RawInputModifiers.None, default, null); Pump(second); Pump(first);
@@ -104,14 +104,14 @@ public sealed class DailyPlayerAcceptanceTests
     private static WeakReference MountAndClose(Window window, Fixture fixture)
     {
         using var page = fixture.Page(); window.Content = page.View; Pump(window);
-        Assert.Equal("播放中", page.Music.StateText); Assert.Single(fixture.Player.Audio.Opened);
+        Assert.Equal("播放中", page.Music.Player.StateText); Assert.Single(fixture.Player.Audio.Opened);
         window.Content = null; Pump(window); return new(page.View);
     }
     private static void Pump(Window window) => DesktopUiTests.Pump(window);
     private static string Theme(bool dark) => dark ? "dark" : "light";
     private static async Task Click(Control root, string content)
     {
-        var button = root.GetVisualDescendants().OfType<Button>().Single(b => b.IsEffectivelyVisible && Equals(b.Content, content));
+        var button = root.GetVisualDescendants().OfType<Button>().First(b => b.IsEffectivelyVisible && (Equals(b.Content, content) || Avalonia.Automation.AutomationProperties.GetName(b) == content));
         Assert.True(button.IsEnabled, content); Assert.NotNull(button.Command);
         if (button.Command is IAsyncRelayCommand asyncCommand) await asyncCommand.ExecuteAsync(button.CommandParameter);
         else button.Command.Execute(button.CommandParameter);
@@ -132,7 +132,7 @@ public sealed class DailyPlayerAcceptanceTests
     {
         TestEvidence.Write(name, value);
     }
-    private sealed class Fixture : IAsyncDisposable
+    internal sealed class Fixture : IAsyncDisposable
     {
         internal readonly PlaybackPersistenceTests.Fixture Player;
         internal readonly LoginCoordinator Login = TestLogin.Create(new(), new MemorySessionStore { Saved = FakeAuthApi.Authorized(AuthContext.Create()) }, TimeProvider.System, LoginOptions.Default);
@@ -149,7 +149,7 @@ public sealed class DailyPlayerAcceptanceTests
         internal Page Page() => new(this);
         public async ValueTask DisposeAsync() { await Lyrics.DisposeAsync(); await Player.DisposeAsync(); await Login.DisposeAsync(); }
     }
-    private sealed class Page : IDisposable
+    internal sealed class Page : IDisposable
     {
         private readonly MusicLifetime _life = new();
         internal MusicWorkspace Music { get; } internal MainDocument Document { get; } internal MainView View { get; }

@@ -1,7 +1,7 @@
 # MusicNetEasePlugin 文档导航
 
 > 本插件唯一文档总导航；更新日期：2026-09-23。
-> 当前基线：V1–V4 已实现，用户已确认手工验收完成；对应能力里程碑 M0–M2 已完成。
+> 当前实现：V5 核心 A–D 已接入，自动验证与实机边界见 [V5 专用实施记录](maintenance/netease-v5-ui-interaction-implementation.md)。V1–V4 已实现，用户已确认手工验收完成；对应能力里程碑 M0–M2 已完成。
 > 验收依据：[V1–V4 验收收口记录](archive/records/netease-v1-v4-acceptance-20260923.md)。后续 M3–M5 尚未实施，下一步另行讨论。
 
 ## 当前使用与实现
@@ -13,7 +13,7 @@
 | 播放器与运行库如何工作 | [音乐与播放当前契约](reference/netease-music-playback.md) | 单曲执行、账号隔离、媒体预算、LibVLC 来源和设置 Tool |
 | 歌单、队列与歌词如何工作 | [日常播放器当前实现](reference/netease-daily-player.md) | 四模式、定位、歌词、历史、静默恢复与页面寿命 |
 | 界面如何工作 | [Document / Tool 当前界面契约](reference/netease-desktop-ui.md) | 紧凑布局、深浅主题、动效、偏好存储与资源所有权 |
-| 下一版交互与 UI 如何优化 | [V5 轻量交互与 UI 优化方案](roadmap/netease-v5-lightweight-interaction-and-ui-plan.md) | 官方与开源客户端对照、逐页交互、视觉规范、资源预算和实施验收计划；尚未实施 |
+| V5 交互与 UI 依据什么优化 | [V5 轻量交互与 UI 优化方案](roadmap/netease-v5-lightweight-interaction-and-ui-plan.md) | 官方与开源客户端对照、逐页交互、视觉规范、资源预算和实施验收计划；核心 A–D 已接入 |
 | 登录与请求如何工作 | [HTTP 与会话契约](reference/netease-http-session.md) | 微信/App 登录、Flurl、端点、会话、取消和生命周期 |
 | 后续有哪些候选能力 | [能力路线图](roadmap/netease-capability-roadmap.md) | 已完成 M0–M2，待讨论的 M3–M5 范围与依赖 |
 | 上游还有哪些能力 | [api-enhanced 能力清单](reference/netease-api-enhanced-capabilities.md) | 固定提交的模块索引与移植边界；不代表全部已支持 |
@@ -38,8 +38,9 @@ V 编号表示实施文档序号，M 编号表示能力里程碑，均不是插�
 | [登录验证矩阵](maintenance/netease-login-verification.md) | 协议、HTTP、状态、存储、UI、微信专项测试与人工回归方法 |
 | [V2 / M1 播放验证矩阵](maintenance/netease-v2-m1-playback-verification.md) | 搜索、播放、路径/Tool、Dock、共享运行库与平台边界；页面寿命已同步 V4 |
 | [V3 界面验证矩阵](maintenance/netease-v3-ui-verification.md) | 主题、尺寸、动效、资源回收与实机回归方法 |
-| [V4 / M2 日常播放器验证矩阵](maintenance/netease-v4-m2-daily-player-verification.md) | 默认完整 V4 检查：M2 场景、M1/V3 回归、门禁自测与实机回归方法 |
-| [V5 交互与 UI 专用验证计划](maintenance/netease-v5-ui-interaction-verification-plan.md) | 待实施的 V5 场景、单元/组件/资源检查、门禁失败注入与证据要求；尚未执行 |
+| [V4 / M2 日常播放器验证矩阵](maintenance/netease-v4-m2-daily-player-verification.md) | V4 历史完整检查：M2 场景、M1/V3 回归、门禁自测与实机回归方法 |
+| [V5 交互与 UI 专用验证计划](maintenance/netease-v5-ui-interaction-verification-plan.md) | 现行 V5 场景、单元/组件/资源检查、门禁失败注入与证据要求 |
+| [V5 专用实施记录](maintenance/netease-v5-ui-interaction-implementation.md) | 实现差异、自动证据、资源对比、SOLID 分工和实机边界 |
 | [开发部署、正式发布与验收](maintenance/deployment-and-release.md) | 私有依赖、干净部署目录、正式 ZIP 和真实 Host 回归流程 |
 
 以上矩阵继续作为后续回归依据，V1–V4 手工验收已收口。自动测试、用户手工验收和部署分别引用各自记录；正式发布与跨平台适配不包含在本次完成结论中。

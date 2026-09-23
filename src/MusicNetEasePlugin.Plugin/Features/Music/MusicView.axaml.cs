@@ -1,85 +1,76 @@
-using Avalonia.Controls;
-using Avalonia.Input;
-using Avalonia.Media.Imaging;
 using System.ComponentModel;
 using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.Input;
+using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 using MusicNetEasePlugin.Infrastructure.Ui;
 
 namespace MusicNetEasePlugin.Features.Music;
 
-/// <summary>View 拥有封面位图与可撤销的模型订阅；Dock 拆卸只释放图像，不停止歌曲或销毁模型。</summary>
+/// <summary>音乐内容外壳只组织搜索、浏览和按需队列；播放条拥有自己的手势与图片寿命。</summary>
 public partial class MusicView : UserControl
 {
     private MusicWorkspace? _model;
-    private Bitmap? _cover;
-    private int _widthMode = -1;
-    private string? _state;
+    private IInputElement? _browseFocus;
+    private bool _overlay;
+    public static readonly DirectProperty<MusicView, MusicWorkspace?> ModelProperty = AvaloniaProperty.RegisterDirect<MusicView, MusicWorkspace?>(nameof(Model), view => view.Model);
+    public MusicWorkspace? Model => DataContext as MusicWorkspace;
     public ViewMotion Motion { get; }
-    public static readonly StyledProperty<string> TrackColumnsProperty =
-        AvaloniaProperty.Register<MusicView, string>(nameof(TrackColumns), "3*,2*,3*,60");
-    public string TrackColumns { get => GetValue(TrackColumnsProperty); private set => SetValue(TrackColumnsProperty, value); }
     public MusicView()
     {
-        Motion = new(this);
-        InitializeComponent();
-        // Tunnel 先于 Slider 内部处理，保证第一次跳动前已登记草稿身份；按键自动重复仅在 KeyUp 提交。
-        PlaybackProgress.AddHandler(PointerPressedEvent, (_, _) => _model?.Timeline.Begin(), Avalonia.Interactivity.RoutingStrategies.Tunnel);
-        PlaybackProgress.AddHandler(PointerReleasedEvent, async (_, _) => { if (_model is { } model) await model.Timeline.CommitAsync(); }, Avalonia.Interactivity.RoutingStrategies.Tunnel);
-        PlaybackProgress.PointerCaptureLost += (_, _) => _model?.Timeline.Cancel();
-        PlaybackProgress.AddHandler(KeyDownEvent, (_, e) => { if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown) _model?.Timeline.Begin(); if (e.Key == Key.Escape) _model?.Timeline.Cancel(); }, Avalonia.Interactivity.RoutingStrategies.Tunnel);
-        PlaybackProgress.AddHandler(KeyUpEvent, async (_, e) => { if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown && _model is { } model) await model.Timeline.CommitAsync(); }, Avalonia.Interactivity.RoutingStrategies.Tunnel);
-        DataContextChanged += (_, _) => { if (VisualRoot is not null) Bind(); };
-        SizeChanged += (_, _) => ApplyWidth();
+        Motion = new(this); InitializeComponent();
+        DataContextChanged += (_, _) => { RaisePropertyChanged(ModelProperty, _model, Model); if (VisualRoot is not null) Bind(); };
+        SizeChanged += (_, _) => { Model?.Navigation.SetAvailableSize(Bounds.Width, Bounds.Height); Layout(); };
+        AddHandler(KeyDownEvent, PageKeyDown, RoutingStrategies.Bubble);
+        GotFocus += (_, e) =>
+        {
+            if (Model?.Navigation is { IsLyrics: false, IsQueuePage: false } && e.Source is Control control && control.GetVisualAncestors().Contains(ContentLayout))
+                _browseFocus = control.FindAncestorOfType<ListBoxItem>() ?? control;
+        };
     }
-    protected override void OnAttachedToVisualTree(Avalonia.VisualTreeAttachmentEventArgs args)
-    { base.OnAttachedToVisualTree(args); Bind(); }
-    protected override void OnDetachedFromVisualTree(Avalonia.VisualTreeAttachmentEventArgs args)
-    { Unbind(); SetCover(null); base.OnDetachedFromVisualTree(args); }
+    protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e) { base.OnAttachedToVisualTree(e); Bind(); }
+    protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e) { Unbind(); base.OnDetachedFromVisualTree(e); }
     private void Bind()
     {
-        Unbind();
-        _model = DataContext as MusicWorkspace;
-        Motion.Bind(_model?.Preferences);
-        _state = _model?.StateText;
-        if (_model is not null) _model.PropertyChanged += ModelChanged;
-        SetCover(_model?.CoverBytes);
+        Unbind(); _model = Model; Motion.Bind(_model?.Preferences);
+        if (_model is not null) { if (_model.Preferences is not null) _model.Preferences.PropertyChanged += PreferencesChanged; _model.Navigation.PropertyChanged += NavigationChanged; _model.Navigation.SetAvailableSize(Bounds.Width, Bounds.Height); }
+        Layout();
     }
-    private void Unbind() { if (_model is not null) { _model.PropertyChanged -= ModelChanged; _model.Timeline.Cancel(); } _model = null; Motion.Bind(null); }
-    private void ModelChanged(object? sender, PropertyChangedEventArgs args)
+    private void Unbind() { if (_model is not null) { _model.Navigation.PropertyChanged -= NavigationChanged; if (_model.Preferences is not null) _model.Preferences.PropertyChanged -= PreferencesChanged; } _model = null; _browseFocus = null; Motion.Bind(null); }
+    private void PreferencesChanged(object? sender, PropertyChangedEventArgs e) { if (e.PropertyName == "ShowArtwork") Layout(); }
+    private void NavigationChanged(object? sender, PropertyChangedEventArgs e)
     {
-        if (args.PropertyName == nameof(MusicWorkspace.CoverBytes)) SetCover(_model?.CoverBytes);
-        // 进度快照也会通知 StateText，必须比较实际状态；否则每个进度回调都会重播动画。
-        if (args.PropertyName == nameof(MusicWorkspace.StateText) && _state != _model?.StateText)
-        { _state = _model?.StateText; Motion.FadeIn(PlaybackState); }
+        if (e.PropertyName == nameof(MusicNavigation.IsQueueBeside)) Layout();
+        var overlay = Model?.Navigation is { IsLyrics: true } or { IsQueuePage: true };
+        if (_overlay && !overlay)
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => { if (_browseFocus is Control { IsEffectivelyVisible: true } control) control.Focus(); });
+        _overlay = overlay;
     }
-
-    private void ApplyWidth()
+    private void Layout()
     {
-        var mode = Bounds.Width >= 900 ? 0 : Bounds.Width >= 640 ? 1 : 2;
-        if (mode == _widthMode) return;
-        _widthMode = mode;
-        Classes.Set("compact", mode > 0);
-        Classes.Set("narrow", mode == 2);
-        TrackColumns = mode switch { 0 => "3*,2*,3*,60", 1 => "3*,2*,0,60", _ => "*,0,0,52" };
-        TimelineLayout.ColumnDefinitions = new(mode == 0 ? "*,Auto,180" : "*,Auto");
-        Grid.SetColumn(VolumeControls, mode == 0 ? 2 : 0);
-        Grid.SetRow(VolumeControls, mode == 0 ? 0 : 1);
-        Grid.SetColumnSpan(VolumeControls, mode == 0 ? 1 : 2);
-        VolumeControls.Width = 180;
-        VolumeControls.HorizontalAlignment = Avalonia.Layout.HorizontalAlignment.Right;
+        var large = Bounds.Width >= 1000 && Bounds.Height >= 550 && Model?.Preferences?.ShowArtwork != false;
+        LargeCover.IsVisible = large; LyricsLayout.ColumnDefinitions = new(large ? "216,*" : "0,*"); LyricsLayout.ColumnSpacing = large ? 16 : 0;
+        var beside = Model?.Navigation.IsQueueBeside == true;
+        ContentLayout.ColumnDefinitions = new(beside ? "*,304" : "*,0");
+        ContentLayout.ColumnSpacing = beside ? 12 : 0;
+        Grid.SetColumn(QueuePanel, beside ? 1 : 0);
     }
-    private void SetCover(byte[]? bytes)
+    private void SearchKeyDown(object? sender, KeyEventArgs e)
     {
-        Bitmap? next = null;
-        try { if (bytes is not null) { using var stream = new MemoryStream(bytes); next = new Bitmap(stream); } }
-        catch (Exception) { /* 损坏封面保留音符占位，不向 Host 抛出图像解码异常。 */ }
-        CoverImage.Source = next;
-        _cover?.Dispose();
-        _cover = next;
+        // 候选组合阶段的 Enter 只交给输入法。读取 TextPresenter 的公开预编辑状态，不能假定所有 IME 都会拦截 KeyDown。
+        if (SearchInput.GetVisualDescendants().OfType<Avalonia.Controls.Presenters.TextPresenter>().Any(p => !string.IsNullOrEmpty(p.PreeditText))) return;
+        if (e.Key == Key.Enter && Model is { } m) { m.SearchCommand.Execute(null); e.Handled = true; }
     }
-    private void SearchKeyDown(object? sender, KeyEventArgs args)
+    internal static bool IsInteractiveChild(object? source) => source is Control control &&
+        (control is Button or TextBox or RangeBase or ComboBox || control.GetVisualAncestors().Any(parent => parent is Button or TextBox or RangeBase or ComboBox));
+    private void PageKeyDown(object? sender, KeyEventArgs e)
     {
-        if (args.Key == Key.Enter && DataContext is MusicWorkspace workspace)
-        { workspace.SearchCommand.Execute(null); args.Handled = true; }
+        if (e.Handled || Model is not { } m) return;
+        if (e.Key == Key.Escape && m.Navigation.CanBack) { m.Navigation.Back(); e.Handled = true; }
+        // Space 不覆盖文本编辑、滑块、按钮和列表自身的选择语义，也不注册全局快捷键。
+        else if (e.Key == Key.Space && !IsInteractiveChild(e.Source) && e.Source is Control c && c.FindAncestorOfType<ListBox>() is null && m.Player.ToggleCommand.CanExecute(null))
+        { m.Player.ToggleCommand.Execute(null); e.Handled = true; }
     }
 }

@@ -17,6 +17,8 @@ public sealed class TimelineWorkspace : ObservableObject, IDisposable
     private bool _editing;
     private double _draft;
     private bool _closed;
+    private bool _visible = true;
+    public void SetVisible(bool visible) { _visible = visible; if (visible) Apply(_player.Snapshot); else Cancel(); }
     public TimelineWorkspace(IPlayerSession player, ILoginUiDispatcher ui)
     { (_player, _ui) = (player, ui); player.Changed += Changed; Apply(player.Snapshot); }
     public bool CanSeek => _snapshot.Playback.CanSeek && _snapshot.Playback.DurationMs > 0 && _snapshot.Playback.State is PlaybackState.Playing or PlaybackState.Paused;
@@ -41,7 +43,7 @@ public sealed class TimelineWorkspace : ObservableObject, IDisposable
         catch (OperationCanceledException) { }
     }
     public void Cancel() { _editing = false; OnPropertyChanged(nameof(IsEditing)); OnPropertyChanged(nameof(Position)); OnPropertyChanged(nameof(DraftText)); }
-    private void Changed(object? sender, PlayerSessionSnapshot snapshot) => _ui.Post(() => { if (!_closed) Apply(snapshot); });
+    private void Changed(object? sender, PlayerSessionSnapshot snapshot) { if (_visible) _ui.Post(() => { if (!_closed && _visible) Apply(snapshot); }); }
     private void Apply(PlayerSessionSnapshot snapshot)
     {
         if (snapshot.Revision < _snapshot.Revision) return;

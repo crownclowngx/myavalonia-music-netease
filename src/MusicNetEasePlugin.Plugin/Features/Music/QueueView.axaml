@@ -1,24 +1,18 @@
-<UserControl x:Class="MusicNetEasePlugin.Features.Music.QueueView"
- xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:QueueWorkspace">
- <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="12,6">
-  <Grid ColumnDefinitions="*,Auto">
-   <TextBlock Text="{Binding CountText}" VerticalAlignment="Center" />
-   <ComboBox Grid.Column="1" ItemsSource="{Binding Modes}" SelectedIndex="{Binding ModeIndex, Mode=TwoWay}" AutomationProperties.Name="播放模式" MinWidth="130" />
+<UserControl x:Class="MusicNetEasePlugin.Features.Music.QueueView" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:QueueWorkspace">
+ <Grid RowDefinitions="Auto,Auto,*,Auto,Auto" Margin="4" RowSpacing="6">
+  <Grid ColumnDefinitions="*,Auto,Auto"><TextBlock Text="{Binding CountText}" Classes="netease-secondary" VerticalAlignment="Center" />
+   <Button Grid.Column="1" Classes="netease-button" Content="定位" Click="LocateCurrent" AutomationProperties.Name="定位当前曲目" />
+   <Button Grid.Column="2" Classes="netease-button icon" AutomationProperties.Name="更多队列操作"><PathIcon Width="16" Height="16" Data="{DynamicResource NeteaseMoreIcon}" /><Button.Flyout><MenuFlyout><MenuItem Header="清空队列" Command="{Binding RequestClearCommand}" /></MenuFlyout></Button.Flyout></Button>
   </Grid>
-  <ListBox Grid.Row="1" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected, Mode=TwoWay}" AutomationProperties.Name="当前播放队列" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-   <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
-   <ListBox.ItemTemplate><DataTemplate x:DataType="vm:QueueRow"><Grid ColumnDefinitions="*,Auto">
-    <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" /><TextBlock Grid.Column="1" Text="{Binding Source}" Margin="8,0,0,0" FontSize="12" />
-   </Grid></DataTemplate></ListBox.ItemTemplate>
-  </ListBox>
-  <WrapPanel Grid.Row="2" Orientation="Horizontal">
-   <Button Content="播放所选" Command="{Binding PlayCommand}" Margin="0,4,6,0" />
-   <Button Content="移除" Command="{Binding RemoveCommand}" Margin="0,4,6,0" />
-   <Button Content="上移" Command="{Binding UpCommand}" Margin="0,4,6,0" />
-   <Button Content="下移" Command="{Binding DownCommand}" Margin="0,4,6,0" />
-   <Button Content="清空队列" Command="{Binding ClearCommand}" Margin="0,4,0,0" />
-  </WrapPanel>
-  <TextBlock Grid.Row="3" Text="{Binding Message}" TextTrimming="CharacterEllipsis" />
+  <TextBlock Grid.Row="1" Text="{Binding OrderHint}" Classes="netease-secondary" FontSize="11" TextWrapping="Wrap" />
+  <Grid Grid.Row="2">
+   <vm:SongListBox x:Name="QueueList" Classes="netease-results" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected, Mode=TwoWay}" ActivateCommand="{Binding PlayCommand}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="当前播放队列">
+    <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+    <ListBox.ItemTemplate><DataTemplate x:DataType="vm:QueueRow"><vm:SongRowView Title="{Binding Title}" Subtitle="{Binding Detail}" Current="{Binding IsCurrent}" PlayCommand="{Binding $parent[vm:QueueView].Model.PlayCommand}" RemoveCommand="{Binding $parent[vm:QueueView].Model.RemoveCommand}" UpCommand="{Binding $parent[vm:QueueView].Model.UpCommand}" DownCommand="{Binding $parent[vm:QueueView].Model.DownCommand}" /></DataTemplate></ListBox.ItemTemplate>
+   </vm:SongListBox>
+   <TextBlock Text="队列还是空的，可从歌曲菜单加入。" IsVisible="{Binding IsEmpty}" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16" />
+  </Grid>
+  <Border Grid.Row="3" Padding="8" Background="{DynamicResource NeteaseSelectionBrush}" IsVisible="{Binding ConfirmClear}"><StackPanel Spacing="6"><TextBlock Text="{Binding ClearText}" TextWrapping="Wrap" /><StackPanel Orientation="Horizontal" Spacing="6"><Button Content="确认清空" Command="{Binding ConfirmClearCommand}" Classes="netease-button primary" /><Button Content="取消" Command="{Binding CancelClearCommand}" Classes="netease-button" /></StackPanel></StackPanel></Border>
+  <TextBlock Grid.Row="4" Text="{Binding Message}" TextWrapping="Wrap" Classes="netease-secondary" IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
  </Grid>
 </UserControl>

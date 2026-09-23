@@ -21,6 +21,8 @@ public interface IPlayerSession
     event EventHandler<PlayerSessionSnapshot>? Changed;
     Task ReplaceAsync(IReadOnlyList<QueueEntry> entries, int startIndex, CancellationToken ct);
     Task PlaySingleAsync(MusicTrack track, CancellationToken ct);
+    /// <summary>明确的单曲试听意图：保留原队列，在当前项后插入并播放；已是当前曲目则继续。</summary>
+    Task PlayNowAsync(QueueEntry entry, CancellationToken ct);
     Task EnqueueAsync(IReadOnlyList<QueueEntry> entries, bool playNext, CancellationToken ct);
     Task SelectAsync(Guid entryId, CancellationToken ct);
     Task NextAsync(bool previous, CancellationToken ct);
@@ -28,6 +30,7 @@ public interface IPlayerSession
     void Move(Guid entryId, int direction);
     void SetMode(PlaybackMode mode);
     Task ClearAsync();
+    Task ClearIfUnchangedAsync(long expectedQueueRevision);
     Task StopAsync();
     Task PauseAsync(bool paused, CancellationToken ct);
     Task SetVolumeAsync(int volume, CancellationToken ct);

@@ -47,16 +47,13 @@ public sealed class DesktopUiTests
                 await fixture.Music.PlayCommand.ExecuteAsync(null); Pump(window);
                 fixture.Preferences.ReduceMotion = true; await fixture.Preferences.PendingSave; Pump(window);
                 var music = view.FindControl<MusicView>("MusicContent")!;
-                Assert.Equal(Color.Parse(dark ? "#1E1E1E" : "#FFFFFF"), Brush(view.Background));
+                Assert.Equal(Color.Parse(dark ? "#17191D" : "#F7F8FA"), Brush(view.Background));
                 double wideHeight = 0;
                 foreach (var size in new[] { (1200, 720), (800, 600), (520, 420) })
                 {
                     window.Width = size.Item1; window.Height = size.Item2; Pump(window);
-                    foreach (var name in new[] { "SearchInput", "SearchButton", "PlaySelectedButton", "PauseButton", "StopButton", "VolumeSlider", "PlaybackProgress" })
-                        AssertInside(music.FindControl<Control>(name)!, music);
-                    var volume = music.FindControl<Slider>("VolumeSlider")!;
-                    foreach (var thumb in volume.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.Thumb>())
-                        AssertInside(thumb, volume);
+                    foreach (var name in new[] { "SearchInput", "SearchButton", "PauseButton", "VolumeButton", "PlaybackProgress" })
+                        AssertInside(music.GetVisualDescendants().OfType<Control>().Single(c => c.Name == name), music);
                     var list = music.FindControl<ListBox>("TrackList")!;
                     Assert.True(list.Bounds.Height > 50, $"{size}: 结果区域高度不足 {list.Bounds.Height}");
                     if (size.Item1 == 1200) wideHeight = list.Bounds.Height;
@@ -67,13 +64,13 @@ public sealed class DesktopUiTests
                 }
                 // 原地切换主题，不能重建模型、播放条或选择；固定值不能蒙混通过动态资源检查。
                 window.RequestedThemeVariant = dark ? ThemeVariant.Light : ThemeVariant.Dark; Pump(window);
-                Assert.Equal(Color.Parse(dark ? "#FFFFFF" : "#1E1E1E"), Brush(view.Background));
+                Assert.Equal(Color.Parse(dark ? "#F7F8FA" : "#17191D"), Brush(view.Background));
                 Assert.Same(fixture.Document, view.DataContext);
                 Assert.Equal(PlaybackState.Playing, fixture.Playback.Player.Snapshot.State);
                 Assert.Single(fixture.Playback.Audio.Opened);
-                await fixture.Music.PauseCommand.ExecuteAsync(null); Pump(window);
-                Assert.True(music.FindControl<Button>("ResumeButton")!.IsVisible);
-                Assert.False(music.FindControl<Button>("PauseButton")!.IsVisible);
+                await fixture.Music.Player.PauseCommand.ExecuteAsync(null); Pump(window);
+                Assert.True(music.GetVisualDescendants().OfType<Button>().Single(c => c.Name == "ResumeButton")!.IsVisible);
+                Assert.False(music.GetVisualDescendants().OfType<Button>().Single(c => c.Name == "PauseButton")!.IsVisible);
             }
             finally { window.Close(); }
             return true;
@@ -94,7 +91,7 @@ public sealed class DesktopUiTests
             var window = new Window { Content = view, RequestedThemeVariant = dark ? ThemeVariant.Dark : ThemeVariant.Light };
             try
             {
-                window.Show(); await fixture.Settings.EnsureLoadedAsync();
+                window.Show(); await fixture.Settings.EnsureLoadedAsync(); fixture.Settings.AdvancedExpanded = true;
                 fixture.Settings.DirectoryPath = @"D:\非常长的公共运行库目录\不会立即加载\LibVLC\尚未保存";
                 fixture.Preferences.ReduceMotion = true; await fixture.Preferences.PendingSave;
                 foreach (var size in new[] { (280, 900), (320, 900), (420, 900), (640, 240) })
@@ -168,7 +165,7 @@ public sealed class DesktopUiTests
             var window = new Window { Width = 1200, Height = 720, Content = parent };
             try
             {
-                window.Show(); await fixture.Settings.EnsureLoadedAsync();
+                window.Show(); await fixture.Settings.EnsureLoadedAsync(); fixture.Settings.AdvancedExpanded = true;
                 await fixture.Music.SearchAsync(0, "测试"); Pump(window);
                 fixture.Music.SelectedTrack = fixture.Music.Tracks[0]; await fixture.Music.PlayCommand.ExecuteAsync(null); Pump(window);
                 fixture.Settings.DirectoryPath = "保留草稿";
@@ -177,7 +174,7 @@ public sealed class DesktopUiTests
                 Assert.NotNull(button.Transitions);
                 for (var cycle = 0; cycle < 20; cycle++)
                 {
-                    music.Motion.FadeIn(music.FindControl<Control>("PlaybackState")!);
+                    music.Motion.FadeIn(music.GetVisualDescendants().OfType<Control>().Single(c => c.Name == "PlaybackState")!);
                     parent.IsVisible = false; Pump(window);
                     Assert.False(music.Motion.IsEnabled); Assert.False(music.Motion.HasActiveFade);
                     Assert.DoesNotContain(button.Transitions ?? [], transition => transition is Avalonia.Animation.BrushTransition);
@@ -293,7 +290,7 @@ public sealed class DesktopUiTests
             try
             {
                 window.Show(); await fixture.SignInAsync(); await fixture.Music.SearchAsync(0, "测试"); Pump(window);
-                Assert.Equal(Color.Parse("#1E1E1E"), Brush(view.Background));
+                Assert.Equal(Color.Parse("#17191D"), Brush(view.Background));
                 Assert.Equal(count, app.Resources.Count);
                 var button = view.GetVisualDescendants().OfType<Button>().Single(x => Equals(x.Content, "账号"));
                 var flyout = Assert.IsType<MenuFlyout>(button.Flyout);
@@ -305,7 +302,7 @@ public sealed class DesktopUiTests
                 // 同一 View 在窗口间移动后继续继承新窗口主题；不是实际 Dock 拖拽验收。
                 window.Content = null;
                 var other = new Window { Width = 1000, Height = 600, Content = view, RequestedThemeVariant = ThemeVariant.Light };
-                try { other.Show(); Pump(other); Assert.Equal(Colors.White, Brush(view.Background)); }
+                try { other.Show(); Pump(other); Assert.Equal(Color.Parse("#F7F8FA"), Brush(view.Background)); }
                 finally { other.Close(); }
             }
             finally { window.Close(); }

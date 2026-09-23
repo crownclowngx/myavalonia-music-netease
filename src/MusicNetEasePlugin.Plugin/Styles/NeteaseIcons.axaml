@@ -1,0 +1,10 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <!-- 音乐控制使用同一套自绘单色几何；一次解析、按主题着色，不引入字体或位图图标包。 -->
+ <StreamGeometry x:Key="NeteasePlayIcon">M6,3 L17,10 L6,17 Z</StreamGeometry>
+ <StreamGeometry x:Key="NeteasePauseIcon">M5,3 H8 V17 H5 Z M12,3 H15 V17 H12 Z</StreamGeometry>
+ <StreamGeometry x:Key="NeteasePreviousIcon">M3,4 H5 V16 H3 Z M16,4 L6,10 L16,16 Z</StreamGeometry>
+ <StreamGeometry x:Key="NeteaseNextIcon">M15,4 H17 V16 H15 Z M4,4 L14,10 L4,16 Z</StreamGeometry>
+ <StreamGeometry x:Key="NeteaseMusicIcon">M7,3 L17,1 V13 A3,3 0 1 1 15,10 V5 L9,7 V15 A3,3 0 1 1 7,12 Z</StreamGeometry>
+ <StreamGeometry x:Key="NeteaseMoreIcon">M4,8 A2,2 0 1 1 4,12 A2,2 0 1 1 4,8 M10,8 A2,2 0 1 1 10,12 A2,2 0 1 1 10,8 M16,8 A2,2 0 1 1 16,12 A2,2 0 1 1 16,8</StreamGeometry>
+ <StreamGeometry x:Key="NeteaseSearchIcon">M8,2 A6,6 0 1 0 8,14 A6,6 0 1 0 8,2 M8,4 A4,4 0 1 1 8,12 A4,4 0 1 1 8,4 M12,12 L14,12 L19,17 L17,19 Z</StreamGeometry>
+</ResourceDictionary>

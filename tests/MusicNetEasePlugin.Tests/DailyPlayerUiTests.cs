@@ -57,14 +57,14 @@ public sealed class DailyPlayerUiTests
             try
             {
                 window.Show(); await f.Queue.PlaySingleAsync(MusicCatalog.Track(1), default); DesktopUiTests.Pump(window);
-                var slider = view.FindControl<Slider>("PlaybackProgress")!; Assert.True(slider.IsEnabled); slider.Focus();
+                var slider = view.GetVisualDescendants().OfType<Slider>().Single(c => c.Name == "PlaybackProgress")!; Assert.True(slider.IsEnabled); slider.Focus();
                 window.KeyPress(Key.Right, RawInputModifiers.None, default, null); window.KeyPress(Key.Right, RawInputModifiers.None, default, null); Assert.Empty(f.Audio.SeekPositions);
                 window.KeyRelease(Key.Right, RawInputModifiers.None, default, null); DesktopUiTests.Pump(window);
                 Assert.Single(f.Audio.SeekPositions); Assert.True(f.Audio.SeekPositions.Single() > 0);
                 var point = slider.TranslatePoint(new Point(slider.Bounds.Width / 2, slider.Bounds.Height / 2), window)!.Value;
                 window.MouseDown(point, MouseButton.Left); window.MouseMove(point + new Vector(20, 0));
                 await f.Queue.PlaySingleAsync(MusicCatalog.Track(2), default); window.MouseUp(point, MouseButton.Left); DesktopUiTests.Pump(window);
-                Assert.False(model.Timeline.IsEditing); Assert.Single(f.Audio.SeekPositions); Assert.Equal(0, f.Queue.Snapshot.Playback.PositionMs);
+                Assert.False(model.Player.Timeline.IsEditing); Assert.Single(f.Audio.SeekPositions); Assert.Equal(0, f.Queue.Snapshot.Playback.PositionMs);
             }
             finally { window.Close(); }
             return true;
@@ -89,6 +89,8 @@ public sealed class DailyPlayerUiTests
                 await browser.OpenCommand.ExecuteAsync(null); DesktopUiTests.Pump(window);
                 Assert.Equal(1, browser.TabIndex); Assert.Equal(50, browser.Tracks.Count);
                 var list = view.FindControl<ListBox>("PlaylistTrackList")!;
+                Assert.True(list.IsEffectivelyVisible, "歌单详情列表不可见");
+                Assert.True(list.Items.Count == 50, $"列表绑定数量 {list.Items.Count}");
                 Assert.True(list.Bounds.Height > 30); Assert.InRange(list.GetVisualDescendants().OfType<ListBoxItem>().Count(), 1, 20);
                 await browser.NextTracksCommand.ExecuteAsync(null); DesktopUiTests.Pump(window);
                 Assert.Equal(50, browser.Tracks[0].Index);

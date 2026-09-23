@@ -1,6 +1,7 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Main.MainView" x:Name="MainRoot"
  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:vm="using:MusicNetEasePlugin.Features.Main" xmlns:music="using:MusicNetEasePlugin.Features.Music"
+ xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:settings="using:MusicNetEasePlugin.Features.Settings" ui:ArtworkImage.Context="{Binding Artwork}"
  xmlns:conv="using:Avalonia.Data.Converters" x:DataType="vm:MainDocument"
  Background="{DynamicResource NeteaseDocumentBackgroundBrush}" Foreground="{DynamicResource NeteaseTextBrush}" FontSize="13">
  <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
@@ -13,11 +14,12 @@
     <TextBlock Text="网易云音乐" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
     <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
      <Border Width="24" Height="24" CornerRadius="12" ClipToBounds="True" IsVisible="{Binding IsSignedIn}" Background="{DynamicResource NeteasePanelBrush}" VerticalAlignment="Center">
-      <Grid><TextBlock Text="云" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource NeteaseAccentBrush}" /><Image x:Name="AvatarImage" Stretch="UniformToFill" /></Grid>
+      <Grid><TextBlock Text="云" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource NeteaseAccentBrush}" /><ui:ArtworkImage x:Name="AvatarImage" Bytes="{Binding AvatarImageBytes}" Stretch="UniformToFill" /></Grid>
      </Border>
      <TextBlock x:Name="AccountSummary" Text="{Binding AccountName}" MaxWidth="160" TextTrimming="CharacterEllipsis" IsVisible="{Binding IsSignedIn}" VerticalAlignment="Center" ToolTip.Tip="{Binding AccountId}" />
-     <Button Classes="netease-button" Classes.netease-motion="{Binding #MainRoot.Motion.IsEnabled}" Content="账号" AutomationProperties.Name="账号操作">
+     <Button Classes="netease-button" Classes.netease-motion="{Binding #MainRoot.Motion.IsEnabled}" x:Name="AccountMenuButton" Content="账号" AutomationProperties.Name="账号操作">
       <Button.Flyout><MenuFlyout>
+       <MenuItem Header="账号与播放设置" Click="OpenSettings" />
        <MenuItem Header="恢复登录" Command="{Binding RestoreCommand}" />
        <MenuItem Header="重试保存登录信息" Command="{Binding RetrySaveCommand}" IsVisible="{Binding NeedsSaveRetry}" />
        <Separator />
@@ -48,10 +50,8 @@
     <StackPanel x:Name="LoginDetails" Grid.Column="1" Spacing="10" VerticalAlignment="Center">
      <TextBlock Text="连接音乐账号" FontSize="18" FontWeight="SemiBold" />
      <TextBlock Classes="netease-secondary" Text="{Binding QrInstruction}" TextWrapping="Wrap" />
-     <WrapPanel>
-      <Button Classes="netease-button primary" Classes.netease-motion="{Binding #MainRoot.Motion.IsEnabled}" Content="微信扫码登录 / 更新" Command="{Binding StartLoginCommand}" Margin="0,0,6,6" />
-      <Button Classes="netease-button" Classes.netease-motion="{Binding #MainRoot.Motion.IsEnabled}" Content="网易云 App 扫码" Command="{Binding StartNeteaseLoginCommand}" Margin="0,0,0,6" />
-     </WrapPanel>
+     <ComboBox ItemsSource="{Binding LoginMethods}" SelectedIndex="{Binding LoginMethodIndex, Mode=TwoWay}" AutomationProperties.Name="扫码方式" HorizontalAlignment="Stretch" />
+     <Button x:Name="LoginActionButton" Classes="netease-button primary" Content="{Binding LoginAction}" Command="{Binding LoginCommand}" HorizontalAlignment="Left" />
      <StackPanel Orientation="Horizontal" Spacing="6">
       <Button Classes="netease-button" Content="取消" Command="{Binding CancelLoginCommand}" IsVisible="{Binding IsBusy}" />
       <Button Classes="netease-button" Content="重试恢复" Command="{Binding RestoreCommand}" />
@@ -66,5 +66,8 @@
    </Grid>
   </ScrollViewer>
   <Border Grid.Row="2" IsVisible="{Binding IsSignedIn}"><music:MusicView x:Name="MusicContent" DataContext="{Binding Music}" /></Border>
+  <Border x:Name="SettingsOverlay" Grid.Row="1" Grid.RowSpan="2" IsVisible="False" Background="{DynamicResource NeteaseDocumentBackgroundBrush}">
+   <Grid RowDefinitions="Auto,*"><Button Content="‹ 返回音乐" Click="CloseSettings" HorizontalAlignment="Left" Classes="netease-button" Margin="8" /><settings:MusicSettingsView Grid.Row="1" DataContext="{Binding Settings}" /></Grid>
+  </Border>
  </Grid>
 </UserControl>

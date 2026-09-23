@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "m2-restored-paused-dark.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "F955B09BF13F69934F4CC0B66222DE520DF2592248002889D886C12FFB5CEB37",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-093716-a76d8003",
+    "revision": "a9b85f02c8516acf8a24236fb1e61ec0ca8bbc87",
+    "sourceSha256": "DCA795554C7D4A5844243C41435F7E1DE7BBF8AA361F518FBF1C02CC8CAAE563"
+  }
+}

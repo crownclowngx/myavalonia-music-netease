@@ -1,0 +1,86 @@
+{
+  "completedUtc": "2026-09-23T17:42:35.6738634+08:00",
+  "target": "D:\\data\\avalonia\\Controls\\MusicNetEasePlugin",
+  "configuration": "Debug",
+  "includeLibVlcRuntime": false,
+  "managedLibVlcSharpIncluded": true,
+  "files": [
+    {
+      "name": "BouncyCastle.Cryptography.dll",
+      "bytes": 4924576,
+      "sha256": "E5EEAF6D263C493619982FD3638E6135077311D08C961E1FE128F9107D29EBC6"
+    },
+    {
+      "name": "Flurl.dll",
+      "bytes": 39936,
+      "sha256": "7FF7965161F6ACC809F7154CD3BA1F56E0290974D4FCFC5944BD4C9030996383"
+    },
+    {
+      "name": "Flurl.Http.dll",
+      "bytes": 113152,
+      "sha256": "CB204C6865563BC7F023F4655977CF5263536A75069B0E7E1D72A900A66F1EB5"
+    },
+    {
+      "name": "LibVLCSharp.dll",
+      "bytes": 229888,
+      "sha256": "EA886CA99677A28C2B15D11F8DDD52EF5F22D7E17600F1A31C0F6DD91DC9E4FE"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.deps.json",
+      "bytes": 16843,
+      "sha256": "3F828A0007BB1C6D18AE668B2918DFAC988888E1D2566E70BE03FABC65257D00"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.dll",
+      "bytes": 763392,
+      "sha256": "A0E36616E7D53B43370C53166FC6011B99EABB2A86A35D422E02DB71A4CE149E"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.pdb",
+      "bytes": 185008,
+      "sha256": "C7519756C11330E30E58C6CF3106A1C8F7498289EBA49316A03771B901EEBD59"
+    },
+    {
+      "name": "MyAvaloniaManagement.Icons.dll",
+      "bytes": 8192,
+      "sha256": "52AB55FB828C3F6CF404814BC22F1B7A3B8045B762C56A9E6610799C6BE922E9"
+    },
+    {
+      "name": "plugin.manifest.json",
+      "bytes": 298,
+      "sha256": "97B99D057395F9200CB4555A2C73744A67EBFC405130BCDD7CCCAD436B37D0FD"
+    },
+    {
+      "name": "QRCoder.dll",
+      "bytes": 204288,
+      "sha256": "5CACB8E071EF6B355615E8CAE1D02D94B9D191EC33DB12A05D82099CDDB16E9A"
+    },
+    {
+      "name": "System.Security.Cryptography.ProtectedData.dll",
+      "bytes": 40208,
+      "sha256": "7CCC461B061D8E45ACF41219809C8773028274037906180C77495571A305734B"
+    },
+    {
+      "name": "THIRD-PARTY-NOTICES.md",
+      "bytes": 2333,
+      "sha256": "2CAB65847EC2386946992054968F7B841F1E33DBCFB6E9D93CAA6C01513679E0"
+    }
+  ],
+  "fileCount": 12,
+  "previousTotalBytes": 6383814,
+  "totalBytes": 6528114,
+  "backupPath": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-deployment-20260923\\previous-plugin",
+  "backupVerified": true,
+  "stagingMatchesTarget": true,
+  "unchangedCommonFiles": 425,
+  "unchangedOtherPluginDirectories": 12,
+  "gateRunId": "20260923-093716-a76d8003",
+  "sourceSha256": "DCA795554C7D4A5844243C41435F7E1DE7BBF8AA361F518FBF1C02CC8CAAE563",
+  "revision": "a9b85f02c8516acf8a24236fb1e61ec0ca8bbc87",
+  "workingTreeDirty": true,
+  "hostLaunched": false,
+  "releaseGateExecuted": false,
+  "backupRetainedAfterCleanup": true,
+  "postCleanupDeploymentVerified": true,
+  "matchingPluginManifests": 1
+}

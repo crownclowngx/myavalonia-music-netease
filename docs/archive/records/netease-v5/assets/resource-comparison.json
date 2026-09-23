@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "realHost": false,
+  "secondsPerScenario": 60,
+  "rounds": 3,
+  "statistics": "median",
+  "samples": {
+    "v4-baseline": {
+      "paused-visible": {
+        "privateBytes": 51994624,
+        "allocatedBytes": 1308232,
+        "cpuOneCorePercent": 4.598057601576079,
+        "navigationPairP95Ms": 10.2148,
+        "visibleRows": 9
+      },
+      "lyrics-visible": {
+        "privateBytes": 54358016,
+        "allocatedBytes": 58620296,
+        "cpuOneCorePercent": 8.328904216412143,
+        "navigationPairP95Ms": 10.2148,
+        "visibleRows": 9
+      },
+      "playing-hidden": {
+        "privateBytes": 54468608,
+        "allocatedBytes": 3717712,
+        "cpuOneCorePercent": 4.674535075685991,
+        "navigationPairP95Ms": 10.2148,
+        "visibleRows": 0
+      }
+    },
+    "v5-observation": {
+      "paused-visible": {
+        "privateBytes": 55205888,
+        "allocatedBytes": 1248240,
+        "cpuOneCorePercent": 6.6494522543628,
+        "navigationPairP95Ms": 14.6506,
+        "visibleRows": 8
+      },
+      "lyrics-visible": {
+        "privateBytes": 55328768,
+        "allocatedBytes": 54021272,
+        "cpuOneCorePercent": 10.934424875244252,
+        "navigationPairP95Ms": 14.6506,
+        "visibleRows": 7
+      },
+      "playing-hidden": {
+        "privateBytes": 55279616,
+        "allocatedBytes": 1551360,
+        "cpuOneCorePercent": 5.3309072033819405,
+        "navigationPairP95Ms": 14.6506,
+        "visibleRows": 0
+      }
+    }
+  },
+  "limitations": [
+    "强制 Headless 绘制循环，不是实际 Host 空闲 CPU 或帧耗时",
+    "性能报告源码身份与最终门禁分别记录；后续仅修正图片回调收口、设置遮挡与测试文档，采样未使用联网图片或打开设置"
+  ]
+}

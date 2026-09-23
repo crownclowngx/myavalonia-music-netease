@@ -34,6 +34,39 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     public PlayerSessionSnapshot Snapshot { get { lock (_sync) return _snapshot; } }
     public event EventHandler<PlayerSessionSnapshot>? Changed;
     public Task PlaySingleAsync(MusicTrack track, CancellationToken ct) => ReplaceAsync([QueueEntry.FromTrack(track)], 0, ct);
+    /// <summary>
+    /// “插入、选中、启动”在唯一写入者的同一短锁中接纳，页面不能自行拼接三个异步命令。
+    /// 同曲只与当前项比较：队列其他位置仍有独立 EntryId，不擅自合并用户安排的重复歌曲。
+    /// 音频启动继续由单曲执行器在锁外完成，沿用旧尝试取消、账号撤销和有限失败推进规则。
+    /// </summary>
+    public Task PlayNowAsync(QueueEntry entry, CancellationToken ct)
+    {
+        Validate([entry]);
+        var session = Capture(ct);
+        Task work;
+        var inserted = false;
+        lock (_sync)
+        {
+            BindAccount(session);
+            if (_order.Current?.TrackId == entry.TrackId)
+            {
+                work = _snapshot.Playback.State is PlaybackState.Playing or PlaybackState.Loading
+                    ? Task.CompletedTask : PauseAsync(false, ct);
+            }
+            else
+            {
+                if (_order.Entries.Count >= 10000 || _order.Entries.Any(item => item.EntryId == entry.EntryId))
+                    throw new MusicException(MusicError.Storage, "队列已满或条目标识重复，请整理队列后重试。");
+                _order.InsertAndSelect(entry);
+                _failedCandidates.Clear();
+                PublishOrder();
+                work = StartCurrent();
+                inserted = true;
+            }
+        }
+        Notify(explicitReplacement: inserted);
+        return work;
+    }
     public Task ReplaceAsync(IReadOnlyList<QueueEntry> entries, int startIndex, CancellationToken ct)
     {
         Validate(entries);
@@ -111,11 +144,15 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         lock (_sync) { if (_closed) return; _order.SetMode(mode); PublishOrder(); }
         Notify();
     }
-    public Task ClearAsync()
+    public Task ClearAsync() => ClearCore(null);
+    public Task ClearIfUnchangedAsync(long expectedQueueRevision) => ClearCore(expectedQueueRevision);
+    private Task ClearCore(long? expectedQueueRevision)
     {
         Task work;
         lock (_sync)
         {
+            if (expectedQueueRevision is { } expected && expected != _snapshot.QueueRevision)
+                throw new MusicException(MusicError.Storage, "队列已经变化，请重新确认。");
             _attempt = Guid.Empty; _terminalConsumed = true; _failedCandidates.Clear(); _order.Replace([], 0);
             PublishOrder(); work = StopToPending(PlaybackState.Stopped);
         }

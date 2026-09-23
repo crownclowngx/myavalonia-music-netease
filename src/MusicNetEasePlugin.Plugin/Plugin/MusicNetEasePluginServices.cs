@@ -32,7 +32,10 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<INeteaseAuthApi, NeteaseAuthApi>();
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IQrLoginProvider, NeteaseAppQrLoginProvider>());
         services.TryAddEnumerable(ServiceDescriptor.Singleton<IQrLoginProvider, WeChatQrLoginProvider>());
-        services.TryAddSingleton<IAccountImageSource, AccountImageSource>();
+        services.TryAddSingleton<AccountImageSource>();
+        services.TryAddSingleton<IAccountImageSource>(p => new AccountImageCache(p.GetRequiredService<AccountImageSource>(), p.GetRequiredService<LoginCoordinator>()));
+        services.TryAddSingleton<ArtworkContext>();
+        services.TryAddSingleton<MusicNetEasePlugin.Features.Settings.MusicSettingsTool>();
         services.TryAddSingleton<ISessionProtector, CurrentUserSessionProtector>();
         services.TryAddSingleton<ILoginSessionStore>(provider =>
             new ProtectedLoginSessionStore(Path.GetFullPath(root), provider.GetRequiredService<ISessionProtector>()));

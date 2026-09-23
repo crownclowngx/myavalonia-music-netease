@@ -5,14 +5,16 @@ using MusicNetEasePlugin.Application.Authentication;
 namespace MusicNetEasePlugin.Application.Appearance;
 
 /// <summary>仅保存本插件的界面偏好，文件边界与账号、运行库配置分开。</summary>
+public sealed record UiPreferencesData(bool ReduceMotion = false, bool ShowArtwork = true, bool ShowTranslation = true);
+
 public interface IUiPreferencesStore
 {
-    Task<bool> LoadReduceMotionAsync(CancellationToken cancellationToken);
-    Task SaveReduceMotionAsync(bool reduceMotion, CancellationToken cancellationToken);
+    Task<UiPreferencesData> LoadAsync(CancellationToken cancellationToken);
+    Task SaveAsync(UiPreferencesData preferences, CancellationToken cancellationToken);
 }
 
 /// <summary>
-/// 插件容器共享的一项界面偏好。用户操作立即影响所有视图，磁盘写入串行执行；
+/// 插件容器共享的界面偏好。用户操作立即影响所有视图，磁盘写入串行执行；
 /// 保存失败只表示下次启动不能恢复，不撤销用户本次减少动画的选择。
 /// 不拥有 View、动画或播放器，也不解析 Host 的服务容器。
 /// </summary>
@@ -24,6 +26,8 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
     private Task _saving = Task.CompletedTask;
     private long _revision;
     private bool _reduceMotion;
+    private bool _showArtwork = true;
+    private bool _showTranslation = true;
     private bool _disposed;
     private string _message = "";
 
@@ -36,6 +40,16 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
             Interlocked.Increment(ref _revision);
             Save();
         }
+    }
+    public bool ShowArtwork
+    {
+        get => _showArtwork;
+        set { if (!_disposed && SetProperty(ref _showArtwork, value)) { Interlocked.Increment(ref _revision); Save(); } }
+    }
+    public bool ShowTranslation
+    {
+        get => _showTranslation;
+        set { if (!_disposed && SetProperty(ref _showTranslation, value)) { Interlocked.Increment(ref _revision); Save(); } }
     }
 
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
@@ -50,11 +64,13 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
         var revision = _revision;
         try
         {
-            var value = await store.LoadReduceMotionAsync(_closing.Token).ConfigureAwait(false);
+            var value = await store.LoadAsync(_closing.Token).ConfigureAwait(false);
             ui.Post(() =>
             {
                 if (_disposed || revision != _revision) return;
-                SetProperty(ref _reduceMotion, value, nameof(ReduceMotion));
+                SetProperty(ref _reduceMotion, value.ReduceMotion, nameof(ReduceMotion));
+                SetProperty(ref _showArtwork, value.ShowArtwork, nameof(ShowArtwork));
+                SetProperty(ref _showTranslation, value.ShowTranslation, nameof(ShowTranslation));
             });
         }
         catch (OperationCanceledException) { }
@@ -66,13 +82,13 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
     {
         if (_disposed) return;
         var revision = _revision;
-        var value = ReduceMotion;
+        var value = new UiPreferencesData(ReduceMotion, ShowArtwork, ShowTranslation);
         // 保留所有未完成任务供容器释放收口；同一时刻只有一个写操作触达文件。
         var next = SaveAsync(revision, value);
         _saving = _saving.IsCompleted ? next : Task.WhenAll(_saving, next);
     }
 
-    private async Task SaveAsync(long revision, bool value)
+    private async Task SaveAsync(long revision, UiPreferencesData value)
     {
         try
         {
@@ -80,7 +96,7 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
             try
             {
                 if (revision != Volatile.Read(ref _revision)) return;
-                await store.SaveReduceMotionAsync(value, _closing.Token).ConfigureAwait(false);
+                await store.SaveAsync(value, _closing.Token).ConfigureAwait(false);
                 PostMessage(revision, "");
             }
             finally { _writes.Release(); }

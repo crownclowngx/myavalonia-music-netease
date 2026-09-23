@@ -47,6 +47,15 @@ internal sealed class QueueNavigator(Func<int, int>? choose = null)
         if (CurrentId is { } id) Record(id);
         ResetCandidates();
     }
+    /// <summary>
+    /// 临时试听直接插入当前项之后，不进入“下一首优先”FIFO。既有优先项仍在试听结束后优先消费，
+    /// 其余原队列的相对顺序不变；Select 同时维护随机候选袋和真实访问历史。
+    /// </summary>
+    public void InsertAndSelect(QueueEntry entry)
+    {
+        _entries.Insert(Math.Max(0, Index + 1), entry);
+        Select(entry.EntryId);
+    }
     public bool Select(Guid id)
     {
         if (!_entries.Any(e => e.EntryId == id)) return false;

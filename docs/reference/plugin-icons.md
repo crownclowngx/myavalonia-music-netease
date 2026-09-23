@@ -1,6 +1,6 @@
 # 插件图标与公共资源
 
-> 用途：基于仓库当前 SDK / Build `3.4.1` 的图标接入参考。当前模块使用 `CommonIcons.TextCheck` 注册 `main-document`，用于网易云音乐入口，见[模块实现](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginModule.cs)。
+> 用途：基于仓库当前 SDK / Build `3.4.1` 的图标接入参考。当前模块使用自绘的 20×20 音符矢量注册 `main-document`，用于网易云音乐入口，见[模块实现](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginModule.cs)。
 
 插件可使用专属图标和 `MyAvaloniaManagement.Icons` 公共矢量包，通过描述符的 `IconPath` 字符串引用。以下说明与示例用于后续图标开发；示例名称不表示当前已注册对应功能。
 

@@ -277,3 +277,5 @@ function Assert-MarkdownLinks {
     }
     Write-Host "文档检查通过：$($files.Count) 个文件；$($optional.Count) 个邻仓参考单列，不要求邻仓存在。"
 }
+
+. (Join-Path $PSScriptRoot 'V5DevelopmentChecks.ps1')

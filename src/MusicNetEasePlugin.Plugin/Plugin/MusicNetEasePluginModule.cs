@@ -14,11 +14,10 @@ public sealed class MusicNetEasePluginModule : IPluginModule
         ArgumentNullException.ThrowIfNull(registration);
         registration.Services.AddMusicNetEasePluginServices();
         registration.UseLifecycle<MusicNetEasePluginLifecycle>();
-        var asset = CommonIcons.TextCheck;
         var icon = registration.AddIcon("main-document", new VectorIconDefinition(
-            asset.PathData, asset.ViewBoxWidth, asset.ViewBoxHeight));
+            "M7,3 L17,1 V13 A3,3 0 1 1 15,10 V5 L9,7 V15 A3,3 0 1 1 7,12 Z", 20, 20));
         registration.AddDocument<MainDocument, MainView>(new DocumentDescriptor(
-            PluginIds.MainDocument, "网易云音乐", "扫码登录、搜索歌曲与单曲播放",
+            PluginIds.MainDocument, "网易云音乐", "扫码登录、浏览歌单与共享播放队列",
             "音乐", iconPath: icon));
         registration.AddTool<MusicSettingsTool, MusicSettingsView>(new ToolDescriptor(
             PluginIds.AccountSettings, "网易云音乐 · 账号与播放设置",

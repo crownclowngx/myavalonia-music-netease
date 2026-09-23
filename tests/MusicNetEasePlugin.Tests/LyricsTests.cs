@@ -99,7 +99,7 @@ public sealed class LyricsTests
         await using var f = new PlaybackFixture(); var api = new LyricsFake();
         var entered = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously); var late = new TaskCompletionSource<RawLyrics>(TaskCreationOptions.RunContinuationsAsynchronously);
         api.Get = (id, _) => { if (id == 1) { entered.TrySetResult(); return late.Task; } return Task.FromResult(new RawLyrics("[00:01]第一句\n[00:03]第二句")); };
-        await using var lyrics = new LyricsCoordinator(f.Queue, f.Sessions, api); using var view = new LyricsWorkspace(lyrics, new ImmediateUi());
+        await using var lyrics = new LyricsCoordinator(f.Queue, f.Sessions, api); using var view = new LyricsWorkspace(lyrics, new ImmediateUi()); view.SetVisible(true);
         await f.Queue.PlaySingleAsync(MusicCatalog.Track(1), default); await entered.Task;
         await f.Queue.PlaySingleAsync(MusicCatalog.Track(2), default); late.SetResult(new("[00:01]迟到")); await lyrics.Pending;
         Assert.Equal(2, lyrics.Snapshot.TrackId); Assert.Equal("第一句", lyrics.Snapshot.Document.Lines[0].Text);

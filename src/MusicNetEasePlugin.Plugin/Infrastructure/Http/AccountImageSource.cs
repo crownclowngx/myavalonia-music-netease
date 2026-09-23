@@ -5,7 +5,7 @@ namespace MusicNetEasePlugin.Infrastructure.Http;
 
 internal sealed class AccountImageSource(NeteaseFlurlClients clients) : IAccountImageSource
 {
-    public async Task<byte[]?> LoadAsync(string? address, CancellationToken cancellationToken)
+    internal static string? Normalize(string? address)
     {
         if (!Uri.TryCreate(address, UriKind.Absolute, out var uri) ||
             uri.Scheme is not ("https" or "http") ||
@@ -14,11 +14,18 @@ internal sealed class AccountImageSource(NeteaseFlurlClients clients) : IAccount
             !string.IsNullOrEmpty(uri.UserInfo) || !uri.IsDefaultPort) return null;
         // 账号资料可能返回旧的 http 图片地址，限定网易图片域后升级 HTTPS，不向图片域携带账号 Cookie。
         var secure = new UriBuilder(uri) { Scheme = "https", Port = -1 };
+        secure.Fragment = "";
+        return new Flurl.Url(secure.Uri).SetQueryParam("param", "160y160").ToString();
+    }
+    public async Task<byte[]?> LoadAsync(string? address, CancellationToken cancellationToken)
+    {
+        var normalized = Normalize(address);
+        if (normalized is null) return null;
         using var cancellation = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         cancellation.CancelAfter(TimeSpan.FromSeconds(10));
         try
         {
-            using var response = await clients.Images.Request(secure.Uri).SetQueryParam("param", "160y160")
+            using var response = await clients.Images.Request(normalized).SetQueryParam("param", "160y160")
                 .AllowAnyHttpStatus().GetAsync(completionOption: HttpCompletionOption.ResponseHeadersRead,
                     cancellationToken: cancellation.Token).ConfigureAwait(false);
             if (response.StatusCode != 200) return null;

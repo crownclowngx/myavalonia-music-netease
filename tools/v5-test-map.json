@@ -1,0 +1,197 @@
+{
+  "schemaVersion": 1,
+  "methods": {
+    "MusicNetEasePlugin.Tests.LightweightPlaybackTests.空队列立即播放且其他位置同曲不被擅自合并": 1,
+    "MusicNetEasePlugin.Tests.LightweightStateTests.歌单过滤只针对已加载项且行播放保留队列和返回详情状态": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作": 2,
+    "MusicNetEasePlugin.Tests.LightweightPlaybackTests.当前同曲继续而不重复入队或从头播放": 1,
+    "MusicNetEasePlugin.Tests.LightweightNavigationTests.当前歌曲停止与失败重试不插入重复项": 1,
+    "MusicNetEasePlugin.Tests.LightweightPlaybackTests.立即播放保留原队列和下一首优先顺序": 4,
+    "MusicNetEasePlugin.Tests.QueueTests.模式首尾和随机访问历史有确定行为": 1,
+    "MusicNetEasePlugin.Tests.LightweightPlaybackTests.满队列和冲突条目标识拒绝后保持原播放": 1,
+    "MusicNetEasePlugin.Tests.LightweightPlaybackTests.连续接纳试听时旧加载不能覆盖新曲并且旧队列仍在": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留": 1,
+    "MusicNetEasePlugin.Tests.LightweightPlaybackTests.试听网络失败保留原队列且撤销账号后拒绝新意图": 1,
+    "MusicNetEasePlugin.Tests.QueueTests.内容不可用跳过后成功播放并在下一段重新计算预算": 1,
+    "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.无地址不启动引擎且试听显示来自资源事实": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.从选中位置播放接纳整单且刷新不会改写已接纳队列": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.不完整或超限歌单不冒充播放全部": 2,
+    "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致": 2,
+    "MusicNetEasePlugin.Tests.LightweightNavigationTests.队列小操作复用行和选择且清空确认在唯一写入者校验版本": 1,
+    "MusicNetEasePlugin.Tests.LightweightNavigationTests.队列跨断点保持单一导航且歌词返回原浏览页": 1,
+    "MusicNetEasePlugin.Tests.SearchDocumentTests.搜索只投影最新响应并在失败后保留原页允许重试": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产进度滑块键盘合并提交且换曲取消鼠标草稿": 1,
+    "MusicNetEasePlugin.Tests.LightweightStateTests.单一扫码入口跟随当前方式且取消旧二维码后可重新生成": 1,
+    "MusicNetEasePlugin.Tests.LightweightStateTests.正常运行库收起诊断故障展开且不混淆保存与实际加载值": 1,
+    "MusicNetEasePlugin.Tests.MainDocumentTests.默认微信入口可切换网易App且文案与图片同步": 1,
+    "MusicNetEasePlugin.Tests.LightweightStateTests.成功反馈替换旧延迟且隐藏和释放立即收口": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.逐字使用绝对时间且翻译按时间关联不按数组下标": 1,
+    "MusicNetEasePlugin.Tests.LightweightInteractionTests.隐藏歌词和播放条不投递进度刷新且回到页面立即同步": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌词视图手动浏览停止跟随并经二十次重挂可恢复": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.缓存最多二十首且失败仅手动重试试听不猜同步偏移": 1,
+    "MusicNetEasePlugin.Tests.NativeSeekTests.原生定位保留暂停且续播第一帧来自指定区段": 1,
+    "MusicNetEasePlugin.Tests.LightweightResourceTests.界面偏好兼容旧版本且三个开关独立持久化": 1,
+    "MusicNetEasePlugin.Tests.UiPreferencesTests.迟到读取不能覆盖用户选择且读取只执行一次": 1,
+    "MusicNetEasePlugin.Tests.UiPreferencesTests.快速修改串行保存且失败不撤销本次减少动效": 1,
+    "MusicNetEasePlugin.Tests.LightweightStateTests.历史使用指定本地时区跨日刷新且浏览不会产生播放记录": 1,
+    "MusicNetEasePlugin.Tests.NativeSeekTests.静默恢复首次继续才解码且按真实长度校正起点": 2,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存": 1,
+    "MusicNetEasePlugin.Tests.LightweightResourceTests.下载最多两个且合并请求的取消只影响本消费者": 1,
+    "MusicNetEasePlugin.Tests.LightweightArtworkTests.解码有界且跨页面租约共享和缓存清理不释放正在使用的位图": 1,
+    "MusicNetEasePlugin.Tests.LightweightResourceTests.压缩缓存按字节和条数淘汰且超大响应不驻留": 1,
+    "MusicNetEasePlugin.Tests.LightweightResourceTests.最后消费者取消及账户清空均不允许迟到响应入缓存": 1,
+    "MusicNetEasePlugin.Tests.LightweightArtworkTests.图片随隐藏偏好和重挂释放引用且账户退出清空缓存": 1,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲": 1,
+    "MusicNetEasePlugin.Tests.SearchDocumentTests.迟到封面不能覆盖新歌曲且失败保留占位": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化": 2,
+    "MusicNetEasePlugin.Tests.UiResourceObservationTests.同条件界面资源采样保留环境与测量边界": 1,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.动效开关成本对照与已脱离视图可回收": 1,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.真实Document主题尺寸与播放区域验证": 2,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.真实Tool宽窄布局和主题切换保留草稿": 2,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立": 1,
+    "MusicNetEasePlugin.Tests.LightweightPlaybackTests.加载中再次点同曲不会重复取资源或打开媒体": 1,
+    "MusicNetEasePlugin.Tests.LightweightPlaybackTests.临时不可播曲目按原规则推进而试听仍保留真实范围": 1,
+    "MusicNetEasePlugin.Tests.LightweightInteractionTests.账号菜单打开同一设置模型且故障提示和返回焦点可用": 2
+  },
+  "scenarios": {
+    "Q01": [
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.空队列立即播放且其他位置同曲不被擅自合并",
+      "MusicNetEasePlugin.Tests.LightweightStateTests.歌单过滤只针对已加载项且行播放保留队列和返回详情状态",
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作"
+    ],
+    "Q02": [
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.当前同曲继续而不重复入队或从头播放",
+      "MusicNetEasePlugin.Tests.LightweightNavigationTests.当前歌曲停止与失败重试不插入重复项",
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.加载中再次点同曲不会重复取资源或打开媒体"
+    ],
+    "Q03": [
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.立即播放保留原队列和下一首优先顺序",
+      "MusicNetEasePlugin.Tests.QueueTests.模式首尾和随机访问历史有确定行为"
+    ],
+    "Q04": [
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.满队列和冲突条目标识拒绝后保持原播放",
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.空队列立即播放且其他位置同曲不被擅自合并"
+    ],
+    "Q05": [
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.连续接纳试听时旧加载不能覆盖新曲并且旧队列仍在",
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留"
+    ],
+    "Q06": [
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.试听网络失败保留原队列且撤销账号后拒绝新意图",
+      "MusicNetEasePlugin.Tests.QueueTests.内容不可用跳过后成功播放并在下一段重新计算预算",
+      "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.无地址不启动引擎且试听显示来自资源事实",
+      "MusicNetEasePlugin.Tests.LightweightPlaybackTests.临时不可播曲目按原规则推进而试听仍保留真实范围"
+    ],
+    "Q07": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.从选中位置播放接纳整单且刷新不会改写已接纳队列",
+      "MusicNetEasePlugin.Tests.PlaylistTests.不完整或超限歌单不冒充播放全部"
+    ],
+    "Q08": [
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致",
+      "MusicNetEasePlugin.Tests.LightweightNavigationTests.队列小操作复用行和选择且清空确认在唯一写入者校验版本"
+    ],
+    "N01": [
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致",
+      "MusicNetEasePlugin.Tests.LightweightStateTests.歌单过滤只针对已加载项且行播放保留队列和返回详情状态"
+    ],
+    "N02": [
+      "MusicNetEasePlugin.Tests.LightweightNavigationTests.队列跨断点保持单一导航且歌词返回原浏览页",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致"
+    ],
+    "N03": [
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致",
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.搜索只投影最新响应并在失败后保留原页允许重试"
+    ],
+    "N04": [
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产进度滑块键盘合并提交且换曲取消鼠标草稿"
+    ],
+    "N05": [
+      "MusicNetEasePlugin.Tests.LightweightStateTests.单一扫码入口跟随当前方式且取消旧二维码后可重新生成",
+      "MusicNetEasePlugin.Tests.LightweightStateTests.正常运行库收起诊断故障展开且不混淆保存与实际加载值",
+      "MusicNetEasePlugin.Tests.MainDocumentTests.默认微信入口可切换网易App且文案与图片同步",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.账号菜单打开同一设置模型且故障提示和返回焦点可用"
+    ],
+    "N06": [
+      "MusicNetEasePlugin.Tests.LightweightStateTests.成功反馈替换旧延迟且隐藏和释放立即收口",
+      "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试",
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.搜索只投影最新响应并在失败后保留原页允许重试"
+    ],
+    "L01": [
+      "MusicNetEasePlugin.Tests.LyricsTests.逐字使用绝对时间且翻译按时间关联不按数组下标",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.隐藏歌词和播放条不投递进度刷新且回到页面立即同步"
+    ],
+    "L02": [
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌词视图手动浏览停止跟随并经二十次重挂可恢复",
+      "MusicNetEasePlugin.Tests.LyricsTests.缓存最多二十首且失败仅手动重试试听不猜同步偏移"
+    ],
+    "L03": [
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产进度滑块键盘合并提交且换曲取消鼠标草稿",
+      "MusicNetEasePlugin.Tests.NativeSeekTests.原生定位保留暂停且续播第一帧来自指定区段"
+    ],
+    "P01": [
+      "MusicNetEasePlugin.Tests.LightweightResourceTests.界面偏好兼容旧版本且三个开关独立持久化",
+      "MusicNetEasePlugin.Tests.UiPreferencesTests.迟到读取不能覆盖用户选择且读取只执行一次",
+      "MusicNetEasePlugin.Tests.UiPreferencesTests.快速修改串行保存且失败不撤销本次减少动效"
+    ],
+    "P02": [
+      "MusicNetEasePlugin.Tests.LightweightStateTests.历史使用指定本地时区跨日刷新且浏览不会产生播放记录",
+      "MusicNetEasePlugin.Tests.NativeSeekTests.静默恢复首次继续才解码且按真实长度校正起点"
+    ],
+    "P03": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存"
+    ],
+    "R01": [
+      "MusicNetEasePlugin.Tests.LightweightResourceTests.下载最多两个且合并请求的取消只影响本消费者",
+      "MusicNetEasePlugin.Tests.LightweightArtworkTests.解码有界且跨页面租约共享和缓存清理不释放正在使用的位图"
+    ],
+    "R02": [
+      "MusicNetEasePlugin.Tests.LightweightResourceTests.压缩缓存按字节和条数淘汰且超大响应不驻留",
+      "MusicNetEasePlugin.Tests.LightweightArtworkTests.解码有界且跨页面租约共享和缓存清理不释放正在使用的位图"
+    ],
+    "R03": [
+      "MusicNetEasePlugin.Tests.LightweightArtworkTests.解码有界且跨页面租约共享和缓存清理不释放正在使用的位图",
+      "MusicNetEasePlugin.Tests.LightweightResourceTests.最后消费者取消及账户清空均不允许迟到响应入缓存"
+    ],
+    "R04": [
+      "MusicNetEasePlugin.Tests.LightweightArtworkTests.图片随隐藏偏好和重挂释放引用且账户退出清空缓存",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.隐藏歌词和播放条不投递进度刷新且回到页面立即同步",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲"
+    ],
+    "R05": [
+      "MusicNetEasePlugin.Tests.LightweightResourceTests.最后消费者取消及账户清空均不允许迟到响应入缓存",
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.迟到封面不能覆盖新歌曲且失败保留占位",
+      "MusicNetEasePlugin.Tests.LightweightArtworkTests.图片随隐藏偏好和重挂释放引用且账户退出清空缓存"
+    ],
+    "R06": [
+      "MusicNetEasePlugin.Tests.LightweightNavigationTests.队列小操作复用行和选择且清空确认在唯一写入者校验版本",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化",
+      "MusicNetEasePlugin.Tests.UiResourceObservationTests.同条件界面资源采样保留环境与测量边界"
+    ],
+    "R07": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效开关成本对照与已脱离视图可回收",
+      "MusicNetEasePlugin.Tests.LightweightArtworkTests.图片随隐藏偏好和重挂释放引用且账户退出清空缓存"
+    ],
+    "U01": [
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Document主题尺寸与播放区域验证",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Tool宽窄布局和主题切换保留草稿",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致"
+    ],
+    "U02": [
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化"
+    ],
+    "U03": [
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立",
+      "MusicNetEasePlugin.Tests.LightweightStateTests.正常运行库收起诊断故障展开且不混淆保存与实际加载值",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.账号菜单打开同一设置模型且故障提示和返回焦点可用"
+    ]
+  },
+  "scriptScenarios": {
+    "U04": "Assert-V5Assets"
+  }
+}
