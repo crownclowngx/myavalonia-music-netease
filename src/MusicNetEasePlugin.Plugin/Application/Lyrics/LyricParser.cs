@@ -12,7 +12,24 @@ public static class LyricParser
     public const int MaximumLines = 10000;
     private static readonly Regex Stamp = new(@"\[(\d{1,8}):([0-5]?\d)(?:\.(\d{1,3}))?\]", RegexOptions.CultureInvariant | RegexOptions.NonBacktracking);
     private static readonly Regex Offset = new(@"\[offset:([+-]?\d{1,10})\]", RegexOptions.CultureInvariant | RegexOptions.NonBacktracking | RegexOptions.IgnoreCase);
-    public static LyricDocument Parse(RawLyrics raw) => ParseLrc(raw.Lrc, raw.Instrumental);
+    public static LyricDocument Parse(RawLyrics raw)
+    {
+        var original = ParseLrc(raw.Lrc, raw.Instrumental);
+        if (raw.Instrumental) return original;
+        var words = YrcParser.Parse(raw.Yrc);
+        var useWords = words is { Count: > 0 };
+        if (useWords) original = new(words!, "", "逐字歌词");
+        else if (!string.IsNullOrWhiteSpace(raw.Yrc)) original = original with { Status = original.Status + " · 逐字轨道不可用，已降级" };
+        var translation = ParseLrc(useWords && !string.IsNullOrWhiteSpace(raw.YTranslation) ? raw.YTranslation : raw.Translation);
+        var mapping = translation.Lines.GroupBy(line => line.StartMs).ToDictionary(group => group.Key, group => string.Join('\n', group.Select(line => line.Text)));
+        var times = original.Lines.Select(line => line.StartMs).ToHashSet();
+        var unmatched = translation.Lines.Where(line => !times.Contains(line.StartMs)).Select(line => $"{line.StartMs / 60000:00}:{line.StartMs / 1000 % 60:00} {line.Text}");
+        return original with
+        {
+            Lines = Array.AsReadOnly(original.Lines.Select(line => line with { Translation = mapping.GetValueOrDefault(line.StartMs) }).ToArray()),
+            UnmatchedTranslation = string.Join('\n', unmatched.Append(translation.PlainText).Where(text => text.Length > 0))
+        };
+    }
     internal static LyricDocument ParseLrc(string? text, bool instrumental = false)
     {
         if (instrumental) return new(Array.Empty<LyricLine>(), "", "纯音乐，暂无歌词。");

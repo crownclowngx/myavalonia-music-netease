@@ -11,6 +11,52 @@ namespace MusicNetEasePlugin.Tests;
 
 public sealed class LyricsTests
 {
+    [Fact, Trait("M2", "Y03,Y04,Y05")]
+    public void 逐字使用绝对时间且翻译按时间关联不按数组下标()
+    {
+        var result = LyricParser.Parse(new("[00:01]原逐行\n[00:03]另一句", Translation: "[00:03]后译\n[00:01]先译\n[00:02]未匹配",
+            Yrc: "{\"t\":0}\n[1000,1000](1000,200,0)测 (1500,300,0)试\n[3000,400](3000,400,0)下一句"));
+        Assert.Equal(new long[] { 1000, 3000 }, result.Lines.Select(line => line.StartMs));
+        Assert.Equal("测 试", result.Lines[0].Text); Assert.Equal("先译", result.Lines[0].Translation); Assert.Equal("后译", result.Lines[1].Translation);
+        Assert.Contains("未匹配", result.UnmatchedTranslation);
+        var words = result.Lines[0].Words!;
+        Assert.Equal(new long[] { 1000, 1500 }, words.Select(word => word.StartMs)); Assert.Equal(new long[] { 200, 300 }, words.Select(word => word.DurationMs));
+        Assert.Equal(-1, LyricTimeline.FindWord(words, 999)); Assert.Equal(0, LyricTimeline.FindWord(words, 1000));
+        Assert.Equal(-1, LyricTimeline.FindWord(words, 1200)); Assert.Equal(1, LyricTimeline.FindWord(words, 1600)); Assert.Equal(-1, LyricTimeline.FindWord(words, 1800));
+        var row = new LyricRow(result.Lines[0]) { IsCurrent = true };
+        row.UpdatePosition(1600); Assert.Equal("测 ", row.BeforeText); Assert.Equal("试", row.ActiveText);
+        row.UpdatePosition(1000); Assert.Equal("测 ", row.ActiveText); Assert.Equal("试", row.AfterText);
+        row.IsCurrent = false; row.UpdatePosition(1000); Assert.Empty(row.ActiveText); Assert.Equal("测 试", row.BeforeText);
+    }
+    [Theory]
+    [InlineData("[1000,1000](-1,200,0)负数")]
+    [InlineData("[1000,1000](1000,1500,0)越界")]
+    [InlineData("[1000,1000](1000,700,0)前(1300,100,0)重叠")]
+    [InlineData("[999999999999999999999,1](0,1,0)异常数字")]
+    [InlineData("[1000,1000](1000,200,1)未知格式")]
+    [Trait("M2", "Y04,Y07")]
+    public void 损坏逐字轨道仅降级该轨道(string yrc)
+    {
+        var result = LyricParser.Parse(new("[00:01]逐行仍在", Translation: "[00:01]翻译仍在", Yrc: yrc));
+        Assert.Equal("逐行仍在", result.Lines[0].Text); Assert.Null(result.Lines[0].Words); Assert.Equal("翻译仍在", result.Lines[0].Translation); Assert.Contains("降级", result.Status);
+    }
+    [Fact, Trait("M2", "Y04,Y07")]
+    public void 逐字片段总数受十万上限约束()
+    {
+        var source = string.Join('\n', Enumerable.Repeat("[0,1]" + string.Concat(Enumerable.Repeat("(0,0,0)", 501)), 200));
+        Assert.True(source.Length < 1024 * 1024);
+        var result = LyricParser.Parse(new("[00:00]降级", Yrc: source)); Assert.Null(result.Lines.Single().Words); Assert.Contains("降级", result.Status);
+    }
+    [Fact, Trait("M2", "Y02,Y04")]
+    public async Task 新歌词接口不可用时回退逐行且缺轨道不构造逐字()
+    {
+        using var http = new HttpTest(); using var clients = new NeteaseFlurlClients(new FlurlClientCache()); using var sessions = new MusicSessions();
+        http.RespondWithJson(new { code = 404 }); http.RespondWithJson(new { code = 200, lrc = new { lyric = "[00:01]逐行" }, tlyric = new { lyric = "[00:01]翻译" } });
+        var api = new NeteaseLyricsApi(new(new(clients, TimeProvider.System), sessions));
+        var result = LyricParser.Parse(await api.GetAsync(1, sessions.Capture(), default));
+        Assert.Equal("翻译", result.Lines[0].Translation); Assert.Null(result.Lines[0].Words); Assert.Equal(2, http.CallLog.Count);
+        Assert.Equal("/eapi/song/lyric", new Uri(http.CallLog[1].Request.Url).AbsolutePath);
+    }
     [Theory, InlineData("zh-CN"), InlineData("fr-FR"), InlineData("en-US"), Trait("M2", "Y01,Y02")]
     public void 逐行解析独立期望覆盖多标签偏移稳定排序与文化(string culture)
     {
@@ -43,7 +89,7 @@ public sealed class LyricsTests
         var api = new NeteaseLyricsApi(new(new(clients, TimeProvider.System), sessions));
         http.RespondWithJson(new { code = 200, lrc = new { lyric = "[00:01]原文" } });
         Assert.Equal("[00:01]原文", (await api.GetAsync(1, sessions.Capture(), default)).Lrc);
-        Assert.Equal("/eapi/song/lyric", new Uri(http.CallLog[0].Request.Url).AbsolutePath);
+        Assert.Equal("/eapi/song/lyric/v1", new Uri(http.CallLog[0].Request.Url).AbsolutePath);
         http.RespondWithJson(new { code = 200, nolyric = true }); Assert.True((await api.GetAsync(2, sessions.Capture(), default)).Instrumental);
         Assert.Equal(2, sessions.Commits);
     }

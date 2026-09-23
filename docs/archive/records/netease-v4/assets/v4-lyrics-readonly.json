@@ -1,0 +1,107 @@
+{
+  "success": true,
+  "dateUtc": "2026-09-23T04:53:20.0052771+00:00",
+  "results": [
+    {
+      "endpoint": "user_playlist",
+      "protocol": "Weapi",
+      "code": 200,
+      "bytes": 16010
+    },
+    {
+      "endpoint": "playlist_detail_n0",
+      "protocol": "Eapi",
+      "code": 200,
+      "bytes": 79116
+    },
+    {
+      "endpoint": "detail_shape",
+      "n": 0,
+      "trackCount": 449,
+      "ids": 449,
+      "tracks": 0
+    },
+    {
+      "endpoint": "playlist_detail_n1",
+      "protocol": "Eapi",
+      "code": 200,
+      "bytes": 81390
+    },
+    {
+      "endpoint": "detail_shape",
+      "n": 1,
+      "trackCount": 449,
+      "ids": 449,
+      "tracks": 1
+    },
+    {
+      "endpoint": "batch_detail",
+      "protocol": "Eapi",
+      "code": 200,
+      "bytes": 6511
+    },
+    {
+      "endpoint": "lyric",
+      "protocol": "Eapi",
+      "code": 200,
+      "bytes": 1585
+    },
+    {
+      "endpoint": "lyric_new",
+      "protocol": "Eapi",
+      "code": 200,
+      "bytes": 6994
+    },
+    {
+      "endpoint": "lyric_tracks",
+      "tracks": [
+        "lrc",
+        "tlyric",
+        "yrc"
+      ]
+    },
+    {
+      "endpoint": "lyric_parse",
+      "hasLrc": true,
+      "hasYrc": true,
+      "hasTranslation": false,
+      "lines": 24,
+      "wordSegments": 234,
+      "translatedLines": 0,
+      "wordTimesValid": true,
+      "degraded": false
+    },
+    {
+      "endpoint": "lyric_parse",
+      "hasLrc": true,
+      "hasYrc": false,
+      "hasTranslation": false,
+      "lines": 32,
+      "wordSegments": 0,
+      "translatedLines": 0,
+      "wordTimesValid": true,
+      "degraded": false
+    },
+    {
+      "endpoint": "lyric_parse",
+      "hasLrc": true,
+      "hasYrc": false,
+      "hasTranslation": false,
+      "lines": 72,
+      "wordSegments": 0,
+      "translatedLines": 0,
+      "wordTimesValid": true,
+      "degraded": false
+    },
+    {
+      "endpoint": "native_seek",
+      "Format": "MP3",
+      "PositionMs": 10000,
+      "CanSeek": true,
+      "frames": 39168
+    }
+  ],
+  "hostSessionModified": false,
+  "actualDeviceOutput": false,
+  "realHost": false
+}

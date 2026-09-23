@@ -3,6 +3,7 @@ using System.Text.Json;
 using Microsoft.Extensions.DependencyInjection;
 using MusicNetEasePlugin.Application.Authentication;
 using MusicNetEasePlugin.Application.Playback;
+using MusicNetEasePlugin.Application.Lyrics;
 using MusicNetEasePlugin.Infrastructure.Audio;
 using MusicNetEasePlugin.Infrastructure.Http;
 using MusicNetEasePlugin.Infrastructure.Persistence;
@@ -75,6 +76,17 @@ internal static class DailyPlayerProbe
             var lyrics = await Read("lyric_new", "/api/song/lyric/v1", new()
             { ["id"] = id, ["cp"] = false, ["tv"] = 0, ["lv"] = 0, ["rv"] = 0, ["kv"] = 0, ["yv"] = 0, ["ytv"] = 0, ["yrv"] = 0 }, NeteaseProtocol.Eapi);
             results.Add(new { endpoint = "lyric_tracks", tracks = new[] { "lrc", "tlyric", "yrc", "ytlrc" }.Where(name => lyrics.TryGetProperty(name, out _)).ToArray() });
+            // 只保存轨道结构与解析数量，不输出歌词、歌曲 ID 或用户歌单正文。
+            foreach (var sampleId in ids)
+            {
+                var raw = await container.GetRequiredService<ILyricsApi>().GetAsync(sampleId, accessor.Capture(), timeout.Token);
+                var parsed = LyricParser.Parse(raw);
+                var words = parsed.Lines.SelectMany(line => line.Words ?? []).ToArray();
+                results.Add(new { endpoint = "lyric_parse", hasLrc = !string.IsNullOrWhiteSpace(raw.Lrc), hasYrc = !string.IsNullOrWhiteSpace(raw.Yrc),
+                    hasTranslation = !string.IsNullOrWhiteSpace(raw.Translation) || !string.IsNullOrWhiteSpace(raw.YTranslation),
+                    lines = parsed.Lines.Count, wordSegments = words.Length, translatedLines = parsed.Lines.Count(line => line.Translation is not null),
+                    wordTimesValid = words.All(word => word.StartMs >= 0 && word.DurationMs >= 0), degraded = parsed.Status.Contains("降级", StringComparison.Ordinal) });
+            }
             stage = "native_seek";
             var resource = await container.GetRequiredService<IPlaybackResourceResolver>().ResolveAsync(id, session, timeout.Token);
             using var media = await container.GetRequiredService<IMediaBuffer>().DownloadAsync(resource, timeout.Token);
