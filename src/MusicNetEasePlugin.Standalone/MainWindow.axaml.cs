@@ -47,7 +47,7 @@ public sealed partial class MainWindow : Window
 
     private void PreviewChanged(object? sender, SelectionChangedEventArgs e)
     {
-        // 只调整预览容器；保留同一套生产 View、输入草稿和播放所有者，避免假页面掩盖 Dock 重挂问题。
+        // 只调整预览容器；保留同一套生产 View、输入草稿和共享播放会话，避免假页面掩盖 Dock 重挂问题。
         if (sender is not ComboBox selector || PreviewLayout is null) return;
         var mode = selector.SelectedIndex;
         DocumentView.IsVisible = mode < 2;

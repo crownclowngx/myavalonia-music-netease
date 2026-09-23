@@ -1,9 +1,9 @@
 # V4：M2 日常播放器实施指导
 
-> 更新：2026-09-23。状态：**V4.0–V4.4b 已完成，V4.5 起业务功能与完整 V4 门禁正在实施**。实际结果见[专用实施记录](../archive/records/netease-v4/m2-implementation-20260923.md)。
+> 更新：2026-09-23。状态：**V4.0–V4.5 功能及 V4.6 完整自动门禁已完成，真实验收单列待完成**。实际结果见[专用实施记录](../archive/records/netease-v4/m2-implementation-20260923.md)。
 > 对应[能力路线图](netease-capability-roadmap.md)“M2：形成可日常使用的播放器”；V4 是实施文档编号，不是插件包版本。
 > 源码核对基线：`afb3159`。承接 V2 单曲播放与 V3 桌面界面；M1 听感、真实 Host/Dock 及 V3 剩余实机验收继续保留，不因进入 M2 自动完成。
-> 配套：[V4 / M2 专用开发验证矩阵](../maintenance/netease-v4-m2-daily-player-verification.md)。本文所有“新增”“调整”和目标行为均为待实施契约。
+> 配套：[V4 / M2 专用开发验证矩阵](../maintenance/netease-v4-m2-daily-player-verification.md)。本文保留实施设计语气；当前落地契约见[日常播放器说明](../reference/netease-daily-player.md)，完成状态由第 13 节和实际证据共同维护。
 
 ## 1. 目标与首要规定
 
@@ -33,7 +33,7 @@
 
 ## 3. 源码基线与必须迁移的契约
 
-| 当前事实 | V4 改动及依据 |
+| `afb3159` 设计基线事实 | V4 改动及依据（现已实施） |
 | --- | --- |
 | [MusicContracts](../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicContracts.cs) 中 `MusicSession` 有 epoch/version，未携带账号 ID | 在唯一会话提交者锁内捕获已核验 `AccountId` 与 epoch；不能把 UI 的账号字段与另一时刻的会话拼接 |
 | [MusicWorkspace](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicWorkspace.cs) 把页面 `_closing.Token` 交给播放，并在关闭时 `StopAsync(_owner)` | 播放接受后改由账号/插件寿命拥有；页面关闭只取消搜索、浏览、图片和订阅，不能取消已接纳的播放 |
@@ -41,7 +41,7 @@
 | [FlurlMediaBuffer](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Media/FlurlMediaBuffer.cs) 完整下载后交付本地文件，64 MiB/120 秒上限 | 优先沿用完整缓冲实现 seek，补进度和有限重试；不把本次目标自动扩大成 Range 流式播放器 |
 | [LibVlcAudioOutput](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Audio/LibVlcAudioOutput.cs) 只有打开/暂停/停止/音量 | 增加可定位能力和带目标代次的定位命令；原生回调仍只上报事实，不重入原生控制 |
 | [服务注册](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs) 已共享播放器；[生命周期](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginLifecycle.cs) 先收口播放后登录 | 新增共享队列及恢复协调；停止前捕获续播位置，等待持久化尾任务，再依序释放单曲、媒体、账号及容器 |
-| [现有开发入口](../../tools/verify-development.ps1) 仅支持 Login/M1/V3，默认 V3 | 实施时扩展 V4；当前不可直接运行 `-Milestone V4`，也不能把 V3 绿色结果当作 M2 通过 |
+| [开发入口](../../tools/verify-development.ps1) 在设计基线仅支持 Login/M1/V3 | 已扩展完整 V4 并设为默认；旧 V3 结果不能当作 M2 通过，实际运行记录分别保留 |
 
 V4 会有意替换 M1 的“关闭播放所有者停止”契约。实施 V4.2 时同步修改 `SearchDocumentTests`、`PlaybackCoordinatorTests` 和相关映射/当前说明；保留“页面工作被取消、账号退出停止、旧事件失效”的覆盖。V2/V3 历史记录不改写，新记录说明迁移原因。
 
@@ -229,7 +229,7 @@ Document 验收沿用 1200×720、800×600、520×420；Tool 沿用 280/320/420 
 # 当前已存在的基线入口；只证明现有能力，不证明 M2。
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V3
 
-# 目标入口：仅在实现 V4 分支与映射后可运行。
+# 当前默认完整入口，保留 M1/V3 回归与产物。
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V4
 
 # 仅修改文档时执行。
@@ -247,7 +247,7 @@ git diff --check
 | [M1 矩阵](../maintenance/netease-v2-m1-playback-verification.md)、[V3 矩阵](../maintenance/netease-v3-ui-verification.md)、[V4 矩阵](../maintenance/netease-v4-m2-daily-player-verification.md) | 旧语义迁移、新场景映射、自动/人工边界与未完成项 |
 | 专用记录（实施时新建） | `docs/archive/records/netease-v4/m2-implementation-YYYYMMDD.md`；源码基线、阶段、实际命令、TRX、脱敏截图/解码数据、失败及未执行项；同步[归档索引](../archive/README.md) |
 
-不预建假执行记录，不填写预计测试数量为通过数量。本次仅创建方案与矩阵并更新导航；当前实现说明不提前宣称 M2 已实现。
+不预建假执行记录，不填写预计测试数量为通过数量。方案、当前实现、验证矩阵与专用记录随各阶段同步；实机未执行项不因代码完成而勾选。
 
 ## 13. 进度与最终完成判定
 
@@ -258,7 +258,7 @@ git diff --check
 - [x] V4.3：进度定位、缓冲反馈和有限恢复完成；持久化续播随 V4.5 验证。
 - [x] V4.4a / V4.4b：逐行、翻译及逐字支持完成，缺失轨道降级明确；真实有/无 YRC 样本已留证，翻译实机样本仍待验收。
 - [x] V4.5：真实最近播放、按账号持久化与静默恢复完成；真实文件原子替换、退出竞态、容器最终保存和原生首段 PCM 均有测试。
-- [ ] V4.6 自动：V4 完整本地门禁通过，当前契约与专用记录同步。
+- [x] V4.6 自动：V4 完整本地门禁通过，58 个 M2 场景及 M1/V3 回归与产物齐全，当前契约与专用记录同步。
 - [ ] V4.6 实机：真实账号歌单连续至少三首可播歌曲；上下首、自然结束、队列修改、seek、歌词、页面关闭重开、重启静默与账号退出通过，Host 无双引擎/资源残留。
 
 只有上述实施与实机条件都有对应证据，才将 M2 标记为完成。真实权限导致个别歌曲不可播不等于实现失败，但必须有对应反馈与停止预算证据；接口不可访问或缺少实机环境则保留未验收状态。

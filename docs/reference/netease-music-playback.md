@@ -1,4 +1,4 @@
-# V2 / M1 音乐与播放当前契约
+# 音乐与播放当前契约（V4 / M2）
 
 > 更新：2026-09-23。实现与本地开发门禁已落地；真实账号 MP3 已解码，内置和指定视频插件运行库两种来源均成功。实际扬声器与真实 Host/Dock 验收仍待完成，详见[实施记录](../archive/records/netease-v2/m1-implementation-20260923.md)。
 
@@ -6,7 +6,7 @@
 
 V3 已调整 Document / Tool 的紧凑布局与深浅主题，详见[界面当前契约](netease-desktop-ui.md)。本页的播放、账号和运行库语义继续有效。
 
-歌曲搜索每页 30 条，关键词去除两端空白，长度 1–200，offset 0–30000。V4.3 已增加歌单浏览、共享队列、四模式连续播放、进度定位与有限下载恢复，见[日常播放器当前实现](netease-daily-player.md)；歌词、下载收藏或更高音质请求尚未接入界面。结果展示名称、歌手、专辑；播放详情展示封面、时长、试听标记和状态。封面失败显示音符，不影响歌曲。
+歌曲搜索每页 30 条，关键词去除两端空白，长度 1–200，offset 0–30000。V4 已增加歌单、共享队列、四模式、进度定位、有限下载恢复、逐行/翻译/逐字歌词、本地历史与静默恢复，见[日常播放器当前实现](netease-daily-player.md)；下载收藏和更高音质请求尚未接入。结果展示名称、歌手、专辑；播放详情展示封面、时长、试听标记和状态。封面失败显示音符，不影响歌曲。
 
 一个插件容器共享一个账号、队列和单曲执行器，每个 Document 独立搜索。V4.2 起播放由账号/插件寿命拥有，关闭任意页面继续播放，再打开订阅同一会话；退出或插件关闭才停止。Tool 是右侧 singleton，关闭行为为 Hide。暂时卸载 View 只释放图片和订阅，不取消音乐。
 
@@ -21,6 +21,10 @@ V3 已调整 Document / Tool 的紧凑布局与深浅主题，详见[界面当�
 | `LibVlcRuntimeResolver` / `LibVlcRuntime` | 只读候选检查、惰性加载、实际运行库状态与容器引擎 |
 | `LibVlcAudioOutput` | 串行原生控制，MediaPlayer/Media 所有权和事实事件 |
 | `PlaybackCoordinator` | 单曲意图、代次、旧工作收口、控制和资源释放顺序 |
+| `QueueNavigator` / `PlaybackQueueCoordinator` | 纯导航规则与共享队列写入；按条目身份和尝试身份消费终态 |
+| `MediaLoader` / `LyricsCoordinator` | 分别处理有限媒体恢复与共享歌词请求/时间轴；互不控制对方 |
+| `PlaybackPersistence` / `PlaybackStateStore` | 值快照保存策略与原子文件格式；不反向持有播放器 |
+| `PlayerAccountCoordinator` | 核验账号后的恢复资格、退出清理及会话失效保存桥接 |
 | `MusicWorkspace` / `MusicSettingsTool` | 页面搜索投影与设置草稿；依赖端口，不接触 LibVLC/Flurl |
 
 没有事件总线、通用仓储或状态机框架。业务层只依赖窄接口和记录，平台文件/原生差异留在 Infrastructure；共享服务由组合入口通过构造函数注入。
@@ -38,7 +42,7 @@ API 响应共用 15 秒/1 MiB 预算，支持明文、eapi/xeapi 加密及解密
 
 ## 会话、并发与清理
 
-音乐会话包含账号 epoch、credentialVersion、AuthContext 和撤销 Token，仅在业务内部传递。重登即使是同一个账号也产生新 epoch；重试保存不撤销已核验账号。音乐响应的 Cookie 只能通过登录协调器按 epoch/version 提交；旧响应不能覆盖新凭据。保存与退出共用既有尾任务顺序，退出最终清理不会被迟到写盘复活。
+音乐会话包含原子捕获的 AccountId、账号 epoch、credentialVersion、AuthContext 和撤销 Token，仅在业务内部传递。重登即使是同一个账号也产生新 epoch；重试保存不撤销已核验账号。音乐响应的 Cookie 只能通过登录协调器按 epoch/version 提交；旧响应不能覆盖新凭据。保存与退出共用既有尾任务顺序，退出最终清理不会被迟到写盘复活。
 
 每次 Play 先登记新代次，再取消旧工作，等待其停止和文件释放后执行新请求。详情、地址、缓冲、引擎打开均检查撤销；A→B→C 最终只允许 C 接管。暂停/定位令牌与原播放代次关联，音量继承和用户修改共用顺序。V4.3 支持定位草稿，进度事实仍来自原生事件，不用 UI 计时器伪造。
 
@@ -74,4 +78,4 @@ Tool 分别显示草稿、已保存目录、候选来源/问题和实际加载�
 
 ## 本地验证入口
 
-[使用步骤](../quick-start/netease-playback.md) · [自动/人工验证矩阵](../maintenance/netease-v2-m1-playback-verification.md) · [场景到实际方法的映射](../../tools/m1-test-map.json)。默认 `verify-development.ps1` 执行 M1 本地门禁；`-Milestone Login` 保留旧入口格式但仍运行全量测试。未使用 AIFLOW、Windows CI 或发布门禁。
+[使用步骤](../quick-start/netease-playback.md) · [M2 自动/人工验证矩阵](../maintenance/netease-v4-m2-daily-player-verification.md) · [M2 场景方法映射](../../tools/m2-test-map.json)。默认 `verify-development.ps1` 执行完整 V4 本地门禁，同时保留 [M1 映射](../../tools/m1-test-map.json)与 V3 检查；Login/M1/V3 入口仍运行全量测试，只按相应层次核验产物。未使用 AIFLOW、Windows CI 或发布门禁。

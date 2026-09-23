@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
-using System.Text.Json;
 using MusicNetEasePlugin.Application.Playback;
 using MusicNetEasePlugin.Infrastructure.Audio;
 using Xunit;
@@ -37,9 +36,9 @@ public sealed class NativeSeekTests
         Assert.Equal(reset, queue.Snapshot.Playback.Message.Contains("超出", StringComparison.Ordinal));
         await queue.StopAsync(); using (File.Open(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
         var artifacts = Environment.GetEnvironmentVariable("NETEASE_TEST_ARTIFACTS");
-        if (!string.IsNullOrEmpty(artifacts)) await File.WriteAllTextAsync(Path.Combine(artifacts, $"m2-native-restore-{target}.json"), JsonSerializer.Serialize(new
+        if (!string.IsNullOrEmpty(artifacts)) TestEvidence.Write($"m2-native-restore-{target}.json", new
         { schemaVersion = 1, target, reset, runtime.ActiveVersion, sampleSha256 = Convert.ToHexString(SHA256.HashData(sample)), initializedWithoutEngine = true,
-            firstOutputMatchesStart = true, decodedFrames = pcm.Length, fileReleased = true, actualDeviceOutput = false, realHost = false }));
+            firstOutputMatchesStart = true, decodedFrames = pcm.Length, fileReleased = true, actualDeviceOutput = false, realHost = false });
     }
     [Fact, Trait("M2", "Q05,C02,A03")]
     public async Task 原生三曲自然结束连续交接且最后释放所有文件()
@@ -61,7 +60,7 @@ public sealed class NativeSeekTests
         await ended.Task.WaitAsync(TimeSpan.FromSeconds(20)); await queue.DisposeAsync();
         Assert.Equal(new long[] { 1, 2, 3 }, played.Distinct()); Assert.True(samples > 48000); Assert.Empty(Directory.GetFiles(directory.Path));
         var artifacts = Environment.GetEnvironmentVariable("NETEASE_TEST_ARTIFACTS");
-        if (!string.IsNullOrEmpty(artifacts)) await File.WriteAllTextAsync(Path.Combine(artifacts, "m2-native-queue.json"), JsonSerializer.Serialize(new { schemaVersion = 1, tracks = 3, decodedFrames = samples, filesReleased = true, actualDeviceOutput = false, realHost = false }));
+        if (!string.IsNullOrEmpty(artifacts)) TestEvidence.Write("m2-native-queue.json", new { schemaVersion = 1, tracks = 3, decodedFrames = samples, filesReleased = true, actualDeviceOutput = false, realHost = false });
     }
     [Fact, Trait("M2", "B02,B03,B08")]
     public async Task 原生定位保留暂停且续播第一帧来自指定区段()
@@ -110,13 +109,13 @@ public sealed class NativeSeekTests
         using (File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
         var artifacts = Environment.GetEnvironmentVariable("NETEASE_TEST_ARTIFACTS");
         if (!string.IsNullOrEmpty(artifacts))
-            await File.WriteAllTextAsync(Path.Combine(artifacts, "m2-native-seek.json"), JsonSerializer.Serialize(new
+            TestEvidence.Write("m2-native-seek.json", new
             {
                 schemaVersion = 1, runtime.ActiveVersion, sampleSha256 = Convert.ToHexString(SHA256.HashData(sample)),
                 startPositionMs = 4000, firstOutputMatchesStart = true, backward.PositionMs,
                 forwardPositionMs = forward.PositionMs, pausedAfterSeek = true, fileReleased = true,
                 actualDeviceOutput = false, realHost = false
-            }));
+            });
     }
 
     private static byte[] SegmentedWave(int seconds = 8)

@@ -28,7 +28,7 @@ dotnet run --project src/MusicNetEasePlugin.Standalone -c Debug --no-build -- --
 
 关闭页面不是退出账号。取消扫码或刷新二维码会撤销旧尝试；过期后需要主动重取。
 保存失败时本次内存登录仍有效，可点击“重试保存登录信息”，不需要重新扫码。
-登录后可使用[搜索与单曲播放](netease-playback.md)，账号设置 Tool 提供恢复、重试保存、退出及 LibVLC 目录设置；歌单等后续安排见[能力路线图](../roadmap/netease-capability-roadmap.md)。
+登录后可使用[日常播放器](netease-playback.md)的搜索、歌单、队列、歌词和本机历史/静默恢复。账号设置 Tool 提供登录恢复、保存重试、退出、LibVLC 目录及本地播放记录保存/清理重试；收藏与推荐等后续安排见[能力路线图](../roadmap/netease-capability-roadmap.md)。
 
 ## 3. 常见情况
 

@@ -74,7 +74,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         PlayNextCommand = new AsyncRelayCommand(() => EnqueueSelectedAsync(true), () => !_closed && SelectedTrack is not null);
         PauseCommand = new AsyncRelayCommand(() => _playback.PauseAsync(true, _closing.Token), () => _snapshot.State == PlaybackState.Playing);
         ResumeCommand = new AsyncRelayCommand(() => _playback.PauseAsync(false, _closing.Token), () => _snapshot.Track is not null && _snapshot.State is PlaybackState.Paused or PlaybackState.Stopped or PlaybackState.Ended or PlaybackState.Failed);
-        StopCommand = new AsyncRelayCommand(() => _playback.StopAsync(), () => _snapshot.State is PlaybackState.Loading or PlaybackState.Playing or PlaybackState.Paused);
+        StopCommand = new AsyncRelayCommand(() => _playback.StopAsync(), () => _snapshot.State is PlaybackState.Loading or PlaybackState.Playing or PlaybackState.Paused or PlaybackState.Failed);
         _playback.Changed += PlaybackChanged;
         _login.Changed += LoginChanged;
         ApplyPlayback(playback.Snapshot.Playback with { Revision = playback.Snapshot.Revision });

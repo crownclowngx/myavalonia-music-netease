@@ -41,6 +41,8 @@ Host 容器，或保存 `IPluginRegistration` 供运行时使用。
 
 ## Standalone/MainWindow 应当做什么
 
+V4 的队列、歌词与持久化协调属于插件容器；每个 Document 只拥有搜索、歌单浏览和 UI 投影。关闭发起页或最后一页均继续播放，重开直接订阅当前快照。Host Shutdown 先停止接纳账号恢复，再收口队列/音频并保存停止前位置，最后释放依赖。Standalone 主窗关闭释放 scope 和根容器，等待同一保存/停止任务；同步容器释放已有组合测试，但不能替代真实 Host/Dock 或主窗交互验收。
+
 当前 [MainWindow](../../src/MusicNetEasePlugin.Standalone/MainWindow.axaml.cs)使用同一服务注册入口、真实 `MainDocument`/`MusicWorkspace` 和 `MusicSettingsTool`，以音乐/设置页签承载，提供独立数据目录与 `IDocumentLifetime`。账号取消见[HTTP 与会话契约](netease-http-session.md)，播放所有者规则见[播放契约](netease-music-playback.md)。当前 SDK 没有 Tool 主动打开 Document 的公开端口，Tool 提示使用 Host“新建”入口。
 
 Standalone 的 `MainWindow` 是开发工作台，不是插件对 Host 暴露的正式窗体。它应当保持轻薄，只负责：

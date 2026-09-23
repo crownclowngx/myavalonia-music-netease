@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "m2-document-dark-520.png",
+  "width": 520,
+  "height": 420,
+  "sha256": "65C48985333EFED38D393C651509C16293EE8ED7C397C733DDB667D4D38B0AE4",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-054602-0a211745",
+    "revision": "bfaecab46ffb77b40d8223360daf918e48bd1aba",
+    "sourceSha256": "C25A09C5CDBDF7CCB677E19700FFCE1FF0EF13F84F1A219D9A67F21F345AE880"
+  }
+}

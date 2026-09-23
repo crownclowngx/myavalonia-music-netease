@@ -84,6 +84,91 @@ function Assert-V3TestMap {
     return Assert-DevelopmentTestMap $TrxPath $MapPath @('THEME-AUTO','DOCUMENT-AUTO','TOOL-AUTO','LOGIN-AUTO','MOTION-AUTO','PREFERENCES-AUTO','RESOURCE-AUTO')
 }
 
+function Get-M2RequiredScenarios {
+    # 固定需求集合独立于映射文件，删映射不能缩小退出条件。
+    foreach ($group in @(@('P',8),@('Q',12),@('C',6),@('B',8),@('Y',7),@('H',8),@('A',4),@('U',5))) {
+        foreach ($number in 1..$group[1]) { '{0}{1:00}' -f $group[0],$number }
+    }
+}
+function Assert-M2TestMap {
+    param([string]$TrxPath, [string]$MapPath)
+    return Assert-DevelopmentTestMap $TrxPath $MapPath @(Get-M2RequiredScenarios)
+}
+
+function Get-DevelopmentSourceStamp {
+    param([string]$Root)
+    $revision = (& git -C $Root rev-parse HEAD).Trim()
+    if ($LASTEXITCODE -ne 0) { throw '无法读取源码 revision。' }
+    $dirty = [bool](& git -C $Root status --porcelain)
+    if ($LASTEXITCODE -ne 0) { throw '无法读取工作树状态。' }
+    # 纳入未跟踪实现/测试/工具，排除本轮报告和文档归档自身，避免摘要形成自引用哈希。
+    $paths = & git -C $Root ls-files --cached --others --exclude-standard -- src tests tools Directory.Build.props Directory.Packages.props global.json MusicNetEasePlugin.slnx
+    if ($LASTEXITCODE -ne 0) { throw '无法枚举验证源码。' }
+    $manifest = foreach ($path in ($paths | Sort-Object -Unique)) {
+        $full = Join-Path $Root $path
+        if (Test-Path -LiteralPath $full -PathType Leaf) { $path + ':' + (Get-FileHash -LiteralPath $full -Algorithm SHA256).Hash }
+        else { $path + ':deleted' }
+    }
+    $hash = [Convert]::ToHexString([Security.Cryptography.SHA256]::HashData([Text.Encoding]::UTF8.GetBytes(($manifest -join "`n"))))
+    return @{ revision=$revision; workingTreeDirty=$dirty; sourceSha256=$hash }
+}
+
+function Get-M2Screenshots {
+    foreach ($theme in @('light','dark')) {
+        foreach ($size in @(@(1200,720),@(800,600),@(520,420))) { @{ name="m2-document-$theme-$($size[0]).png"; width=$size[0]; height=$size[1] } }
+        @{ name="m2-restored-paused-$theme.png"; width=800; height=600 }
+    }
+}
+function Read-RunEvidence {
+    param([string]$Path, [hashtable]$Context)
+    $value = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json -AsHashtable
+    if ($value.schemaVersion -ne 1 -or !$value.provenance) { throw "缺少产物版本或本轮身份：$Path" }
+    foreach ($field in @('runId','revision','sourceSha256')) {
+        if (!$Context[$field] -or $value.provenance[$field] -cne $Context[$field]) { throw "产物来自其他运行或源码：$Path / $field" }
+    }
+    return $value
+}
+function Assert-RenderedPng {
+    param([string]$Path, [int]$Width, [int]$Height)
+    $bytes = [IO.File]::ReadAllBytes($Path)
+    if ($bytes.Length -lt 1024 -or [Convert]::ToHexString($bytes[0..7]) -ne '89504E470D0A1A0A' -or
+        [Convert]::ToHexString($bytes[($bytes.Length-12)..($bytes.Length-1)]) -ne '0000000049454E44AE426082') { throw "PNG 不完整：$Path" }
+    # 本地 Windows 开发环境用系统解码器读取像素；签名和尺寸字段存在不能冒充实际截图。
+    $bitmap = [Drawing.Bitmap]::new($Path)
+    try {
+        if ($bitmap.Width -ne $Width -or $bitmap.Height -ne $Height) { throw "PNG 尺寸错误：$Path" }
+        [void]$bitmap.GetPixel($Width-1,$Height-1)
+    } finally { $bitmap.Dispose() }
+}
+function Assert-M2Artifacts {
+    param([string]$RunDirectory, [hashtable]$Context, [datetimeoffset]$StartedAt)
+    foreach ($file in Get-ChildItem -LiteralPath $RunDirectory -File) {
+        if ($file.LastWriteTimeUtc -lt $StartedAt.UtcDateTime.AddSeconds(-2)) { throw "产物不是本轮生成：$($file.Name)" }
+    }
+    foreach ($shot in (Get-M2Screenshots)) {
+        $path = Join-Path $RunDirectory $shot.name
+        Assert-RenderedPng $path $shot.width $shot.height
+        $proof = Read-RunEvidence ($path+'.json') $Context
+        if ($proof.name -ne $shot.name -or $proof.width -ne $shot.width -or $proof.height -ne $shot.height -or
+            $proof.realHost -ne $false -or $proof.sha256 -ne (Get-FileHash -LiteralPath $path -Algorithm SHA256).Hash) { throw '截图尺寸、哈希或来源不符。' }
+    }
+    $seek = Read-RunEvidence (Join-Path $RunDirectory 'm2-native-seek.json') $Context
+    if (!$seek.ActiveVersion -or $seek.sampleSha256 -notmatch '^[a-fA-F0-9]{64}$' -or $seek.startPositionMs -ne 4000 -or
+        $seek.PositionMs -lt 950 -or $seek.PositionMs -gt 1050 -or $seek.forwardPositionMs -lt 4450 -or $seek.forwardPositionMs -gt 4550 -or
+        $seek.firstOutputMatchesStart -ne $true -or $seek.pausedAfterSeek -ne $true -or $seek.fileReleased -ne $true -or $seek.actualDeviceOutput -ne $false -or $seek.realHost -ne $false) { throw '定位容差、PCM 或释放证据无效。' }
+    foreach ($target in @(4000,12000)) {
+        $restore = Read-RunEvidence (Join-Path $RunDirectory "m2-native-restore-$target.json") $Context
+        if (!$restore.ActiveVersion -or $restore.sampleSha256 -notmatch '^[a-fA-F0-9]{64}$' -or $restore.target -ne $target -or $restore.reset -ne ($target -eq 12000) -or
+            $restore.initializedWithoutEngine -ne $true -or $restore.firstOutputMatchesStart -ne $true -or $restore.decodedFrames -le 0 -or
+            $restore.fileReleased -ne $true -or $restore.realHost -ne $false -or $restore.actualDeviceOutput -ne $false) { throw '静默恢复或首段 PCM 证据无效。' }
+    }
+    $queue = Read-RunEvidence (Join-Path $RunDirectory 'm2-native-queue.json') $Context
+    if ($queue.tracks -ne 3 -or $queue.decodedFrames -le 48000 -or $queue.filesReleased -ne $true -or $queue.actualDeviceOutput -ne $false -or $queue.realHost -ne $false) { throw '三曲原生交接证据无效。' }
+    $life = Read-RunEvidence (Join-Path $RunDirectory 'm2-lifetime.json') $Context
+    if (!$life.environment -or $life.realHost -ne $false -or $life.mountedDocuments -ne 22 -or $life.detachedViews -ne 20 -or $life.retainedViews -ne 0 -or
+        $life.audioOpens -ne 1 -or $life.stoppedAfterShutdown -ne $true -or $life.noAutomaticResume -ne $true) { throw 'Document 或关闭生命周期证据无效。' }
+}
+
 function Assert-DevelopmentTestMap {
     param([string]$TrxPath, [string]$MapPath, [string[]]$Required)
     # 映射是经审阅的实际方法清单，不在门禁里扫描 Trait 字符串冒充执行证据。

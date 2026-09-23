@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "m2-restored-paused-light.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "FE97C83532A5E39E7F77B8ECA9BDE344A56E5F6758A0BF139E20B40F18BE7FE9",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-054602-0a211745",
+    "revision": "bfaecab46ffb77b40d8223360daf918e48bd1aba",
+    "sourceSha256": "C25A09C5CDBDF7CCB677E19700FFCE1FF0EF13F84F1A219D9A67F21F345AE880"
+  }
+}

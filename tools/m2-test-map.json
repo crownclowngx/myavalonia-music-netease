@@ -1,0 +1,397 @@
+{
+  "methods": {
+    "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作": 2,
+    "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌词视图手动浏览停止跟随并经二十次重挂可恢复": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产进度滑块键盘合并提交且换曲取消鼠标草稿": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化": 2,
+    "MusicNetEasePlugin.Tests.DailyRequestTests.歌单与歌词固定协议保持长身份并以零详情获取完整顺序": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.逐字使用绝对时间且翻译按时间关联不按数组下标": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.损坏逐字轨道仅降级该轨道": 5,
+    "MusicNetEasePlugin.Tests.LyricsTests.逐字片段总数受十万上限约束": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.新歌词接口不可用时回退逐行且缺轨道不构造逐字": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.逐行解析独立期望覆盖多标签偏移稳定排序与文化": 3,
+    "MusicNetEasePlugin.Tests.LyricsTests.缺失纯音乐纯文本与解析上限有明确状态": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.生产歌词适配读取轨道与空歌词并复用受控协议": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.歌词迟到不得串歌并按真实进度定位暂停与退出清理": 1,
+    "MusicNetEasePlugin.Tests.LyricsTests.缓存最多二十首且失败仅手动重试试听不猜同步偏移": 1,
+    "MusicNetEasePlugin.Tests.MediaBufferTests.下载进度区分已知总长与未知长度且最后字节准确": 2,
+    "MusicNetEasePlugin.Tests.NativeSeekTests.静默恢复首次继续才解码且按真实长度校正起点": 2,
+    "MusicNetEasePlugin.Tests.NativeSeekTests.原生三曲自然结束连续交接且最后释放所有文件": 1,
+    "MusicNetEasePlugin.Tests.NativeSeekTests.原生定位保留暂停且续播第一帧来自指定区段": 1,
+    "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.快速三次切歌只允许最终意图打开音源": 4,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.续播失败保留目标且权限范围缩短会从有效起点开始": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.只有非定位正常推进登记历史且重播去重和上限二百": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.重启恢复队列重复身份与位置保持静默直到用户继续": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.高频进度五秒保存且暂停和重复关闭保存停止前位置": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.损坏文件不被初始化或音量覆盖但明确新建队列允许保存": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.迟到恢复不能覆盖用户新队列也不能跨账号": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.退出清理排在不响应取消的旧保存之后并保留账号历史": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.会话失效保留恢复而显式清理失败可见可重试": 1,
+    "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.多账号清理失败分别保留且重登不恢复已退出的旧队列": 1,
+    "MusicNetEasePlugin.Tests.PlaybackStateStoreTests.真实文件白名单保存按账号隔离且大队列省略资料不丢条目": 1,
+    "MusicNetEasePlugin.Tests.PlaybackStateStoreTests.损坏未知版本身份及数值越界保留原文件": 10,
+    "MusicNetEasePlugin.Tests.PlaybackStateStoreTests.保存取消及原子替换失败保持上次完整文件且清理临时文件": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.从选中位置播放接纳整单且刷新不会改写已接纳队列": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.真实歌单适配保留重复顺序并按身份补资料": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.不完整或超限歌单不冒充播放全部": 2,
+    "MusicNetEasePlugin.Tests.PlaylistTests.内容错误和限流不会注销账号且会话失效撤销请求": 3,
+    "MusicNetEasePlugin.Tests.PlaylistTests.浏览分页使用原始偏移且重复页终止刷新可以重新开始": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.旧歌单迟到和账号撤销不污染当前浏览": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试": 1,
+    "MusicNetEasePlugin.Tests.QueueTests.队列停止失败保持可见并允许再次停止释放文件": 1,
+    "MusicNetEasePlugin.Tests.QueueTests.内容不可用跳过后成功播放并在下一段重新计算预算": 1,
+    "MusicNetEasePlugin.Tests.QueueTests.随机第一轮优先段和追加消费后不会再次被抽中": 1,
+    "MusicNetEasePlugin.Tests.QueueTests.删除当前首中尾及唯一项遵守播放意图": 16,
+    "MusicNetEasePlugin.Tests.QueueTests.手动切歌先接纳时旧终态不得双跳且缓存当前曲不依赖新网络": 1,
+    "MusicNetEasePlugin.Tests.QueueTests.优先段保持操作顺序且重复歌曲有独立身份": 4,
+    "MusicNetEasePlugin.Tests.QueueTests.模式首尾和随机访问历史有确定行为": 1,
+    "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲": 1,
+    "MusicNetEasePlugin.Tests.QueueTests.全部不可播按候选预算停止而不是循环": 2,
+    "MusicNetEasePlugin.Tests.QueueTests.全局错误不扫描其他歌曲": 6,
+    "MusicNetEasePlugin.Tests.QueueTests.迟到加载不能反转用户意图且账号撤销清空队列": 1,
+    "MusicNetEasePlugin.Tests.SeekingTests.草稿不被进度回推且暂停定位失败不伪造事实": 1,
+    "MusicNetEasePlugin.Tests.SeekingTests.定位等待时新目标胜出且换曲拒绝旧控制": 1,
+    "MusicNetEasePlugin.Tests.SeekingTests.过期与网络恢复共享三次预算并只取两次地址": 2,
+    "MusicNetEasePlugin.Tests.SeekingTests.不可重试错误只请求一次": 6,
+    "MusicNetEasePlugin.Tests.SeekingTests.重试延时可取消且持续网络失败不耗尽第三次无关预算": 1,
+    "MusicNetEasePlugin.Tests.MusicSessionTests.仅核验通过的账号可取快照且保存失败仍可播放": 1,
+    "MusicNetEasePlugin.Tests.MusicSessionTests.凭据版本拒绝旧更新且同账号重登拒绝旧失效响应": 1,
+    "MusicNetEasePlugin.Tests.MusicSessionTests.音乐响应保存已提交但尚未返回时退出仍最终清除会话": 1,
+    "MusicNetEasePlugin.Tests.AudioAdapterTests.生产适配复用引擎真实解码并释放每次媒体句柄": 1,
+    "MusicNetEasePlugin.Tests.MediaBufferTests.合法重定向逐跳无凭据且临时文件归句柄所有": 1,
+    "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.停止故障保留文件并允许再次停止收口": 1,
+    "MusicNetEasePlugin.Tests.MediaBufferTests.长度不可信和非媒体响应不能发布半成品": 4,
+    "MusicNetEasePlugin.Tests.MediaBufferTests.各阶段超时与主动取消都会关闭响应及清理文件": 4,
+    "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.原生终态在回调外收口并先停止后删文件": 2,
+    "MusicNetEasePlugin.Tests.SearchDocumentTests.迟到封面不能覆盖新歌曲且失败保留占位": 1,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.真实Document主题尺寸与播放区域验证": 2,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.真实Tool宽窄布局和主题切换保留草稿": 2,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.登录区深浅主题保留二维码白底与操作": 2,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲": 1,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.动效开关成本对照与已脱离视图可回收": 1,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立": 1,
+    "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.旧暂停排队期间切歌会撤销旧控制意图": 1,
+    "MusicNetEasePlugin.Tests.HttpTests.超大响应拒绝且读取取消生效": 1,
+    "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放": 1
+  },
+  "scenarios": {
+    "P06": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化",
+      "MusicNetEasePlugin.Tests.PlaylistTests.不完整或超限歌单不冒充播放全部",
+      "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试"
+    ],
+    "U01": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作",
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化"
+    ],
+    "U03": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Document主题尺寸与播放区域验证",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Tool宽窄布局和主题切换保留草稿",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.登录区深浅主题保留二维码白底与操作",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效开关成本对照与已脱离视图可回收",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立"
+    ],
+    "U04": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作",
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产进度滑块键盘合并提交且换曲取消鼠标草稿",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化"
+    ],
+    "U05": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作",
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌词视图手动浏览停止跟随并经二十次重挂可恢复",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌单视图可导航且大列表保持虚拟化"
+    ],
+    "H07": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.生产Document三尺寸五面板与静默恢复可操作",
+      "MusicNetEasePlugin.Tests.NativeSeekTests.静默恢复首次继续才解码且按真实长度校正起点",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.续播失败保留目标且权限范围缩短会从有效起点开始",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.重启恢复队列重复身份与位置保持静默直到用户继续",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.损坏文件不被初始化或音量覆盖但明确新建队列允许保存",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.迟到恢复不能覆盖用户新队列也不能跨账号"
+    ],
+    "U02": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放"
+    ],
+    "A03": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.NativeSeekTests.原生三曲自然结束连续交接且最后释放所有文件",
+      "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲",
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.迟到封面不能覆盖新歌曲且失败保留占位",
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放"
+    ],
+    "A04": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.高频进度五秒保存且暂停和重复关闭保存停止前位置",
+      "MusicNetEasePlugin.Tests.QueueTests.迟到加载不能反转用户意图且账号撤销清空队列",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Document主题尺寸与播放区域验证",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Tool宽窄布局和主题切换保留草稿",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.登录区深浅主题保留二维码白底与操作",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效开关成本对照与已脱离视图可回收",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立"
+    ],
+    "C06": [
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
+      "MusicNetEasePlugin.Tests.PlaylistTests.从选中位置播放接纳整单且刷新不会改写已接纳队列",
+      "MusicNetEasePlugin.Tests.QueueTests.队列停止失败保持可见并允许再次停止释放文件",
+      "MusicNetEasePlugin.Tests.AudioAdapterTests.生产适配复用引擎真实解码并释放每次媒体句柄",
+      "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.停止故障保留文件并允许再次停止收口",
+      "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.原生终态在回调外收口并先停止后删文件"
+    ],
+    "Y06": [
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产歌词视图手动浏览停止跟随并经二十次重挂可恢复",
+      "MusicNetEasePlugin.Tests.LyricsTests.歌词迟到不得串歌并按真实进度定位暂停与退出清理"
+    ],
+    "B05": [
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产进度滑块键盘合并提交且换曲取消鼠标草稿",
+      "MusicNetEasePlugin.Tests.SeekingTests.草稿不被进度回推且暂停定位失败不伪造事实",
+      "MusicNetEasePlugin.Tests.SeekingTests.定位等待时新目标胜出且换曲拒绝旧控制"
+    ],
+    "P01": [
+      "MusicNetEasePlugin.Tests.DailyRequestTests.歌单与歌词固定协议保持长身份并以零详情获取完整顺序",
+      "MusicNetEasePlugin.Tests.LyricsTests.生产歌词适配读取轨道与空歌词并复用受控协议",
+      "MusicNetEasePlugin.Tests.PlaylistTests.真实歌单适配保留重复顺序并按身份补资料"
+    ],
+    "Y03": [
+      "MusicNetEasePlugin.Tests.LyricsTests.逐字使用绝对时间且翻译按时间关联不按数组下标",
+      "MusicNetEasePlugin.Tests.LyricsTests.歌词迟到不得串歌并按真实进度定位暂停与退出清理"
+    ],
+    "Y04": [
+      "MusicNetEasePlugin.Tests.LyricsTests.逐字使用绝对时间且翻译按时间关联不按数组下标",
+      "MusicNetEasePlugin.Tests.LyricsTests.损坏逐字轨道仅降级该轨道",
+      "MusicNetEasePlugin.Tests.LyricsTests.逐字片段总数受十万上限约束",
+      "MusicNetEasePlugin.Tests.LyricsTests.新歌词接口不可用时回退逐行且缺轨道不构造逐字"
+    ],
+    "Y05": [
+      "MusicNetEasePlugin.Tests.LyricsTests.逐字使用绝对时间且翻译按时间关联不按数组下标",
+      "MusicNetEasePlugin.Tests.LyricsTests.歌词迟到不得串歌并按真实进度定位暂停与退出清理",
+      "MusicNetEasePlugin.Tests.LyricsTests.缓存最多二十首且失败仅手动重试试听不猜同步偏移"
+    ],
+    "Y07": [
+      "MusicNetEasePlugin.Tests.LyricsTests.损坏逐字轨道仅降级该轨道",
+      "MusicNetEasePlugin.Tests.LyricsTests.逐字片段总数受十万上限约束",
+      "MusicNetEasePlugin.Tests.LyricsTests.缺失纯音乐纯文本与解析上限有明确状态",
+      "MusicNetEasePlugin.Tests.LyricsTests.歌词迟到不得串歌并按真实进度定位暂停与退出清理",
+      "MusicNetEasePlugin.Tests.LyricsTests.缓存最多二十首且失败仅手动重试试听不猜同步偏移"
+    ],
+    "Y02": [
+      "MusicNetEasePlugin.Tests.LyricsTests.新歌词接口不可用时回退逐行且缺轨道不构造逐字",
+      "MusicNetEasePlugin.Tests.LyricsTests.逐行解析独立期望覆盖多标签偏移稳定排序与文化",
+      "MusicNetEasePlugin.Tests.LyricsTests.缺失纯音乐纯文本与解析上限有明确状态",
+      "MusicNetEasePlugin.Tests.LyricsTests.生产歌词适配读取轨道与空歌词并复用受控协议",
+      "MusicNetEasePlugin.Tests.LyricsTests.缓存最多二十首且失败仅手动重试试听不猜同步偏移"
+    ],
+    "Y01": [
+      "MusicNetEasePlugin.Tests.LyricsTests.逐行解析独立期望覆盖多标签偏移稳定排序与文化"
+    ],
+    "A02": [
+      "MusicNetEasePlugin.Tests.LyricsTests.歌词迟到不得串歌并按真实进度定位暂停与退出清理",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.迟到恢复不能覆盖用户新队列也不能跨账号",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.多账号清理失败分别保留且重登不恢复已退出的旧队列",
+      "MusicNetEasePlugin.Tests.PlaylistTests.内容错误和限流不会注销账号且会话失效撤销请求",
+      "MusicNetEasePlugin.Tests.PlaylistTests.旧歌单迟到和账号撤销不污染当前浏览",
+      "MusicNetEasePlugin.Tests.QueueTests.迟到加载不能反转用户意图且账号撤销清空队列",
+      "MusicNetEasePlugin.Tests.MusicSessionTests.仅核验通过的账号可取快照且保存失败仍可播放",
+      "MusicNetEasePlugin.Tests.MusicSessionTests.凭据版本拒绝旧更新且同账号重登拒绝旧失效响应",
+      "MusicNetEasePlugin.Tests.MusicSessionTests.音乐响应保存已提交但尚未返回时退出仍最终清除会话",
+      "MusicNetEasePlugin.Tests.MediaBufferTests.合法重定向逐跳无凭据且临时文件归句柄所有"
+    ],
+    "B01": [
+      "MusicNetEasePlugin.Tests.MediaBufferTests.下载进度区分已知总长与未知长度且最后字节准确",
+      "MusicNetEasePlugin.Tests.MediaBufferTests.长度不可信和非媒体响应不能发布半成品",
+      "MusicNetEasePlugin.Tests.MediaBufferTests.各阶段超时与主动取消都会关闭响应及清理文件"
+    ],
+    "B08": [
+      "MusicNetEasePlugin.Tests.NativeSeekTests.静默恢复首次继续才解码且按真实长度校正起点",
+      "MusicNetEasePlugin.Tests.NativeSeekTests.原生定位保留暂停且续播第一帧来自指定区段",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.续播失败保留目标且权限范围缩短会从有效起点开始",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.重启恢复队列重复身份与位置保持静默直到用户继续"
+    ],
+    "Q05": [
+      "MusicNetEasePlugin.Tests.NativeSeekTests.原生三曲自然结束连续交接且最后释放所有文件",
+      "MusicNetEasePlugin.Tests.QueueTests.队列停止失败保持可见并允许再次停止释放文件",
+      "MusicNetEasePlugin.Tests.QueueTests.删除当前首中尾及唯一项遵守播放意图",
+      "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲"
+    ],
+    "C02": [
+      "MusicNetEasePlugin.Tests.NativeSeekTests.原生三曲自然结束连续交接且最后释放所有文件",
+      "MusicNetEasePlugin.Tests.QueueTests.内容不可用跳过后成功播放并在下一段重新计算预算",
+      "MusicNetEasePlugin.Tests.QueueTests.手动切歌先接纳时旧终态不得双跳且缓存当前曲不依赖新网络",
+      "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲",
+      "MusicNetEasePlugin.Tests.QueueTests.全部不可播按候选预算停止而不是循环",
+      "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.原生终态在回调外收口并先停止后删文件"
+    ],
+    "B02": [
+      "MusicNetEasePlugin.Tests.NativeSeekTests.原生定位保留暂停且续播第一帧来自指定区段"
+    ],
+    "B03": [
+      "MusicNetEasePlugin.Tests.NativeSeekTests.原生定位保留暂停且续播第一帧来自指定区段",
+      "MusicNetEasePlugin.Tests.SeekingTests.草稿不被进度回推且暂停定位失败不伪造事实"
+    ],
+    "C01": [
+      "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.快速三次切歌只允许最终意图打开音源",
+      "MusicNetEasePlugin.Tests.QueueTests.迟到加载不能反转用户意图且账号撤销清空队列"
+    ],
+    "H08": [
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.续播失败保留目标且权限范围缩短会从有效起点开始",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.退出清理排在不响应取消的旧保存之后并保留账号历史",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.会话失效保留恢复而显式清理失败可见可重试",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.多账号清理失败分别保留且重登不恢复已退出的旧队列"
+    ],
+    "A01": [
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.重启恢复队列重复身份与位置保持静默直到用户继续",
+      "MusicNetEasePlugin.Tests.MusicSessionTests.仅核验通过的账号可取快照且保存失败仍可播放",
+      "MusicNetEasePlugin.Tests.MusicSessionTests.凭据版本拒绝旧更新且同账号重登拒绝旧失效响应",
+      "MusicNetEasePlugin.Tests.MusicSessionTests.音乐响应保存已提交但尚未返回时退出仍最终清除会话"
+    ],
+    "C05": [
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.高频进度五秒保存且暂停和重复关闭保存停止前位置",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.退出清理排在不响应取消的旧保存之后并保留账号历史",
+      "MusicNetEasePlugin.Tests.QueueTests.迟到加载不能反转用户意图且账号撤销清空队列",
+      "MusicNetEasePlugin.Tests.SeekingTests.定位等待时新目标胜出且换曲拒绝旧控制",
+      "MusicNetEasePlugin.Tests.MediaBufferTests.各阶段超时与主动取消都会关闭响应及清理文件"
+    ],
+    "H01": [
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.只有非定位正常推进登记历史且重播去重和上限二百"
+    ],
+    "H06": [
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.只有非定位正常推进登记历史且重播去重和上限二百",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.重启恢复队列重复身份与位置保持静默直到用户继续",
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.高频进度五秒保存且暂停和重复关闭保存停止前位置"
+    ],
+    "H02": [
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.重启恢复队列重复身份与位置保持静默直到用户继续",
+      "MusicNetEasePlugin.Tests.PlaybackStateStoreTests.真实文件白名单保存按账号隔离且大队列省略资料不丢条目"
+    ],
+    "H04": [
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.损坏文件不被初始化或音量覆盖但明确新建队列允许保存",
+      "MusicNetEasePlugin.Tests.PlaybackStateStoreTests.损坏未知版本身份及数值越界保留原文件"
+    ],
+    "H05": [
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.损坏文件不被初始化或音量覆盖但明确新建队列允许保存",
+      "MusicNetEasePlugin.Tests.PlaybackStateStoreTests.保存取消及原子替换失败保持上次完整文件且清理临时文件"
+    ],
+    "H03": [
+      "MusicNetEasePlugin.Tests.PlaybackStateStoreTests.真实文件白名单保存按账号隔离且大队列省略资料不丢条目"
+    ],
+    "P05": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.从选中位置播放接纳整单且刷新不会改写已接纳队列",
+      "MusicNetEasePlugin.Tests.PlaylistTests.真实歌单适配保留重复顺序并按身份补资料",
+      "MusicNetEasePlugin.Tests.PlaylistTests.不完整或超限歌单不冒充播放全部",
+      "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试"
+    ],
+    "Q01": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.从选中位置播放接纳整单且刷新不会改写已接纳队列",
+      "MusicNetEasePlugin.Tests.QueueTests.优先段保持操作顺序且重复歌曲有独立身份",
+      "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲"
+    ],
+    "Q02": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.从选中位置播放接纳整单且刷新不会改写已接纳队列",
+      "MusicNetEasePlugin.Tests.QueueTests.优先段保持操作顺序且重复歌曲有独立身份",
+      "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲"
+    ],
+    "P02": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.真实歌单适配保留重复顺序并按身份补资料",
+      "MusicNetEasePlugin.Tests.PlaylistTests.浏览分页使用原始偏移且重复页终止刷新可以重新开始"
+    ],
+    "P04": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.真实歌单适配保留重复顺序并按身份补资料",
+      "MusicNetEasePlugin.Tests.PlaylistTests.旧歌单迟到和账号撤销不污染当前浏览"
+    ],
+    "P07": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.真实歌单适配保留重复顺序并按身份补资料",
+      "MusicNetEasePlugin.Tests.PlaylistTests.不完整或超限歌单不冒充播放全部",
+      "MusicNetEasePlugin.Tests.PlaylistTests.内容错误和限流不会注销账号且会话失效撤销请求",
+      "MusicNetEasePlugin.Tests.HttpTests.超大响应拒绝且读取取消生效"
+    ],
+    "P08": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.浏览分页使用原始偏移且重复页终止刷新可以重新开始",
+      "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试"
+    ],
+    "P03": [
+      "MusicNetEasePlugin.Tests.PlaylistTests.旧歌单迟到和账号撤销不污染当前浏览"
+    ],
+    "Q11": [
+      "MusicNetEasePlugin.Tests.QueueTests.内容不可用跳过后成功播放并在下一段重新计算预算",
+      "MusicNetEasePlugin.Tests.QueueTests.手动切歌先接纳时旧终态不得双跳且缓存当前曲不依赖新网络",
+      "MusicNetEasePlugin.Tests.QueueTests.全部不可播按候选预算停止而不是循环"
+    ],
+    "Q09": [
+      "MusicNetEasePlugin.Tests.QueueTests.随机第一轮优先段和追加消费后不会再次被抽中",
+      "MusicNetEasePlugin.Tests.QueueTests.优先段保持操作顺序且重复歌曲有独立身份",
+      "MusicNetEasePlugin.Tests.QueueTests.模式首尾和随机访问历史有确定行为"
+    ],
+    "Q10": [
+      "MusicNetEasePlugin.Tests.QueueTests.随机第一轮优先段和追加消费后不会再次被抽中",
+      "MusicNetEasePlugin.Tests.QueueTests.优先段保持操作顺序且重复歌曲有独立身份",
+      "MusicNetEasePlugin.Tests.QueueTests.模式首尾和随机访问历史有确定行为"
+    ],
+    "Q04": [
+      "MusicNetEasePlugin.Tests.QueueTests.删除当前首中尾及唯一项遵守播放意图",
+      "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲"
+    ],
+    "Q06": [
+      "MusicNetEasePlugin.Tests.QueueTests.删除当前首中尾及唯一项遵守播放意图",
+      "MusicNetEasePlugin.Tests.QueueTests.模式首尾和随机访问历史有确定行为"
+    ],
+    "C03": [
+      "MusicNetEasePlugin.Tests.QueueTests.手动切歌先接纳时旧终态不得双跳且缓存当前曲不依赖新网络",
+      "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲",
+      "MusicNetEasePlugin.Tests.QueueTests.迟到加载不能反转用户意图且账号撤销清空队列"
+    ],
+    "B07": [
+      "MusicNetEasePlugin.Tests.QueueTests.手动切歌先接纳时旧终态不得双跳且缓存当前曲不依赖新网络",
+      "MusicNetEasePlugin.Tests.SeekingTests.过期与网络恢复共享三次预算并只取两次地址",
+      "MusicNetEasePlugin.Tests.SeekingTests.不可重试错误只请求一次",
+      "MusicNetEasePlugin.Tests.SeekingTests.重试延时可取消且持续网络失败不耗尽第三次无关预算",
+      "MusicNetEasePlugin.Tests.MediaBufferTests.长度不可信和非媒体响应不能发布半成品",
+      "MusicNetEasePlugin.Tests.MediaBufferTests.各阶段超时与主动取消都会关闭响应及清理文件"
+    ],
+    "Q03": [
+      "MusicNetEasePlugin.Tests.QueueTests.优先段保持操作顺序且重复歌曲有独立身份",
+      "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲"
+    ],
+    "Q07": [
+      "MusicNetEasePlugin.Tests.QueueTests.优先段保持操作顺序且重复歌曲有独立身份",
+      "MusicNetEasePlugin.Tests.QueueTests.模式首尾和随机访问历史有确定行为"
+    ],
+    "Q08": [
+      "MusicNetEasePlugin.Tests.QueueTests.优先段保持操作顺序且重复歌曲有独立身份",
+      "MusicNetEasePlugin.Tests.QueueTests.模式首尾和随机访问历史有确定行为"
+    ],
+    "Q12": [
+      "MusicNetEasePlugin.Tests.QueueTests.全局错误不扫描其他歌曲"
+    ],
+    "B04": [
+      "MusicNetEasePlugin.Tests.SeekingTests.草稿不被进度回推且暂停定位失败不伪造事实",
+      "MusicNetEasePlugin.Tests.SeekingTests.定位等待时新目标胜出且换曲拒绝旧控制"
+    ],
+    "C04": [
+      "MusicNetEasePlugin.Tests.SeekingTests.草稿不被进度回推且暂停定位失败不伪造事实",
+      "MusicNetEasePlugin.Tests.SeekingTests.定位等待时新目标胜出且换曲拒绝旧控制",
+      "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.旧暂停排队期间切歌会撤销旧控制意图"
+    ],
+    "B06": [
+      "MusicNetEasePlugin.Tests.SeekingTests.过期与网络恢复共享三次预算并只取两次地址",
+      "MusicNetEasePlugin.Tests.SeekingTests.不可重试错误只请求一次",
+      "MusicNetEasePlugin.Tests.SeekingTests.重试延时可取消且持续网络失败不耗尽第三次无关预算"
+    ]
+  },
+  "schemaVersion": 1
+}

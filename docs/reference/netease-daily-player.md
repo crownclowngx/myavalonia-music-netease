@@ -1,6 +1,6 @@
 # V4 日常播放器当前实现
 
-> 更新：2026-09-23。当前完成 V4.0–V4.5，包含歌单、共享队列、定位、歌词、历史与静默恢复；开发收口继续按[V4 方案](../roadmap/netease-v4-m2-daily-player-plan.md)实施。
+> 更新：2026-09-23。V4.0–V4.5 功能及 V4.6 自动收口完成，真实验收依[V4 方案](../roadmap/netease-v4-m2-daily-player-plan.md)单列；M2 尚未宣称实机全部完成。
 > [专用验证矩阵](../maintenance/netease-v4-m2-daily-player-verification.md) · [实施记录](../archive/records/netease-v4/m2-implementation-20260923.md)。本页只描述已经接入的增量。
 
 ## 歌单与账号
@@ -29,7 +29,7 @@ QueueNavigator 只计算导航；PlaybackQueueCoordinator 是容器唯一队列�
 
 关闭任意或最后一个 Document 后继续播放，再打开订阅同一会话。页面只释放搜索、浏览、图片及订阅；退出账号和插件 Shutdown 停止并清空个人状态。此规则替代 M1 的页面所有者停止语义。
 
-完整 V4 开发门禁尚未接入，当前使用既有 V3 入口跑完整测试；不使用 Windows CI、发布门禁或 AIFLOW。离线原生三曲解码验证不能代替声卡听感与真实 Host 验收。
+完整本地开发门禁默认 `-Milestone V4`，同时核验 M1/V3/M2 映射、真实离线解码与 UI 产物；不使用 Windows CI、发布门禁或 AIFLOW。离线原生三曲解码验证不能代替声卡听感与真实 Host 验收。
 
 ## 定位与缓冲
 

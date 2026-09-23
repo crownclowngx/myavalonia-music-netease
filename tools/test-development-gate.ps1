@@ -126,6 +126,7 @@ try {
     }
     Remove-Item -LiteralPath $motionPath
     Expect-Rejection { Assert-V3Artifacts $directory }; $checks++
+    . (Join-Path $PSScriptRoot 'TestM2DevelopmentGate.ps1')
     Write-Host "门禁自测通过：$checks 项判定。"
 }
 finally {

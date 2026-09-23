@@ -21,7 +21,9 @@
 eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全新进程证明网易云 App 路径获取 QR 和 801 不需要匿名 Cookie 或 xeapi 初始化；该路径的真实 803 授权仍缺单独验证记录。微信路径已完成真实授权、回调与账号核验。
 未实现短信/密码登录、扫码 Cookie 刷新和多账号。V2 已新增 xeapi、搜索、详情和单曲播放，端点、媒体与引擎契约见[音乐与播放当前契约](netease-music-playback.md)。
 
-V4.1 已新增当前账号歌单、n=0 详情与分批曲目读取；账号 ID 在提交者锁内随 epoch 捕获，新增端点复用受控提交和响应预算。协议及浏览约定见[日常播放器当前实现](netease-daily-player.md)。
+V4 已新增当前账号歌单、n=0 详情、分批曲目以及两代歌词读取；账号 ID 在提交者锁内随 epoch 捕获，新增端点复用受控提交和响应预算。`/api/user/playlist` 为 weapi，`/api/v6/playlist/detail`、批量 `/api/v3/song/detail`、`/api/song/lyric` 和 `/api/song/lyric/v1` 为 eapi。固定描述、只读探针与解析夹具可核对；歌词新接口仅网络/协议失败回退旧接口，限流/失效不重放。协议及浏览约定见[日常播放器当前实现](netease-daily-player.md)。
+
+按账号保存的 `playback-state/<数字账号>.json` 与受保护登录会话分离，只允许身份/资料/播放状态白名单，不保存播放 URL 或凭据；最多 4 MiB。核验前不加载个人队列；显式退出串行清理续播并保留本机历史，会话失效保留最后有效恢复位置。恢复初始化不触发任何媒体 HTTP。
 
 ## 2. 职责与资源所有权
 

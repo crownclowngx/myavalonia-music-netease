@@ -1,0 +1,257 @@
+{
+  "deployed": false,
+  "machine": "Microsoft Windows 10.0.26200",
+  "hostVerified": false,
+  "realAccountVerified": false,
+  "scenarioCoverage": {
+    "executedCases": 153.0,
+    "scenarios": 58,
+    "methods": 95
+  },
+  "releaseGateExecuted": false,
+  "workingTreeDirty": true,
+  "testsPassed": 276,
+  "runtime": {
+    "directory": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\bin\\Debug\\net10.0\\native\\win-x64\\libvlc",
+    "version": "3.0.23 Vetinari"
+  },
+  "sourceSha256": "C25A09C5CDBDF7CCB677E19700FFCE1FF0EF13F84F1A219D9A67F21F345AE880",
+  "uiScenarioCoverage": {
+    "executedCases": 16.0,
+    "scenarios": 7,
+    "methods": 10
+  },
+  "m2ScenarioCoverage": {
+    "executedCases": 140.0,
+    "scenarios": 58,
+    "methods": 75
+  },
+  "revision": "bfaecab46ffb77b40d8223360daf918e48bd1aba",
+  "runId": "20260923-054602-0a211745",
+  "artifacts": [
+    {
+      "sha256": "1BF6FD4CD2902BD8168638442B5254ED86A1059A6B9825B4025B713B6D10BF5A",
+      "name": "libvlc-offline.json",
+      "bytes": 1793
+    },
+    {
+      "sha256": "67C1DEE4F37DAC437C1C3286570762873974B5F3D662E020C2214CB7FE8ED699",
+      "name": "login-page.png",
+      "bytes": 25071
+    },
+    {
+      "sha256": "EF112A5B4B892F737CD6FEE52A9F637EEB7E78891CE53FABBDBFC8EA5BB5A5D9",
+      "name": "m1-compact.png",
+      "bytes": 46161
+    },
+    {
+      "sha256": "27D5E9DCB6113CF0A735C66088704827831CC1609C798B78E8371CD2CA17CB95",
+      "name": "m1-music-and-settings.png",
+      "bytes": 48444
+    },
+    {
+      "sha256": "C6EB287FFDB2E0C637AF9C31768F333E612BB5D21CA3282EAD426607404F18C8",
+      "name": "m2-document-dark-1200.png",
+      "bytes": 32217
+    },
+    {
+      "sha256": "2915F556C2296C486178851F1E5C9B4ECBF39BD28236F4DA51090DAAF8020961",
+      "name": "m2-document-dark-1200.png.json",
+      "bytes": 421
+    },
+    {
+      "sha256": "65C48985333EFED38D393C651509C16293EE8ED7C397C733DDB667D4D38B0AE4",
+      "name": "m2-document-dark-520.png",
+      "bytes": 17108
+    },
+    {
+      "sha256": "3AC42904A88E78CDF12D167B0999011C0A449D1DC27FB16F6A1D8A8EA923EB37",
+      "name": "m2-document-dark-520.png.json",
+      "bytes": 419
+    },
+    {
+      "sha256": "B34E3E09DBEC7399A0001C64B553473032EA4F8FEE60D9D7061BB5734A11B300",
+      "name": "m2-document-dark-800.png",
+      "bytes": 24702
+    },
+    {
+      "sha256": "E79CE2298CC7170413F34DCCDB1FC43E254B5086E754F1820F2EE0D8787162B8",
+      "name": "m2-document-dark-800.png.json",
+      "bytes": 419
+    },
+    {
+      "sha256": "6584D433634DBFCBB62FCDB4493B3C94E556D9D2D2CB0C2D28179BE0FE65B4A9",
+      "name": "m2-document-light-1200.png",
+      "bytes": 33559
+    },
+    {
+      "sha256": "35040771CF86409E767CFB76F83CB9095CDFCB654F7E5B8E6F44FB503D327E09",
+      "name": "m2-document-light-1200.png.json",
+      "bytes": 422
+    },
+    {
+      "sha256": "50BA7256BC2676384D95EED4C298994127D90AE87AF0E4CB62C24EF12444053E",
+      "name": "m2-document-light-520.png",
+      "bytes": 18094
+    },
+    {
+      "sha256": "52E81680307C96A0537222579DF3D2CBC5E58677D95762DA86DEB47068A40DB2",
+      "name": "m2-document-light-520.png.json",
+      "bytes": 420
+    },
+    {
+      "sha256": "1F24FB2BED761F2C0F24D746C50CDDC66185915977BB4C08A04A9C39E6F812F8",
+      "name": "m2-document-light-800.png",
+      "bytes": 25673
+    },
+    {
+      "sha256": "21B250DCD496A12A12696056011F27D5DA00204DA2229B520D6A014F47357279",
+      "name": "m2-document-light-800.png.json",
+      "bytes": 420
+    },
+    {
+      "sha256": "DFA0343FA8F1FEFCE6E37D84104A236A2F6F16ED1BAADDB8FDD8509B487055F8",
+      "name": "m2-lifetime.json",
+      "bytes": 513
+    },
+    {
+      "sha256": "BBFC75178E7352544D50632BF1FB00B36DA617C337F626D48FA58046BB27D05B",
+      "name": "m2-native-queue.json",
+      "bytes": 366
+    },
+    {
+      "sha256": "DBBF55DE8F9D36539F67437B889EA443964CB35647CBDDC9BD553E7954D7C438",
+      "name": "m2-native-restore-12000.json",
+      "bytes": 584
+    },
+    {
+      "sha256": "0420764F5EA1D35E6731B84E3522E1B1A8F8F9A3FD3DB0740969F50456EEB232",
+      "name": "m2-native-restore-4000.json",
+      "bytes": 584
+    },
+    {
+      "sha256": "6DE59430706903F903DC3174BF2DAEEFC32C0787F0DA4B378E422768EC61F138",
+      "name": "m2-native-seek.json",
+      "bytes": 592
+    },
+    {
+      "sha256": "91B55F7F53B0A2D20C93B245B4DD69EB0A4D6CD62027607CAA3E79259B74AD15",
+      "name": "m2-restored-paused-dark.png",
+      "bytes": 20241
+    },
+    {
+      "sha256": "91ED7C4781FC5BEDA327CC27F4241E2C5101DB0E7FD5AB31FA1A43895396B3EA",
+      "name": "m2-restored-paused-dark.png.json",
+      "bytes": 422
+    },
+    {
+      "sha256": "FE97C83532A5E39E7F77B8ECA9BDE344A56E5F6758A0BF139E20B40F18BE7FE9",
+      "name": "m2-restored-paused-light.png",
+      "bytes": 21749
+    },
+    {
+      "sha256": "1C001A77D45F21440DB5EADF17D7E7CB9C072657243FBBA655C067AE288A5B11",
+      "name": "m2-restored-paused-light.png.json",
+      "bytes": 423
+    },
+    {
+      "sha256": "CF5CD109449A081BEAC23FEC860EDDBD9B08B63905E62C344E6A6AC62E437395",
+      "name": "netease-login-development.trx",
+      "bytes": 413884
+    },
+    {
+      "sha256": "192F168D70D3F887E87252C19B51479D3780DEB0BFC596A17D7CC1DD4C1EDF69",
+      "name": "v3-document-dark-1200.png",
+      "bytes": 59830
+    },
+    {
+      "sha256": "6B95026481A8A2EDB7E9DC40E172983F62FC2A7D773CFDFE5DCDADB1DBDB706D",
+      "name": "v3-document-dark-520.png",
+      "bytes": 20849
+    },
+    {
+      "sha256": "6B3ABE1238AA55DC43472EE2701D8A2EE84BC8E283E85AE8CFFB527462A0E744",
+      "name": "v3-document-dark-800.png",
+      "bytes": 37998
+    },
+    {
+      "sha256": "E755B090FBAFBC2B9D569D5C1942D07A18F8D61AE43A10E570440F928F2B5633",
+      "name": "v3-document-light-1200.png",
+      "bytes": 62435
+    },
+    {
+      "sha256": "20A58D0E9C1C1EE3062B9547E0B745337481DDD639BB72D24F3626E233D3BD13",
+      "name": "v3-document-light-520.png",
+      "bytes": 22011
+    },
+    {
+      "sha256": "F116AD09CA6F38DA48050EC0EE64F6AEE62C0E053D7A51C47662500DA024C559",
+      "name": "v3-document-light-800.png",
+      "bytes": 39193
+    },
+    {
+      "sha256": "E22D64F42A0B0ACB765EAFC3E1BD88E35379D3D9D45FF77246A39B98EB35EB28",
+      "name": "v3-host-theme-dark-composition.png",
+      "bytes": 50297
+    },
+    {
+      "sha256": "D91EBBBE4CAB60C6A8E1169C64A3FE33666F32BE1D48DFD84EF1C6152DC3F559",
+      "name": "v3-login-dark.png",
+      "bytes": 18395
+    },
+    {
+      "sha256": "CACFD0553CC78A6AA1146F06B464A024AF8AF224FEC91FC247E425D6AD85CA0B",
+      "name": "v3-login-light.png",
+      "bytes": 18902
+    },
+    {
+      "sha256": "2DF3B5CE4AD3668E7451D48E2EC6DE73E892DA53BA6A9FBE5350808BDB236724",
+      "name": "v3-motion-observation.json",
+      "bytes": 1466
+    },
+    {
+      "sha256": "AAF79FD041BA4BE1A935C3EC5C8D08A0D1908DC628E01AA6D6E0A4EA5D002AEE",
+      "name": "v3-tool-dark-280.png",
+      "bytes": 27287
+    },
+    {
+      "sha256": "5D1E89BFF40778D3F7C959494317C657751187A2FEE6B6F657C7A3EB789AE114",
+      "name": "v3-tool-dark-320.png",
+      "bytes": 27825
+    },
+    {
+      "sha256": "504DBFCCED56877E12BEC6E06152D6F03F0C84C92C9EBA3ACFB734C9BF266847",
+      "name": "v3-tool-dark-420.png",
+      "bytes": 29233
+    },
+    {
+      "sha256": "662BF9BCA1BF9A37715A282832B29B9B83FF9366031D8BA23B2660DAAFE733CF",
+      "name": "v3-tool-dark-640.png",
+      "bytes": 19913
+    },
+    {
+      "sha256": "648F9DED3D1E93645E969192FDFA3D414594F8A716F35E90B30093E3E0516EA3",
+      "name": "v3-tool-light-280.png",
+      "bytes": 27493
+    },
+    {
+      "sha256": "BB96C78E2F4CAF60D53A9D1BF04D3E052905547EB4EC5FF31BB63A02AF4D9F08",
+      "name": "v3-tool-light-320.png",
+      "bytes": 27987
+    },
+    {
+      "sha256": "714174540D6A2CFAFBF0DF2E9E75138D48E8FF120434DB4793D6C69537A33147",
+      "name": "v3-tool-light-420.png",
+      "bytes": 29408
+    },
+    {
+      "sha256": "A0A36B653975FFFDAFC5EFCC9F90E1C17D95A0947A0C03D36B5206C1BACC5B3F",
+      "name": "v3-tool-light-640.png",
+      "bytes": 20141
+    }
+  ],
+  "completedUtc": "2026-09-23T05:46:40.8826082+00:00",
+  "milestone": "V4",
+  "startedUtc": "2026-09-23T05:46:15.3527132+00:00",
+  "audibleOutputVerified": false
+}

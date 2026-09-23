@@ -5,6 +5,72 @@ namespace MusicNetEasePlugin.Tests;
 
 public sealed class QueueTests
 {
+    [Fact, Trait("M2", "C06,Q05")]
+    public async Task 队列停止失败保持可见并允许再次停止释放文件()
+    {
+        await using var f = new PlaybackFixture(); await f.Queue.PlaySingleAsync(MusicCatalog.Track(1), default);
+        f.Audio.Stopping = () => throw new MusicException(MusicError.Device, "停止设备失败");
+        await f.Queue.StopAsync(); Assert.Equal(PlaybackState.Failed, f.Queue.Snapshot.Playback.State);
+        Assert.NotEmpty(f.Queue.Snapshot.Playback.Message); Assert.Empty(f.Buffer.Deleted);
+        f.Audio.Stopping = null; await f.Queue.StopAsync(); Assert.Null(f.Audio.Current); Assert.Single(f.Buffer.Deleted);
+    }
+    [Fact, Trait("M2", "Q11,C02")]
+    public async Task 内容不可用跳过后成功播放并在下一段重新计算预算()
+    {
+        await using var f = new PlaybackFixture();
+        f.Catalog.Resource = (id, _) => Task.FromResult(new PlaybackResource(id, id % 2 == 1 ? null : new Uri("https://m1.music.126.net/fixture"), "mp3", "standard", false, null));
+        var first = Wait(f.Queue, s => s.Playback.State == PlaybackState.Playing && s.Playback.Track?.Id == 2);
+        await f.Queue.ReplaceAsync(Entries(1, 2, 3, 4), 0, default); await first;
+        var next = Wait(f.Queue, s => s.Playback.State == PlaybackState.Playing && s.Playback.Track?.Id == 4);
+        f.Audio.Emit(f.Queue.Snapshot.Playback.Generation, PlaybackState.Ended); await next;
+        Assert.Equal(4, f.Catalog.Resolves); Assert.Equal(2, f.Audio.Opened.Count);
+    }
+    [Fact, Trait("M2", "Q09,Q10")]
+    public void 随机第一轮优先段和追加消费后不会再次被抽中()
+    {
+        var nav = new QueueNavigator(_ => 0); var entries = Entries(1, 2, 3); nav.Replace(entries, 0); nav.SetMode(PlaybackMode.Shuffle);
+        var priority = Entries(4, 5); nav.Add(priority, true); var appended = Entries(6); nav.Add(appended, false);
+        var played = new List<Guid> { nav.CurrentId!.Value };
+        for (var i = 0; i < 5; i++) played.Add(nav.Next(true)!.Value);
+        Assert.Equal(priority[0].EntryId, played[1]); Assert.Equal(priority[1].EntryId, played[2]);
+        Assert.Equal(6, played.Distinct().Count()); Assert.NotEqual(played[^1], nav.Next(true));
+    }
+    public static IEnumerable<object[]> RemovalCases =>
+        from state in new[] { PlaybackState.Playing, PlaybackState.Paused, PlaybackState.Stopped, PlaybackState.Loading }
+        from index in new[] { 0, 1, 2, 3 }
+        select new object[] { state, index };
+    [Theory, MemberData(nameof(RemovalCases)), Trait("M2", "Q04,Q05,Q06")]
+    public async Task 删除当前首中尾及唯一项遵守播放意图(PlaybackState state, int index)
+    {
+        await using var f = new PlaybackFixture(); var entries = index == 3 ? Entries(1) : Entries(1, 2, 3); var current = index == 3 ? 0 : index;
+        if (state == PlaybackState.Loading) f.Audio.AutoStart = false;
+        await f.Queue.ReplaceAsync(entries, current, default);
+        if (state == PlaybackState.Paused) await f.Queue.PauseAsync(true, default);
+        if (state == PlaybackState.Stopped) await f.Queue.StopAsync();
+        await f.Queue.RemoveAsync(entries[current].EntryId, default);
+        if (entries.Length == 1) { Assert.Empty(f.Queue.Snapshot.Entries); Assert.Null(f.Audio.Current); }
+        else
+        {
+            Assert.Equal(entries[current == 2 ? 1 : current + 1].EntryId, f.Queue.Snapshot.CurrentEntryId);
+            Assert.Equal(state == PlaybackState.Playing ? PlaybackState.Playing : state == PlaybackState.Paused ? PlaybackState.Paused : PlaybackState.Stopped, f.Queue.Snapshot.Playback.State);
+            Assert.Equal(state == PlaybackState.Playing ? 2 : 1, f.Audio.Opened.Count);
+        }
+        await f.Queue.StopAsync(); await f.Queue.StopAsync(); Assert.Equal(0, f.Queue.Snapshot.Playback.PositionMs);
+        await f.Queue.ClearAsync(); await f.Queue.ClearAsync(); Assert.Empty(f.Queue.Snapshot.Entries); Assert.Null(f.Audio.Current);
+    }
+    [Fact, Trait("M2", "C02,C03,Q11,B07")]
+    public async Task 手动切歌先接纳时旧终态不得双跳且缓存当前曲不依赖新网络()
+    {
+        await using var f = new PlaybackFixture(); await f.Queue.ReplaceAsync(Entries(1, 2, 3), 0, default);
+        var old = f.Queue.Snapshot.Playback.Generation;
+        await f.Queue.NextAsync(false, default); f.Audio.Emit(old, PlaybackState.Ended); f.Audio.Emit(old, PlaybackState.Failed);
+        Assert.Equal(2, f.Queue.Snapshot.Playback.Track!.Id); Assert.Equal(2, f.Audio.Opened.Count);
+        f.Catalog.Resource = (_, _) => throw new MusicException(MusicError.Network, "断网");
+        f.Audio.Emit(f.Queue.Snapshot.Playback.Generation, PlaybackState.Playing, 5000);
+        Assert.Equal(PlaybackState.Playing, f.Queue.Snapshot.Playback.State); Assert.Equal(5000, f.Queue.Snapshot.Playback.PositionMs);
+        await f.Queue.NextAsync(false, default); Assert.Equal(PlaybackState.Failed, f.Queue.Snapshot.Playback.State);
+        Assert.Equal(3, f.Catalog.Resolves); Assert.Equal(2, f.Audio.Opened.Count);
+    }
     private static QueueEntry[] Entries(params long[] ids) => ids.Select(id => QueueEntry.FromTrack(MusicCatalog.Track(id))).ToArray();
     [Theory, InlineData(PlaybackMode.Sequential), InlineData(PlaybackMode.RepeatList), InlineData(PlaybackMode.RepeatOne), InlineData(PlaybackMode.Shuffle)]
     [Trait("M2", "Q01,Q02,Q03,Q07,Q08,Q09,Q10")]
@@ -65,7 +131,7 @@ public sealed class QueueTests
         await stopped; Assert.Equal(attempts, f.Catalog.Resolves); Assert.Null(f.Audio.Current);
         Assert.Equal(PlaybackState.Failed, f.Queue.Snapshot.Playback.State);
     }
-    [Theory, InlineData(MusicError.Network), InlineData(MusicError.Device), InlineData(MusicError.RateLimited), InlineData(MusicError.Protocol)]
+    [Theory, InlineData(MusicError.Network), InlineData(MusicError.Device), InlineData(MusicError.RateLimited), InlineData(MusicError.Protocol), InlineData(MusicError.Storage), InlineData(MusicError.SignedOut)]
     [Trait("M2", "Q12")]
     public async Task 全局错误不扫描其他歌曲(MusicError error)
     {

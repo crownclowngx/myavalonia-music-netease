@@ -56,7 +56,7 @@
     "MusicNetEasePlugin.Tests.MusicSessionTests.凭据版本拒绝旧更新且同账号重登拒绝旧失效响应": 1,
     "MusicNetEasePlugin.Tests.MusicSessionTests.音乐响应保存已提交但尚未返回时退出仍最终清除会话": 1,
     "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.旧暂停排队期间切歌会撤销旧控制意图": 1,
-    "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.快速三次切歌只允许最终意图打开音源": 3,
+    "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.快速三次切歌只允许最终意图打开音源": 4,
     "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.停止故障保留文件并允许再次停止收口": 1,
     "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.无地址不启动引擎且试听显示来自资源事实": 1,
     "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.引擎确认前保持加载且控制和旧事件不能复活已停止歌曲": 1,

@@ -31,7 +31,8 @@ public sealed class PlaybackCoordinatorTests
         Assert.Equal(2, f.Catalog.Resolves);
     }
 
-    [Theory, InlineData("detail"), InlineData("resource"), InlineData("buffer")]
+    [Theory, InlineData("detail"), InlineData("resource"), InlineData("buffer"), InlineData("open")]
+    [Trait("M2", "C01")]
     [Trait("M1", "A03,C05,L03,L04,B04")]
     public async Task 快速三次切歌只允许最终意图打开音源(string stage)
     {
@@ -42,6 +43,7 @@ public sealed class PlaybackCoordinatorTests
         f.Catalog.Detail = async (id, _) => { if (stage == "detail") await Wait(id); return MusicCatalog.Track(id); };
         f.Catalog.Resource = async (id, _) => { if (stage == "resource") await Wait(id); return new(id, new Uri("https://m1.music.126.net/file"), "mp3", "standard", false, null); };
         f.Buffer.Download = async (r, _) => { if (stage == "buffer") await Wait(r.Id); return new(r.Id + ".media", f.Buffer.Deleted.Enqueue); };
+        f.Audio.Opening = _ => stage == "open" && !entered.Task.IsCompleted ? Wait(1) : Task.CompletedTask;
         var first = f.Play(1);
         await entered.Task.WaitAsync(TimeSpan.FromSeconds(3));
         var second = f.Play(2);

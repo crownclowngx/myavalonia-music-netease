@@ -23,6 +23,7 @@ internal sealed class QueueNavigator(Func<int, int>? choose = null)
     {
         _entries.Clear(); _entries.AddRange(entries); _priority.Clear(); _bag.Clear(); _history.Clear(); _historyIndex = -1;
         CurrentId = null; if (_entries.Count > 0) Select(_entries[start].EntryId);
+        ResetCandidates();
     }
     public void Add(IReadOnlyList<QueueEntry> entries, bool next)
     {
@@ -34,17 +35,28 @@ internal sealed class QueueNavigator(Func<int, int>? choose = null)
         }
         else _entries.AddRange(entries);
         if (CurrentId is null && _entries.Count > 0) Select(_entries[0].EntryId);
-        if (Mode == PlaybackMode.Shuffle) _bag.AddRange(entries.Select(e => e.EntryId).Where(id => id != CurrentId && !_bag.Contains(id)));
+        if (Mode == PlaybackMode.Shuffle)
+        {
+            var candidates = _bag.ToHashSet();
+            _bag.AddRange(entries.Select(e => e.EntryId).Where(id => id != CurrentId && candidates.Add(id)));
+        }
     }
     public void SetMode(PlaybackMode mode)
     {
         Mode = mode; _bag.Clear(); _history.Clear(); _historyIndex = -1;
         if (CurrentId is { } id) Record(id);
+        ResetCandidates();
     }
     public bool Select(Guid id)
     {
         if (!_entries.Any(e => e.EntryId == id)) return false;
         CurrentId = id; _bag.Remove(id); Record(id); return true;
+    }
+    private void ResetCandidates()
+    {
+        // 在进入随机模式时建立本轮候选，不能等优先段播放完才初始化，否则已消费优先项会重新入袋。
+        _bag.Clear();
+        if (Mode == PlaybackMode.Shuffle) _bag.AddRange(_entries.Select(entry => entry.EntryId).Where(id => id != CurrentId));
     }
     public Guid? Next(bool natural, HashSet<Guid>? excluded = null)
     {

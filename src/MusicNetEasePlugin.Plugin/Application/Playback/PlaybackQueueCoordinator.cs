@@ -52,7 +52,8 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         lock (_sync)
         {
             BindAccount(session);
-            if (_order.Entries.Count + entries.Count > 10000 || entries.Any(e => _order.Entries.Any(existing => existing.EntryId == e.EntryId)))
+            var existingIds = _order.Entries.Select(entry => entry.EntryId).ToHashSet();
+            if (_order.Entries.Count + entries.Count > 10000 || entries.Any(e => existingIds.Contains(e.EntryId)))
                 throw new MusicException(MusicError.Storage, "队列超过 10,000 项或包含重复条目标识。");
             var empty = _order.Current is null;
             _order.Add(entries, playNext); PublishOrder();
@@ -219,7 +220,20 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     private Task StopToPending(PlaybackState state)
     {
         _attempt = Guid.Empty; _terminalConsumed = true;
-        var work = _single.StopAsync(); SetPending(state); return work;
+        var work = _single.StopAsync(); SetPending(state); var revision = _snapshot.Revision;
+        return CompleteStop();
+        async Task CompleteStop()
+        {
+            await work.ConfigureAwait(false);
+            lock (_sync)
+            {
+                // Stop 本身也可能失败。原尝试已撤销，不能靠其事件回填；只有本次停止仍有效时显式转发错误。
+                if (_closed || _snapshot.Revision != revision || _attempt != Guid.Empty || _single.Snapshot.State != PlaybackState.Failed) return;
+                _snapshot = _snapshot with { Revision = revision + 1, Playback = _snapshot.Playback with { State = PlaybackState.Failed,
+                    Error = _single.Snapshot.Error, Message = _single.Snapshot.Message } };
+            }
+            Notify();
+        }
     }
     private void SetPending(PlaybackState state)
     {

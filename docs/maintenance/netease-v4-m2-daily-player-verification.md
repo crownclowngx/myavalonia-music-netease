@@ -1,7 +1,7 @@
 # V4 / M2 日常播放器专用开发验证矩阵
 
-> 更新：2026-09-23。状态：**V4.0 已验证固定请求及原生定位子场景，完整 M2 映射/V4 门禁与其余场景正在实施**。结果见[专用实施记录](../archive/records/netease-v4/m2-implementation-20260923.md)。
-> 实施依据：[V4 实施指导](../roadmap/netease-v4-m2-daily-player-plan.md)。当前可运行入口仍为 `-Milestone V3`。
+> 更新：2026-09-23。状态：**V4 功能及完整本地自动门禁已完成，R01–R06 的实机剩余项单列**。结果见[专用实施记录](../archive/records/netease-v4/m2-implementation-20260923.md)。
+> 实施依据：[V4 实施指导](../roadmap/netease-v4-m2-daily-player-plan.md)。当前默认入口为 `-Milestone V4`，保留 Login/M1/V3 入口及全量回归。
 > 不使用 AIFLOW、Windows CI 或发布门禁。以下“必须通过”是实施退出条件，不是历史执行结果。
 
 ## 1. 验证层次与运行方式
@@ -13,16 +13,16 @@
 | 手工实机 | Standalone、真实 Host、已核验账号与可播歌曲 | 真接口/真实听感、连续听歌、Dock/页面和重启；单独留证 |
 | 门禁自测 | 受控错误 TRX、映射和证据文件 | 门禁能拒绝假绿结果；不代替业务测试 |
 
-所有自动场景加入现有 `tests/MusicNetEasePlugin.Tests`。建议按职责新增 `PlaylistApiTests`、`PlaylistBrowserTests`、`QueueNavigatorTests`、`PlaybackQueueTests`、`SeekTests`、`LyricsTests`、`PlaybackStateStoreTests`、`PlaybackRecoveryTests`、`DailyPlayerUiTests`，并扩展现有会话、缓冲、音频和页面测试；文件名可按实现调整，场景 ID 保持稳定。
+所有自动场景加入现有 `tests/MusicNetEasePlugin.Tests`。实际分布于 PlaylistTests、QueueTests、SeekingTests、LyricsTests、PlaybackStateStoreTests、PlaybackPersistenceTests、NativeSeekTests、DailyPlayerUiTests、DailyPlayerAcceptanceTests，并复用既有 HTTP/会话/媒体/页面测试；固定映射见 [m2-test-map.json](../../tools/m2-test-map.json)。
 
 ```powershell
 # 现有基线，当前即可运行。
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V3
 
-# 以下为实施后的目标命令；当前脚本尚不接受 V4。
+# 默认完整 V4 入口。
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V4
 
-# 当前这次文档编写只执行此组。
+# 仅修改文档时执行此组。
 . ./tools/DevelopmentChecks.ps1
 Assert-MarkdownLinks (Get-Location).Path
 git diff --check
@@ -30,7 +30,7 @@ git diff --check
 
 ## 2. 自动业务场景
 
-表中是**场景数，不是预计测试数**。每个参数组合必须落到实际测试方法及执行用例数；断言覆盖可观察行为，不仅断言 mock 被调用。所有场景当前均为待实施/待执行。
+表中是**场景数，不是测试数**。每个参数组合落到实际测试方法及最小执行用例数；断言覆盖可观察行为，不仅断言 mock 被调用。58 个自动场景已映射并通过完整 V4 入口，单次测试数量及证据只在实施记录登记。
 
 ### P：歌单与曲目（8 项）
 
@@ -136,7 +136,7 @@ B02/B03/B08 必须使用真实适配和已知内容的本地样本，记录版�
 
 V4 自动入口要执行：脚本自测 → locked restore → Debug 零警告构建 → 全量测试 → TRX 完整性 → M1/V3/M2 场景映射 → 本轮证据校验 → 文档链接/锚点 → `git diff --check`。使用现有工具扩展，不复制第二套发布检查。
 
-M2 映射拟为 `tools/m2-test-map.json`：`schemaVersion`、`methods`（真实全限定方法名→最小参数化用例数）、`scenarios`（场景→方法）。必测集合由校验器独立维护：P01–P08、Q01–Q12、C01–C06、B01–B08、Y01–Y07、H01–H08、A01–A04、U01–U05，共 58 个自动场景。编号不能仅出现在 Trait/文档里；TRX 必须存在对应通过结果，且场景与方法的语义映射经审阅。
+M2 映射为 `tools/m2-test-map.json`：`schemaVersion`、`methods`（真实全限定方法名→最小参数化用例数）、`scenarios`（场景→方法）。必测集合由校验器独立维护：P01–P08、Q01–Q12、C01–C06、B01–B08、Y01–Y07、H01–H08、A01–A04、U01–U05，共 58 个自动场景。编号不能仅出现在 Trait/文档里；TRX 必须存在对应通过结果，且场景与方法的语义映射经审阅。
 
 | ID | 注入与检查 | 预期 |
 | --- | --- | --- |
@@ -176,4 +176,6 @@ G05 的旧语义迁移、G06 的事实一致性包含人工审阅，脚本不能
 
 M1/V3 的历史 TRX 和截图只作基线，不复用为 V4 新行为的通过证明。改动后的当前说明与 [V4 方案](../roadmap/netease-v4-m2-daily-player-plan.md)一致，并在旧维护矩阵中注明关闭语义的承接关系。测试方法变更同时更新映射，不能只改场景标签。
 
-当前状态：V4.0 覆盖 P01、B02/B03/B08 的技术子场景及新端点只读实测，详见专用记录；58 个完整自动场景、6 项门禁要求与 6 组真实验收尚未全部完成。完整 M2 完成条件以 V4 第 13 节为准。
+当前状态：58 个自动场景及 G01–G06 的自动检查已通过，G05 语义迁移和 G06 文档事实另经审阅。M1 的页面关闭停止覆盖已迁移为关闭继续播放，同时保留账号/Host 停止与迟到事件保护；没有删除旧集合来制造通过。R01/R03/R04 取得部分只读接口和 PCM 证据，R02/R05/R06 实机及其余子项仍待执行。完整 M2 完成条件以 V4 第 13 节为准。
+
+来源检查采用 `runId + revision + sourceSha256`：源码指纹包含已跟踪/未跟踪的实现、测试、工具及构建配置，摘要另记工作树 dirty；运行前后源码变化拒绝通过。M2 JSON 由测试写入身份；截图附尺寸/哈希/身份侧车，校验 PNG 完整结尾、实际解码与像素尺寸。摘要列出本轮 TRX、运行库、M1/V3/M2 统计和每个产物哈希。新增门禁自测位于 `tools/TestM2DevelopmentGate.ps1`，它只产生隔离的合成输入，不作业务证据。

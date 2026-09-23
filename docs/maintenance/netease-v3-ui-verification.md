@@ -9,7 +9,7 @@
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V3
 ```
 
-不传 Milestone 时默认 V3。Login/M1 入口保留；三个入口仍运行完整测试项目，V3 在 M1 证据检查之上增加 UI 方法映射、截图与动效采样检查。锁定还原、Debug 零警告构建、完整 TRX、文档链接、Git 空白检查均属于本地开发门禁。
+当前不传 Milestone 时默认 [V4](netease-v4-m2-daily-player-verification.md)，Login/M1/V3 入口保留；所有入口仍运行完整测试项目，V4 保留本页的全部映射、截图与动效检查。V3 在 M1 证据检查之上增加 UI 专项；锁定还原、Debug 零警告构建、完整 TRX、文档链接、Git 空白检查均属于本地开发门禁。
 
 门禁为每轮建立独立证据目录，任何失败、跳过、零测试、超时、旧 TRX、缺失方法/参数化用例、无效截图或采样缺项都会失败。映射为 [v3-test-map.json](../../tools/v3-test-map.json)，不扫描 Trait 文字冒充执行。门禁自身有失败注入自测。
 
