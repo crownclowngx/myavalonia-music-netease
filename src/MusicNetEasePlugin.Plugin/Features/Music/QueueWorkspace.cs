@@ -53,6 +53,11 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
         }, () => ConfirmClear);
         UpCommand = new RelayCommand(() => { if (Selected is { } row) player.Move(row.Id, -1); }, () => Selected is not null);
         DownCommand = new RelayCommand(() => { if (Selected is { } row) player.Move(row.Id, 1); }, () => Selected is not null);
+        UndoCommand = new RelayCommand(() =>
+        {
+            var undo = _snapshot.Undo;
+            Message = undo is not null && player.UndoQueueChange(undo.Id, _snapshot.AccountEpoch) ? "已撤销队列操作，播放保持不变。" : "队列已经变化，这次操作无法撤销。";
+        }, () => _snapshot.Undo is not null);
         player.Changed += Changed; Apply(player.Snapshot);
     }
     public ObservableCollection<QueueRow> Rows { get; } = [];
@@ -63,6 +68,19 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
     public string CountText => $"播放队列 · {Rows.Count} 首";
     public string ButtonText => $"队列 {Rows.Count}";
     public bool IsEmpty => Rows.Count == 0;
+    public long QueueRevision => _snapshot.QueueRevision;
+    public long AccountEpoch => _snapshot.AccountEpoch;
+    public bool CanUndo => _snapshot.Undo is not null;
+    public string UndoText => _snapshot.Undo?.Description ?? "撤销";
+    public IRelayCommand UndoCommand { get; }
+    public bool CommitMove(QueueMoveIntent intent)
+    {
+        if (_closed) return false;
+        var moved = _player.MoveTo(intent);
+        Message = moved ? "已调整队列顺序。" : "队列已经变化或位置未改变，未执行移动。";
+        return moved;
+    }
+    public void CancelMove() { if (!_closed) Message = "队列已经变化，已取消拖动，请重新调整。"; }
     public string OrderHint => ModeIndex == 3 ? "队列顺序 · 随机模式的实际下一首由播放器选择" : "队列顺序 · 当前项之后继续播放";
     public bool ConfirmClear { get => _confirmClear; private set { if (SetProperty(ref _confirmClear, value)) ConfirmClearCommand.NotifyCanExecuteChanged(); } }
     public string ClearText => $"清空 {Rows.Count} 首并停止播放？";
@@ -85,7 +103,7 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
         catch (MusicException ex) { _ui.Post(() => { if (!_closed) Message = ex.Message; }); }
     }
     private void Changed(object? sender, PlayerSessionSnapshot snapshot)
-    { if (snapshot.QueueRevision != _queueRevision || snapshot.CanNext != _snapshot.CanNext || snapshot.CanPrevious != _snapshot.CanPrevious) _ui.Post(() => { if (!_closed) Apply(snapshot); }); }
+    { if (snapshot.QueueRevision != _queueRevision || snapshot.Undo != _snapshot.Undo || snapshot.CanNext != _snapshot.CanNext || snapshot.CanPrevious != _snapshot.CanPrevious) _ui.Post(() => { if (!_closed) Apply(snapshot); }); }
     private void Apply(PlayerSessionSnapshot snapshot)
     {
         if (snapshot.Revision <= _revision) return;
@@ -110,12 +128,14 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
             Selected = Rows.FirstOrDefault(row => row.Id == selected);
             foreach (var property in new[] { nameof(CountText), nameof(ButtonText), nameof(ClearText), nameof(IsEmpty), nameof(Current) }) OnPropertyChanged(property);
         }
+        OnPropertyChanged(nameof(QueueRevision)); OnPropertyChanged(nameof(CanUndo)); OnPropertyChanged(nameof(UndoText));
         OnPropertyChanged(nameof(ModeIndex)); OnPropertyChanged(nameof(OrderHint)); UpdateCommands();
     }
     private void UpdateCommands()
     {
         NextCommand.NotifyCanExecuteChanged(); PreviousCommand.NotifyCanExecuteChanged(); PlayCommand.NotifyCanExecuteChanged();
         RemoveCommand.NotifyCanExecuteChanged(); ClearCommand.NotifyCanExecuteChanged(); UpCommand.NotifyCanExecuteChanged(); DownCommand.NotifyCanExecuteChanged();
+        UndoCommand.NotifyCanExecuteChanged();
     }
     public void Dispose() { if (_closed) return; _closed = true; _player.Changed -= Changed; Rows.Clear(); }
 }

@@ -23,6 +23,9 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     private long _lastSingleRevision = -1;
     private Task _background = Task.CompletedTask;
     private Task? _shutdown;
+    // 单步逆操作仅存必要结构；不保存整个播放器快照，也不引入命令栈或多级撤销框架。
+    private sealed record QueueUndo(QueueUndoInfo Info, long Epoch, long Revision, Guid EntryId, int Index, QueueNavigator.RemovedEntry? Removed);
+    private QueueUndo? _undo;
     public PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, PlaybackPersistence? persistence = null)
         : this(sessions, single, new QueueNavigator(), persistence) { }
     internal PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, QueueNavigator order, PlaybackPersistence? persistence = null)
@@ -85,6 +88,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         lock (_sync)
         {
             BindAccount(session);
+            if (entries.Count == 0) return Task.FromResult(new QueueAdditionResult(0, playNext, session.Epoch));
             var existingIds = _order.Entries.Select(entry => entry.EntryId).ToHashSet();
             if (_order.Entries.Count + entries.Count > 10000 || entries.Any(e => existingIds.Contains(e.EntryId)))
                 throw new MusicException(MusicError.Storage, "队列超过 10,000 项或包含重复条目标识。");
@@ -126,17 +130,53 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         lock (_sync)
         {
             BindAccount(session);
+            if (_order.CaptureRemoval(entryId) is not { } removed) return work;
             var current = _order.CurrentId == entryId; var state = _snapshot.Playback.State;
             if (current) _order.Next(false, [entryId]);
             _order.Remove(entryId); _failedCandidates.Remove(entryId); PublishOrder();
             if (current) work = _order.Current is not null && state == PlaybackState.Playing ? StartCurrent() : StopToPending(state == PlaybackState.Paused ? state : PlaybackState.Stopped);
+            RememberUndo(entryId, removed.Index, removed, "撤销移除");
         }
         Notify(); return work;
     }
     public void Move(Guid entryId, int direction)
     {
-        lock (_sync) { if (_closed) return; _order.Move(entryId, direction); PublishOrder(); }
-        Notify();
+        var snapshot = Snapshot; var index = snapshot.Entries.ToList().FindIndex(e => e.EntryId == entryId);
+        if (index >= 0) MoveTo(new(entryId, Math.Clamp(index + Math.Sign(direction), 0, snapshot.Entries.Count - 1), snapshot.QueueRevision, snapshot.AccountEpoch));
+    }
+    /// <summary>版本、账号、目标身份与边界在同一短锁校验；拖动预览期间没有任何结构写入。</summary>
+    public bool MoveTo(QueueMoveIntent intent)
+    {
+        lock (_sync)
+        {
+            if (_closed || _accountToken.IsCancellationRequested || intent.AccountEpoch != _snapshot.AccountEpoch || intent.QueueRevision != _snapshot.QueueRevision) return false;
+            var index = _order.IndexOf(intent.EntryId);
+            if (!_order.MoveTo(intent.EntryId, intent.TargetIndex)) return false;
+            PublishOrder(); RememberUndo(intent.EntryId, index, null, "撤销移动");
+        }
+        Notify(); return true;
+    }
+    public bool UndoQueueChange(Guid undoId, long accountEpoch)
+    {
+        lock (_sync)
+        {
+            if (_closed || _accountToken.IsCancellationRequested || _undo is not { } undo || undo.Info.Id != undoId ||
+                undo.Epoch != accountEpoch || accountEpoch != _snapshot.AccountEpoch || undo.Revision != _snapshot.QueueRevision) return false;
+            if (undo.Removed is { } removed)
+            {
+                if (_order.Entries.Count >= 10000 || _order.IndexOf(undo.EntryId) >= 0) return false;
+                _order.Reinsert(removed);
+            }
+            else if (!_order.MoveTo(undo.EntryId, undo.Index)) return false;
+            PublishOrder();
+        }
+        Notify(); return true;
+    }
+    private void RememberUndo(Guid entryId, int index, QueueNavigator.RemovedEntry? removed, string description)
+    {
+        var info = new QueueUndoInfo(Guid.NewGuid(), description);
+        _undo = new(info, _snapshot.AccountEpoch, _snapshot.QueueRevision, entryId, index, removed);
+        _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Undo = info };
     }
     public void SetMode(PlaybackMode mode)
     {
@@ -281,11 +321,13 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Playback = new(_snapshot.Playback.Revision + 1, state,
             current?.Track ?? (current is null ? null : new(current.TrackId, current.Display, "", "", null, 0)), Volume: _snapshot.Playback.Volume) };
     }
-    private void PublishOrder()
+    private void PublishOrder(bool metadataOnly = false)
     {
+        if (!metadataOnly) _undo = null;
         _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, QueueRevision = _snapshot.QueueRevision + 1,
             Entries = Array.AsReadOnly(_order.Entries.ToArray()), CurrentEntryId = _order.CurrentId, Mode = _order.Mode,
-            CanNext = _order.CanNext, CanPrevious = _order.CanPrevious, Restoration = null };
+            CanNext = _order.CanNext, CanPrevious = _order.CanPrevious, Restoration = null, Undo = _undo?.Info };
+        if (_undo is not null) _undo = _undo with { Revision = _snapshot.QueueRevision };
     }
     private void SingleChanged(object? sender, PlaybackSnapshot playback)
     {
@@ -296,7 +338,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
             _lastSingleRevision = playback.Revision;
             if (playback.State == PlaybackState.Failed && _resumePosition > 0)
                 playback = playback with { PositionMs = _resumePosition, Message = playback.Message + " 已保留续播位置，可重试。" };
-            if (playback.Track is { } track && _order.Current?.Track != track) { _order.UpdateTrack(track); PublishOrder(); }
+            if (playback.Track is { } track && _order.Current?.Track != track) { _order.UpdateTrack(track); PublishOrder(metadataOnly: true); }
             _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Playback = playback };
             if (playback.State == PlaybackState.Playing) { _failedCandidates.Clear(); _resumePosition = 0; }
             if (playback.State is PlaybackState.Ended or PlaybackState.Failed && !_terminalConsumed)

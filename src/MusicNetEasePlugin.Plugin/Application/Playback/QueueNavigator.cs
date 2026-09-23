@@ -115,13 +115,31 @@ internal sealed class QueueNavigator(Func<int, int>? choose = null)
             if (_entries.Count > 0) Select(_entries[Math.Clamp(previousIndex, 0, _entries.Count - 1)].EntryId);
         }
     }
-    public void Move(Guid id, int direction)
+    public int IndexOf(Guid id) => _entries.FindIndex(e => e.EntryId == id);
+    internal sealed record RemovedEntry(QueueEntry Entry, int Index, int PriorityIndex, bool Candidate);
+    public RemovedEntry? CaptureRemoval(Guid id)
     {
-        var index = _entries.FindIndex(e => e.EntryId == id);
-        if (index < 0) return;
-        var target = Math.Clamp(index + Math.Sign(direction), 0, _entries.Count - 1);
-        var item = _entries[index]; _entries.RemoveAt(index); _entries.Insert(target, item);
+        var index = IndexOf(id);
+        return index < 0 ? null : new(_entries[index], index, _priority.IndexOf(id), _bag.Contains(id));
     }
+    /// <summary>
+    /// 撤销删除只补回这个条目及尚未消费的候选资格；不恢复旧 CurrentId 和访问历史，避免伪造真实播放。
+    /// 删最后一首后补回仍保持停止且无当前项，用户从队列明确播放即可。
+    /// </summary>
+    public void Reinsert(RemovedEntry removed)
+    {
+        _entries.Insert(Math.Clamp(removed.Index, 0, _entries.Count), removed.Entry);
+        if (removed.PriorityIndex >= 0) _priority.Insert(Math.Min(removed.PriorityIndex, _priority.Count), removed.Entry.EntryId);
+        if (removed.Candidate && Mode == PlaybackMode.Shuffle) _bag.Add(removed.Entry.EntryId);
+    }
+    public bool MoveTo(Guid id, int target)
+    {
+        var index = IndexOf(id);
+        if (index < 0 || target < 0 || target >= _entries.Count || target == index) return false;
+        var item = _entries[index]; _entries.RemoveAt(index); _entries.Insert(target, item);
+        return true;
+    }
+    public void Move(Guid id, int direction) { if (_entries.Count > 0) MoveTo(id, Math.Clamp(IndexOf(id) + Math.Sign(direction), 0, _entries.Count - 1)); }
     public void UpdateTrack(MusicTrack track)
     {
         var index = Index;

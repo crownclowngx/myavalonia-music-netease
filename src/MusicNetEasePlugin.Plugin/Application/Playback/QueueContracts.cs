@@ -7,6 +7,9 @@ public sealed record QueueAdditionResult(int Added, bool PlayNext, long AccountE
     public string Message => Added == 0 ? "没有新增歌曲" : PlayNext ? $"将在当前歌曲后播放 · 本次 {Added} 首" : $"已加入队列 · 本次 {Added} 首";
 }
 public sealed record RestoredQueue(Guid Id, int Count, long PositionMs);
+public sealed record QueueUndoInfo(Guid Id, string Description);
+/// <summary>拖动从开始到释放携带同一身份与版本，不能用 TrackId 或过期行下标替代。</summary>
+public sealed record QueueMoveIntent(Guid EntryId, int TargetIndex, long QueueRevision, long AccountEpoch);
 /// <summary>同一歌曲可重复入队，因此操作必须使用 EntryId；TrackId 仅用于向网易解析资料和资源。</summary>
 public sealed record QueueEntry(Guid EntryId, long TrackId, string Source, long? SourceId = null, MusicTrack? Track = null)
 {
@@ -15,7 +18,7 @@ public sealed record QueueEntry(Guid EntryId, long TrackId, string Source, long?
 }
 public sealed record PlayerSessionSnapshot(long Revision, long QueueRevision, long AccountId, long AccountEpoch,
     IReadOnlyList<QueueEntry> Entries, Guid? CurrentEntryId, PlaybackMode Mode, PlaybackSnapshot Playback,
-    bool CanPrevious = false, bool CanNext = false, RestoredQueue? Restoration = null)
+    bool CanPrevious = false, bool CanNext = false, RestoredQueue? Restoration = null, QueueUndoInfo? Undo = null)
 {
     public static PlayerSessionSnapshot Empty { get; } = new(0, 0, 0, 0, Array.Empty<QueueEntry>(), null, PlaybackMode.Sequential, new(0, PlaybackState.Idle));
 }
@@ -34,6 +37,8 @@ public interface IPlayerSession
     Task NextAsync(bool previous, CancellationToken ct);
     Task RemoveAsync(Guid entryId, CancellationToken ct);
     void Move(Guid entryId, int direction);
+    bool MoveTo(QueueMoveIntent intent);
+    bool UndoQueueChange(Guid undoId, long accountEpoch);
     void SetMode(PlaybackMode mode);
     Task ClearAsync();
     Task ClearIfUnchangedAsync(long expectedQueueRevision);

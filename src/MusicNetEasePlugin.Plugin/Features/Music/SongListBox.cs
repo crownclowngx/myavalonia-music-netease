@@ -12,13 +12,17 @@ namespace MusicNetEasePlugin.Features.Music;
 /// </summary>
 public sealed class SongListBox : ListBox
 {
+    internal bool PointerGestureIsControl { get; set; }
     // 自定义输入规则仍沿用 ListBox 的主题模板，否则派生类型只占位而不生成虚拟化容器。
     protected override Type StyleKeyOverride => typeof(ListBox);
     public static readonly StyledProperty<ICommand?> ActivateCommandProperty = AvaloniaProperty.Register<SongListBox, ICommand?>(nameof(ActivateCommand));
     public ICommand? ActivateCommand { get => GetValue(ActivateCommandProperty); set => SetValue(ActivateCommandProperty, value); }
     public SongListBox()
     {
-        DoubleTapped += (_, e) => { if (!MusicView.IsInteractiveChild(e.Source)) { Activate(); e.Handled = true; } };
+        // 拖动手柄把捕获交给列表后，DoubleTapped 的 Source 可能已经变成 ListBox。
+        // 必须记住按下的原始目标，否则连续拖动会被误认为双击歌曲并启动播放。
+        AddHandler(PointerPressedEvent, (_, e) => PointerGestureIsControl = MusicView.IsInteractiveChild(e.Source), Avalonia.Interactivity.RoutingStrategies.Tunnel);
+        DoubleTapped += (_, e) => { if (!PointerGestureIsControl && !MusicView.IsInteractiveChild(e.Source)) { Activate(); e.Handled = true; } };
         AddHandler(KeyDownEvent, (_, e) =>
         {
             if (e.Handled) return;
