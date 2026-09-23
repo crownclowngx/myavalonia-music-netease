@@ -1,7 +1,13 @@
 # V5 · 轻量交互与 UI 专用实施记录
 
-> 日期：2026-09-23。对应 [V5 方案](../roadmap/netease-v5-lightweight-interaction-and-ui-plan.md)与 [专用验证矩阵](netease-v5-ui-interaction-verification-plan.md)。本次实现核心阶段 A–D，阶段 E 的取色、平滑居中、拖拽和撤销仍为可选项，不计入核心开发范围。
+> 日期：2026-09-23。对应 [V5 方案](../roadmap/netease-v5-lightweight-interaction-and-ui-plan.md)与 [专用验证矩阵](netease-v5-ui-interaction-verification-plan.md)。本记录保留首轮主体实现；重新核查确认 A–D 尚未全部收口，见 [完成度复核](netease-v5-completion-audit-20260923.md)。阶段 E 的取色、平滑居中、拖拽和撤销仍为可选项。
 > 本记录区分代码完成、自动验证、资源测量和实机验收。V1–V4 的用户验收不自动延伸到 V5。未使用 AIFLOW、Windows CI 或发布门禁。
+
+## 0. 当前完成状态更正
+
+此前自动门禁未覆盖 Host 的贡献根注册所有权，实际启动拒绝了重复登记设置 Tool 的插件。该故障已修复；新一轮 309 项测试、249 项门禁自测通过，实际部署的同一 Host 启动复测诊断为 0 条，见[启动修复记录](../archive/records/netease-v5/startup-fix-20260923.md)。
+
+“主体代码已接入”不等于 A–D 全部完成。恢复提示、操作反馈、加载/定位反馈、部分紧凑布局等仍有方案差项，性能和实机验收未收口；后文首轮数据保留历史事实，当前结论以完成度复核为准。
 
 ## 1. 已接入的行为
 
@@ -45,7 +51,7 @@
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V5
 ```
 
-最终门禁 **307 项测试全部通过、0 失败、0 跳过**；门禁自身 **249 项失败注入/校验检查通过**，Debug 编译 0 警告、0 错误。运行编号 `20260923-093716-a76d8003`，见[完整验证摘要](../archive/records/netease-v5/gate-20260923/verification.json)及同目录原始 TRX、原生离线解码、图片预算、10 张 V5 截图和来源记录。门禁记录基于 `a9b85f0` 上的开发工作树，源码 SHA256 为 `DCA795554C7D4A5844243C41435F7E1DE7BBF8AA361F518FBF1C02CC8CAAE563`；部署前再次核对一致。归档保持运行时的真实身份，不改写为事后的提交号；Git 对该证据目录禁用换行转换，重新检出后仍保留原始文件摘要。
+首轮自动门禁 **307 项测试全部通过、0 失败、0 跳过**；门禁自身 **249 项失败注入/校验检查通过**，Debug 编译 0 警告、0 错误。运行编号 `20260923-093716-a76d8003`，见[完整验证摘要](../archive/records/netease-v5/gate-20260923/verification.json)及同目录原始 TRX、原生离线解码、图片预算、10 张 V5 截图和来源记录。门禁记录基于 `a9b85f0` 上的开发工作树，源码 SHA256 为 `DCA795554C7D4A5844243C41435F7E1DE7BBF8AA361F518FBF1C02CC8CAAE563`；部署前再次核对一致。归档保持运行时的真实身份，不改写为事后的提交号；Git 对该证据目录禁用换行转换，重新检出后仍保留原始文件摘要。
 
 门禁依次运行自身失败注入、locked restore、Debug 零警告构建、全部测试、M1/V3/M2/V5 场景映射、原生离线解码、图片预算与截图来源、静态资源、相对链接、diff 及源码未变化检查。V5 的 30 项行为场景映射实际方法和参数化例数；U04 由产品资产检查覆盖；G01–G05 由 PowerShell 自测覆盖。
 
@@ -77,4 +83,4 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V5
 
 标准清理删除 4,130 个文件、约 **1.915 GiB**。用户要求同时删除旧版本副本，但递归删除被自动审批审核以 `blocked by policy` 拒绝；没有改用其他工具重试。清理范围仍余 608 个文件、约 166.90 MiB，含旧版本备份与部署暂存、还原缓存；不能称为全部清空。已保留精确路径与大小，当前部署清理后再次校验一致。
 
-本次没有真实账号联网探针、实际声卡听音、真实 Host Dock / 多 DPI / 物理 IME 验收，也没有运行 Windows CI 或正式发布门禁。这些边界不能由 Headless 截图或 V1–V4 验收替代。核心代码完成与产品实机验收分别记录。
+首轮没有真实账号联网探针、实际声卡听音、真实 Host Dock / 多 DPI / 物理 IME 验收，也没有运行 Windows CI 或正式发布门禁。这些边界不能由 Headless 截图或 V1–V4 验收替代。主体实现、尚缺体验与产品实机验收分别记录；后续仅启动复测通过不改变这些手工验收边界。

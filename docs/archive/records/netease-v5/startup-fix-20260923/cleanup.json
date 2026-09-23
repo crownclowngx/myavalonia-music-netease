@@ -1,0 +1,102 @@
+{
+  "method": "dotnet clean",
+  "removedFiles": 4130.0,
+  "removedBytes": 2056110497.0,
+  "before": [
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Plugin\\bin",
+      "files": 842,
+      "bytes": 191748085
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Plugin\\obj",
+      "files": 24,
+      "bytes": 1780729
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Standalone\\bin",
+      "files": 935,
+      "bytes": 789822690
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Standalone\\obj",
+      "files": 24,
+      "bytes": 630706
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\bin",
+      "files": 1008,
+      "bytes": 777344589
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\obj",
+      "files": 23,
+      "bytes": 1625392
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tools\\MusicNetEasePlugin.LoginProbe\\bin",
+      "files": 881,
+      "bytes": 207802314
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tools\\MusicNetEasePlugin.LoginProbe\\obj",
+      "files": 22,
+      "bytes": 593820
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-startup-fix-20260923\\deployment\\bin",
+      "files": 417,
+      "bytes": 85973884
+    }
+  ],
+  "remaining": [
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Plugin\\bin",
+      "files": 1,
+      "bytes": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Plugin\\obj",
+      "files": 13,
+      "bytes": 236189
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Standalone\\bin",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Standalone\\obj",
+      "files": 11,
+      "bytes": 384857
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\bin",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\obj",
+      "files": 10,
+      "bytes": 289267
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tools\\MusicNetEasePlugin.LoginProbe\\bin",
+      "files": 0,
+      "bytes": 0
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tools\\MusicNetEasePlugin.LoginProbe\\obj",
+      "files": 10,
+      "bytes": 300803
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-startup-fix-20260923\\deployment\\bin",
+      "files": 1,
+      "bytes": 298
+    }
+  ],
+  "deployedFilesVerified": true,
+  "oldBackupsCreated": false,
+  "recursiveDeleteRetried": false
+}

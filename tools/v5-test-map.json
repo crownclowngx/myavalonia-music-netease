@@ -52,7 +52,9 @@
     "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立": 1,
     "MusicNetEasePlugin.Tests.LightweightPlaybackTests.加载中再次点同曲不会重复取资源或打开媒体": 1,
     "MusicNetEasePlugin.Tests.LightweightPlaybackTests.临时不可播曲目按原规则推进而试听仍保留真实范围": 1,
-    "MusicNetEasePlugin.Tests.LightweightInteractionTests.账号菜单打开同一设置模型且故障提示和返回焦点可用": 2
+    "MusicNetEasePlugin.Tests.LightweightInteractionTests.账号菜单打开同一设置模型且故障提示和返回焦点可用": 2,
+    "MusicNetEasePlugin.Tests.PluginRegistrationTests.真实模块只声明贡献根而不在私有服务中重复登记": 1,
+    "MusicNetEasePlugin.Tests.PluginRegistrationTests.宿主追加贡献根后不同Document共用设置且关闭页面保留草稿": 1
   },
   "scenarios": {
     "Q01": [
@@ -141,7 +143,9 @@
     ],
     "P03": [
       "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
-      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存"
+      "MusicNetEasePlugin.Tests.PlaybackPersistenceTests.生产账号事件只在核验后恢复且容器关闭等待最终位置保存",
+      "MusicNetEasePlugin.Tests.PluginRegistrationTests.真实模块只声明贡献根而不在私有服务中重复登记",
+      "MusicNetEasePlugin.Tests.PluginRegistrationTests.宿主追加贡献根后不同Document共用设置且关闭页面保留草稿"
     ],
     "R01": [
       "MusicNetEasePlugin.Tests.LightweightResourceTests.下载最多两个且合并请求的取消只影响本消费者",
@@ -188,7 +192,9 @@
       "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致",
       "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立",
       "MusicNetEasePlugin.Tests.LightweightStateTests.正常运行库收起诊断故障展开且不混淆保存与实际加载值",
-      "MusicNetEasePlugin.Tests.LightweightInteractionTests.账号菜单打开同一设置模型且故障提示和返回焦点可用"
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.账号菜单打开同一设置模型且故障提示和返回焦点可用",
+      "MusicNetEasePlugin.Tests.PluginRegistrationTests.真实模块只声明贡献根而不在私有服务中重复登记",
+      "MusicNetEasePlugin.Tests.PluginRegistrationTests.宿主追加贡献根后不同Document共用设置且关闭页面保留草稿"
     ]
   },
   "scriptScenarios": {

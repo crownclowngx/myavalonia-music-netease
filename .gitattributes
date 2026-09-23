@@ -1,3 +1,4 @@
 # 验证归档的 SHA256 基于原始字节；禁止随 core.autocrlf 转换换行，确保重新检出后仍可逐文件核验。
 # 原始 JSON 含 Windows CRLF，允许行末 CR，但继续检查真正的尾随空格、空行和 Tab 前空格。
 docs/archive/records/netease-v5/gate-20260923/* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/archive/records/netease-v5/startup-fix-20260923/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol

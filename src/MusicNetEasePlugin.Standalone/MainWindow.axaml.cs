@@ -22,6 +22,7 @@ public sealed partial class MainWindow : Window
         var services = new ServiceCollection();
         services.AddMusicNetEasePluginServices(Program.DataDirectory);
         services.AddSingleton<IDocumentLifetime>(_lifetime);
+        // Standalone 没有 Host 的贡献注册阶段，在预览组合根补齐 Tool；不要放回共享私有服务入口。
         services.AddSingleton<MusicSettingsTool>();
         _services = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true });
         _scope = _services.CreateScope();

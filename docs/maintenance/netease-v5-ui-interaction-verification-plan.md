@@ -1,6 +1,6 @@
 # V5 · 轻量交互与 UI 专用验证计划
 
-> 日期：2026-09-23。状态：与 [V5 方案](../roadmap/netease-v5-lightweight-interaction-and-ui-plan.md)配套的现行验证矩阵。具体结果见 [V5 实施记录](netease-v5-ui-interaction-implementation.md)。
+> 日期：2026-09-23。状态：与 [V5 方案](../roadmap/netease-v5-lightweight-interaction-and-ui-plan.md)配套的现行验证矩阵。具体结果见 [V5 实施记录](netease-v5-ui-interaction-implementation.md)；整体未正式完成，差项见 [完成度复核](netease-v5-completion-audit-20260923.md)。
 > 当前完整本地检查为 `pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V5`，包含 M1/V3/V4 回归。
 > 仅规划本地开发验证，不使用 AIFLOW、Windows CI 或发布门禁。
 
@@ -71,7 +71,7 @@
 
 - **纯单元测试：** 队列规则、导航、偏好迁移、缓存预算与取消判断，不依赖网络、真实账号、Avalonia 窗口或声卡。通过可控完成顺序制造并发，不靠长时间 sleep 偶然撞到竞态。
 - **组件测试：** 使用项目现有 Avalonia 测试设施，经过真实控件事件验证绑定、焦点、菜单、手势和命中区域；不能只直接调用命令就宣称输入交互通过。
-- **集成回归：** 保留现有会话、HTTP、文件存储及 LibVLC 离线用例，检查新界面意图没有破坏既有资源与账号边界。
+- **集成回归：** 真实模块 Configure 后检查贡献根不进入私有 DI 集合；验证 Host 追加 Tool singleton / Document scoped 后设置共享与关页重开。普通 BuildServiceProvider 成功不能代替 Host 注册所有权检查。保留现有会话、HTTP、文件存储及 LibVLC 离线用例，检查新界面意图没有破坏既有资源与账号边界。
 - **架构审查：** 按方案第 9 节检查 SOLID、资源所有权和中文注释。测试替身必须遵守真实契约；不通过大量 Mock 验证内部调用顺序替代用户可见结果。
 - **风险取舍：** 状态机、并发、播放/定位和缓存预算属于重点；静态间距/颜色优先用实际布局和视觉检查，不给每个常量写复述实现的单元测试。
 

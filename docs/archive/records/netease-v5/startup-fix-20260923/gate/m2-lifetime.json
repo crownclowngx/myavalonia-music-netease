@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "environment": "Avalonia Headless / Skia, production Document and application services",
+  "realHost": false,
+  "mountedDocuments": 22,
+  "detachedViews": 20,
+  "retainedViews": 0,
+  "audioOpens": 1,
+  "stoppedAfterShutdown": true,
+  "noAutomaticResume": true,
+  "provenance": {
+    "runId": "20260923-095639-88e63d4d",
+    "revision": "66dd707c92f8f2081c026a8b895480a01482f930",
+    "sourceSha256": "B85FDBAF6046A402E947AA8259F9BDCB439CF2CD47E480025AD36FE6C21FF1A2"
+  }
+}

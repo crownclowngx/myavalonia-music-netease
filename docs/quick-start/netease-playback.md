@@ -2,7 +2,7 @@
 
 登录后打开“我的歌单”，单击歌单名称，可分页浏览、播放全部或从这里播放。搜索和歌单均可追加歌曲或安排下一首；“播放队列”可调整顺序和四种模式。当前增量见[日常播放器说明](../reference/netease-daily-player.md)。
 
-> V5 当前自动验证与剩余实机边界见 [专用实施记录](../maintenance/netease-v5-ui-interaction-implementation.md)。
+> V5 主体已接入，尚未正式完成，见 [完成度复核](../maintenance/netease-v5-completion-audit-20260923.md)。启动加载故障已修复，最新部署见 [修复记录](../archive/records/netease-v5/startup-fix-20260923.md)。
 > 当前支持 Windows x64，V1–V4 已实现并完成手工验收，依据见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。完整边界见[当前播放契约](../reference/netease-music-playback.md)。
 
 ## 开始播放

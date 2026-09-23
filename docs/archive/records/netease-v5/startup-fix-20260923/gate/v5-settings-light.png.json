@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v5-settings-light.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "C85F1BC55DAFABD35258F8BFF6FA12F7B0CBE71DAAC0186D46E7118D25C6A32A",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-095639-88e63d4d",
+    "revision": "66dd707c92f8f2081c026a8b895480a01482f930",
+    "sourceSha256": "B85FDBAF6046A402E947AA8259F9BDCB439CF2CD47E480025AD36FE6C21FF1A2"
+  }
+}

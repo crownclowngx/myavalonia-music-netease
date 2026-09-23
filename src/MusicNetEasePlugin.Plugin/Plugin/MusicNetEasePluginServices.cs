@@ -35,7 +35,9 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<AccountImageSource>();
         services.TryAddSingleton<IAccountImageSource>(p => new AccountImageCache(p.GetRequiredService<AccountImageSource>(), p.GetRequiredService<LoginCoordinator>()));
         services.TryAddSingleton<ArtworkContext>();
-        services.TryAddSingleton<MusicNetEasePlugin.Features.Settings.MusicSettingsTool>();
+        // 此处只登记插件私有服务。MusicSettingsTool 已由模块的 AddTool 声明，Host 会在
+        // Configure 返回后追加其 singleton 描述符，Document 可直接注入同一个实例。
+        // 若在此重复登记贡献根，Host 会在构建容器前拒绝整个插件；Standalone 自行补齐即可。
         services.TryAddSingleton<ISessionProtector, CurrentUserSessionProtector>();
         services.TryAddSingleton<ILoginSessionStore>(provider =>
             new ProtectedLoginSessionStore(Path.GetFullPath(root), provider.GetRequiredService<ISessionProtector>()));

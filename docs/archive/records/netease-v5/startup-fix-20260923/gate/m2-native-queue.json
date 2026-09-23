@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "tracks": 3,
+  "decodedFrames": 144000,
+  "filesReleased": true,
+  "actualDeviceOutput": false,
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-095639-88e63d4d",
+    "revision": "66dd707c92f8f2081c026a8b895480a01482f930",
+    "sourceSha256": "B85FDBAF6046A402E947AA8259F9BDCB439CF2CD47E480025AD36FE6C21FF1A2"
+  }
+}

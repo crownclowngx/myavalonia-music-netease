@@ -39,6 +39,8 @@ Host 读取构建生成的 `plugin.manifest.json`，检查 Plugin SDK 兼容区�
 登记结果创建 Document Scope、Tool singleton、View 和 Dock 适配对象。插件不应扫描 Host、直接操作
 Host 容器，或保存 `IPluginRegistration` 供运行时使用。
 
+`registration.Services` 只登记私有服务。通过 `AddDocument`、`AddTool`、`UseLifecycle` 声明的根类型由 Host 最后追加，不得再调用 AddSingleton / AddScoped 重复注册。Document 需要共享设置时可以注入 Host 追加的 Tool 单例；Standalone 缺少该阶段，才在自己的组合根补齐。V5 的相关启动回归见[专项记录](../archive/records/netease-v5/startup-fix-20260923.md)。
+
 ## Standalone/MainWindow 应当做什么
 
 V4 的队列、歌词与持久化协调属于插件容器；每个 Document 只拥有搜索、歌单浏览和 UI 投影。关闭发起页或最后一页均继续播放，重开直接订阅当前快照。Host Shutdown 先停止接纳账号恢复，再收口队列/音频并保存停止前位置，最后释放依赖。Standalone 主窗关闭释放 scope 和根容器，等待同一保存/停止任务；同步容器释放已有组合测试，但不能替代真实 Host/Dock 或主窗交互验收。

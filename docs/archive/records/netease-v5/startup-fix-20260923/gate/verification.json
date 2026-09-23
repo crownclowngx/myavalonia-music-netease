@@ -1,0 +1,388 @@
+{
+  "runId": "20260923-095639-88e63d4d",
+  "v5ScenarioCoverage": {
+    "methods": 54,
+    "scenarios": 30,
+    "executedCases": 65.0
+  },
+  "scenarioCoverage": {
+    "methods": 95,
+    "scenarios": 58,
+    "executedCases": 153.0
+  },
+  "uiScenarioCoverage": {
+    "methods": 10,
+    "scenarios": 7,
+    "executedCases": 16.0
+  },
+  "audibleOutputVerified": false,
+  "releaseGateExecuted": false,
+  "deployed": false,
+  "milestone": "V5",
+  "startedUtc": "2026-09-23T09:56:54.0936634+00:00",
+  "testsPassed": 309,
+  "revision": "66dd707c92f8f2081c026a8b895480a01482f930",
+  "realAccountVerified": false,
+  "hostVerified": false,
+  "sourceSha256": "B85FDBAF6046A402E947AA8259F9BDCB439CF2CD47E480025AD36FE6C21FF1A2",
+  "completedUtc": "2026-09-23T09:57:41.5045648+00:00",
+  "artifacts": [
+    {
+      "name": "libvlc-offline.json",
+      "bytes": 1793,
+      "sha256": "AF171A6B76CC1449EF80255741DCE82B3F86F93073D12152936EC24B7CC9D1BC"
+    },
+    {
+      "name": "login-page.png",
+      "bytes": 25767,
+      "sha256": "685899954DD7E17E2C9359222E0BF6EBE4D91005A1E68351D7CDFF29D593CCD0"
+    },
+    {
+      "name": "m1-compact.png",
+      "bytes": 37766,
+      "sha256": "B0F0E4BC26149525B8B2BF733BCC1FEE19E22D4893E90D42402A2238359A672F"
+    },
+    {
+      "name": "m1-music-and-settings.png",
+      "bytes": 40098,
+      "sha256": "A5531727632654E1D785F93FF9BAEB5CF6E34AACC48BF5B04E1D4258A59AC824"
+    },
+    {
+      "name": "m2-document-dark-1200.png",
+      "bytes": 41798,
+      "sha256": "57BF30EF56A956135B21C565FE3BC4C153397DEFC01231E0F2DB26D03DF42FB2"
+    },
+    {
+      "name": "m2-document-dark-1200.png.json",
+      "bytes": 421,
+      "sha256": "D9E863B3E996C161FD09D69848E07E2E780EC321FB0B4BE00B3412D04B12A7FD"
+    },
+    {
+      "name": "m2-document-dark-520.png",
+      "bytes": 23546,
+      "sha256": "EA264FA4401F5FEACEB4D21ABC30EEB861F52BE2839CDEB4C461E6D967BFAF4D"
+    },
+    {
+      "name": "m2-document-dark-520.png.json",
+      "bytes": 419,
+      "sha256": "899C8D795C53986206C1A8FFF46044B1301416F578A4B82D788DFE7E9D243FF8"
+    },
+    {
+      "name": "m2-document-dark-800.png",
+      "bytes": 31489,
+      "sha256": "C5EE958C2C9B771477196D70BF63E88CAF2681D5A8F8D38DB514DF1019044424"
+    },
+    {
+      "name": "m2-document-dark-800.png.json",
+      "bytes": 419,
+      "sha256": "6E8121833238D5A79202627C4387CA95C789B3936E87AB497CA89C9B7810333C"
+    },
+    {
+      "name": "m2-document-light-1200.png",
+      "bytes": 41157,
+      "sha256": "2FA5EDC7903622073FABB59D7E1482E1CD6D3D8BE73D5C0BFF99F7C1027BF063"
+    },
+    {
+      "name": "m2-document-light-1200.png.json",
+      "bytes": 422,
+      "sha256": "9F78C9FD9FC2EEFFC078B2EE235B1C1CF85A67795517E70BB0B8025E281A6C1B"
+    },
+    {
+      "name": "m2-document-light-520.png",
+      "bytes": 23294,
+      "sha256": "5D030162966B1D051460E495A38ED86153947D169615ACAEB26E86A432282560"
+    },
+    {
+      "name": "m2-document-light-520.png.json",
+      "bytes": 420,
+      "sha256": "099EA4B3C2628355B3B797FDF949538C9EAEA9DE181D9460D9596CAF9CE414EE"
+    },
+    {
+      "name": "m2-document-light-800.png",
+      "bytes": 30928,
+      "sha256": "EFBEC01A3E4C5A43A05064159ED47E1F514C94D3BA905B33DE0B037D36BB97EB"
+    },
+    {
+      "name": "m2-document-light-800.png.json",
+      "bytes": 420,
+      "sha256": "93BE6AA3C0AA2FEA1E578A1A699A8407CB6B64F7A2878C45D0E9ABD896302987"
+    },
+    {
+      "name": "m2-lifetime.json",
+      "bytes": 513,
+      "sha256": "9C2D1ABB16165ADA661229891690303A36F13F765B7F3DB5763849D15025A5E8"
+    },
+    {
+      "name": "m2-native-queue.json",
+      "bytes": 366,
+      "sha256": "D0E73F456E452F7C0059DFECFAC7E361212119F0AB73215433A1749004AFB8EC"
+    },
+    {
+      "name": "m2-native-restore-12000.json",
+      "bytes": 584,
+      "sha256": "A63D8973EF83CD0E0EE0FC62939BB3528760489BF8F21D9E0674FA3078797333"
+    },
+    {
+      "name": "m2-native-restore-4000.json",
+      "bytes": 584,
+      "sha256": "BA26D2A3A511C0B9C2E90EB0BFA3D30ECBC842B13ACD8543F99860AE2773C46A"
+    },
+    {
+      "name": "m2-native-seek.json",
+      "bytes": 592,
+      "sha256": "6730DA33704EE136A748B09D219E96B1E5F9714D9E430D159CB6350E8071348B"
+    },
+    {
+      "name": "m2-restored-paused-dark.png",
+      "bytes": 22478,
+      "sha256": "F955B09BF13F69934F4CC0B66222DE520DF2592248002889D886C12FFB5CEB37"
+    },
+    {
+      "name": "m2-restored-paused-dark.png.json",
+      "bytes": 422,
+      "sha256": "2A2F6CC815616119958F47BD31445FF50435EBE58F57935C474CA971FA68D663"
+    },
+    {
+      "name": "m2-restored-paused-light.png",
+      "bytes": 21886,
+      "sha256": "B07E9F86DCD87163327D4901106AD167DC907A6A8AD7135A472FAF90799EF80E"
+    },
+    {
+      "name": "m2-restored-paused-light.png.json",
+      "bytes": 423,
+      "sha256": "319C774C205E095338070A3FE610BE0791622EE0E408100F41134BC0266472EB"
+    },
+    {
+      "name": "netease-login-development.trx",
+      "bytes": 463974,
+      "sha256": "03AA32DBB2BD86E16DB7832ACC58E1335C3AB2B51C571C0E547549F099C530FF"
+    },
+    {
+      "name": "ui-resource-observation.json",
+      "bytes": 1732,
+      "sha256": "0D5221A0067A6E80F37DB46CA079130C9C91785FCD4DFBE5AFCF52A2117F1C1E"
+    },
+    {
+      "name": "v3-document-dark-1200.png",
+      "bytes": 52399,
+      "sha256": "C950DAF76A2B79832D98F0C4F7186444A8CED3749CE978FBD16F6020055A6174"
+    },
+    {
+      "name": "v3-document-dark-520.png",
+      "bytes": 27133,
+      "sha256": "3C19B1D350A10126FA5BB93AE9B1872FDEFC1826A7E41DABD5E92703271559DA"
+    },
+    {
+      "name": "v3-document-dark-800.png",
+      "bytes": 41309,
+      "sha256": "4B0E98A2615522656DF3E4F769C00147855776F4A6D7D90747A4F990092ECF3D"
+    },
+    {
+      "name": "v3-document-light-1200.png",
+      "bytes": 51591,
+      "sha256": "51B468E512CC6EC91F7CF1846C78A1B4B1C8D6EA0C89AFEC5D52163D890BF064"
+    },
+    {
+      "name": "v3-document-light-520.png",
+      "bytes": 26517,
+      "sha256": "982DE7A4E25D5A9D77FC83F86EEE69913380C4F9CB053B978B8F7DE30641F406"
+    },
+    {
+      "name": "v3-document-light-800.png",
+      "bytes": 40417,
+      "sha256": "FD0736C18FDE2BC18E3820EB937515321A4E35CBBE6EAC7D98550070B73FF43D"
+    },
+    {
+      "name": "v3-host-theme-dark-composition.png",
+      "bytes": 49838,
+      "sha256": "86BFAC51A0367822AC10BEAEFCA2D6B0AD605240E26A68BEBE5EDCB4FE898B85"
+    },
+    {
+      "name": "v3-login-dark.png",
+      "bytes": 19356,
+      "sha256": "85ECE3D301AD22F016678B6CE35DAEA880039B5B524D8B27BE6B787F69E52445"
+    },
+    {
+      "name": "v3-login-light.png",
+      "bytes": 19322,
+      "sha256": "AE4A96C49916AA6A0AE9DC092A6371BE9FABFB43D8EE94BEF6DD0FB20B66EE3B"
+    },
+    {
+      "name": "v3-motion-observation.json",
+      "bytes": 1456,
+      "sha256": "000A03A877589A8F5AF97D34FCF9D5DD8BF28DD624BC5A60F3943B017558F4BA"
+    },
+    {
+      "name": "v3-tool-dark-280.png",
+      "bytes": 35226,
+      "sha256": "9769DE6C5C50778BB494FE7C41CC57C219C4F93BBA6C8CFE077756333DB1195B"
+    },
+    {
+      "name": "v3-tool-dark-320.png",
+      "bytes": 36760,
+      "sha256": "87398AD20776E9BE3343CEBC66663332C923C6816836FC55151B713AFC079F8A"
+    },
+    {
+      "name": "v3-tool-dark-420.png",
+      "bytes": 38362,
+      "sha256": "D0DBE7AF7472A28C9EA0C12BEF6570196A5E7341BC9AB6E25B41DF58ECFC843D"
+    },
+    {
+      "name": "v3-tool-dark-640.png",
+      "bytes": 21436,
+      "sha256": "0876C1824ECC17245237304D06B1A62828CD07BD800774EDDB719F51845F5D7D"
+    },
+    {
+      "name": "v3-tool-light-280.png",
+      "bytes": 34633,
+      "sha256": "851D1C406B884615818FFC67F72EEFA0035B367AB5454E5ADD7C86A5271DD03C"
+    },
+    {
+      "name": "v3-tool-light-320.png",
+      "bytes": 36075,
+      "sha256": "E651E2DA862545B1ABF313D9D056D8CB33F628EB03BF1D2F2B3C7F3E06E92722"
+    },
+    {
+      "name": "v3-tool-light-420.png",
+      "bytes": 37727,
+      "sha256": "A77CA4F450702D336937CC78CD0141895B827EB094C4B80B9D66157246B2EE11"
+    },
+    {
+      "name": "v3-tool-light-640.png",
+      "bytes": 21023,
+      "sha256": "8112AB4ED1557E5CBF62625AE9B64C483C39F453A888DE228BF23C871CE2BD53"
+    },
+    {
+      "name": "v5-artwork-budget.json",
+      "bytes": 524,
+      "sha256": "B8A044FCBE774E1C2220E43C7B31AE9B85E8D53DB831231520875A79098648BF"
+    },
+    {
+      "name": "v5-detail-dark-1200.png",
+      "bytes": 55950,
+      "sha256": "7B9550B7FD4416DD0DA3141357A9B53A65227641EC01748FEBED82CC54B3C4A3"
+    },
+    {
+      "name": "v5-detail-dark-1200.png.json",
+      "bytes": 419,
+      "sha256": "7A590385ECE17AA26ACE3DB12B6A18D2C14B11287E9F861C1D279858AA170CC9"
+    },
+    {
+      "name": "v5-detail-dark-520.png",
+      "bytes": 23186,
+      "sha256": "0F284527CAB013FB9E636D78DD3B691E27FD2290818003893639980DC10CE688"
+    },
+    {
+      "name": "v5-detail-dark-520.png.json",
+      "bytes": 417,
+      "sha256": "EB83441C53BBE9F84CFDA2152654FF1CC7CD58BD0459C4A949A8689048398BFC"
+    },
+    {
+      "name": "v5-detail-dark-800.png",
+      "bytes": 30257,
+      "sha256": "78718C1362F98477AD5C2D12EA2DB30033AB434462EF87A2CC55368AD4614E11"
+    },
+    {
+      "name": "v5-detail-dark-800.png.json",
+      "bytes": 417,
+      "sha256": "46854D8D3730C1824922B9CDC0EC9082EC6E12516CD0233249A3874BB7BC2791"
+    },
+    {
+      "name": "v5-detail-light-1200.png",
+      "bytes": 55359,
+      "sha256": "337A53A33946E18E820EEAFE04F11F7234E014E4375CBFD83339DDB980049861"
+    },
+    {
+      "name": "v5-detail-light-1200.png.json",
+      "bytes": 420,
+      "sha256": "5F3E63BE92ACE9801A64CB34CA693ECD6F0CC9AAB9D8B2A713CDF4BE0746C12B"
+    },
+    {
+      "name": "v5-detail-light-520.png",
+      "bytes": 23044,
+      "sha256": "29D25E4F37DF6B56588BBE167FA7A7BE272E78D9D12B53ABA4489EA6786F2EA4"
+    },
+    {
+      "name": "v5-detail-light-520.png.json",
+      "bytes": 418,
+      "sha256": "60D6B72577E09B332331863EC233444EF88A2C1978F1DFCE0EA0735FFF93D6A6"
+    },
+    {
+      "name": "v5-detail-light-800.png",
+      "bytes": 29892,
+      "sha256": "256B64F04366E8537F0C92A7E0B0E91686BB470CDA54E689ED793051D17A8C6C"
+    },
+    {
+      "name": "v5-detail-light-800.png.json",
+      "bytes": 418,
+      "sha256": "A5545578627B90BC13CE7F06C2B22F72E1F4BB94FA7821CC4C68035C4BC9FE5D"
+    },
+    {
+      "name": "v5-failure-dark.png",
+      "bytes": 22904,
+      "sha256": "B55972FF03FFE34FC309930EC899DDC59E43410B0CCADAF5869D4EF7D3032B13"
+    },
+    {
+      "name": "v5-failure-dark.png.json",
+      "bytes": 414,
+      "sha256": "0B9E8265D46416D38FCCB924E3FE34BECF4D31A16004F1BE46467765E8B9A4AB"
+    },
+    {
+      "name": "v5-failure-light.png",
+      "bytes": 22306,
+      "sha256": "029F27151D355332AA9F140C3001201BE7FE1FA9C98A90B8FE47E8EABE213B17"
+    },
+    {
+      "name": "v5-failure-light.png.json",
+      "bytes": 415,
+      "sha256": "FFDF696F473DD9D8C56118DC1B44D3521EEE1D8C8FF02FE8850B3537EE73B7A7"
+    },
+    {
+      "name": "v5-image-compressed.json",
+      "bytes": 362,
+      "sha256": "82A0E3A1B3F2967DD34E4027A82C614831FEE15DEF31FA768B149714EF6E9BBC"
+    },
+    {
+      "name": "v5-image-transfer.json",
+      "bytes": 396,
+      "sha256": "02503A569FBB25B05C52D51BF288941DE3047532624B8892CDC2985BBB206E69"
+    },
+    {
+      "name": "v5-settings-dark.png",
+      "bytes": 39923,
+      "sha256": "6CCD8163A22A53CDDCA04356D4CE8C32067279317972EFEF3DC0BA0664BCC469"
+    },
+    {
+      "name": "v5-settings-dark.png.json",
+      "bytes": 415,
+      "sha256": "6D3B69FBCEA1F18AB0EB9666E160B13E954264F3E7F6CF11AE11156377E03914"
+    },
+    {
+      "name": "v5-settings-light.png",
+      "bytes": 39642,
+      "sha256": "C85F1BC55DAFABD35258F8BFF6FA12F7B0CBE71DAAC0186D46E7118D25C6A32A"
+    },
+    {
+      "name": "v5-settings-light.png.json",
+      "bytes": 416,
+      "sha256": "86DC86E3B65B360BAB52F97D565D76E60BE5DB90EC4DCDB51FE528B44B19E05A"
+    }
+  ],
+  "workingTreeDirty": true,
+  "machine": "Microsoft Windows 10.0.26200",
+  "runtime": {
+    "directory": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\bin\\Debug\\net10.0\\native\\win-x64\\libvlc",
+    "version": "3.0.23 Vetinari"
+  },
+  "v5StaticAssets": {
+    "staticAssetFiles": 3,
+    "staticAssetBytes": 8725.0,
+    "builtInBitmapFontVideoFiles": 0,
+    "scenario": "U04"
+  },
+  "m2ScenarioCoverage": {
+    "methods": 75,
+    "scenarios": 58,
+    "executedCases": 140.0
+  }
+}

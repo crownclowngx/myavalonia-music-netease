@@ -1,0 +1,50 @@
+{
+  "purpose": "实际已部署 Host 启动注册故障的修复前后复测",
+  "sameHostExecutable": true,
+  "isolatedHostData": true,
+  "automaticClose": true,
+  "windowsCiExecuted": false,
+  "releaseGateExecuted": false,
+  "before": {
+    "exitCode": 0,
+    "exeSha256": "B8F8653192E6B8CF979F1FC4C5F6285F99B9190B7F9E487210DF31B001774879",
+    "pluginSha256": "A0E36616E7D53B43370C53166FC6011B99EABB2A86A35D422E02DB71A4CE149E",
+    "completedUtc": "2026-09-23T17:56:11.2095888+08:00"
+  },
+  "beforeDiagnostics": [
+    {
+      "schemaVersion": 2,
+      "sessionId": "dc81d744-48f5-4790-9cfd-23be6e7198a5",
+      "sequence": 1,
+      "timestampUtc": "2026-09-23T17:56:09.8440009+08:00",
+      "code": "PLUGIN_CONTRIBUTION_SERVICE_REGISTRATION_FORBIDDEN",
+      "severity": "Error",
+      "phase": "PluginServiceRegistration",
+      "disposition": "Continue",
+      "pluginId": "myavalonia.plugin.music.netease",
+      "pluginDirectory": null,
+      "assemblyName": "MusicNetEasePlugin.Plugin",
+      "stableId": null,
+      "pluginVersion": null,
+      "sdkRange": null,
+      "userMessage": "插件登记了由宿主保留的服务类型，已在容器构建前隔离该插件。",
+      "exceptionType": null,
+      "technicalDetail": null
+    }
+  ],
+  "after": {
+    "exitCode": 0,
+    "exeSha256": "B8F8653192E6B8CF979F1FC4C5F6285F99B9190B7F9E487210DF31B001774879",
+    "pluginSha256": "C28533D1D4993C94D1EBF652292B95545CBF26DD901B8EDED3D33BFB3965FE24",
+    "completedUtc": "2026-09-23T17:59:27.1051928+08:00",
+    "startupOutput": "Startup firstFrameMs=893 readyMs=2293",
+    "diagnosticCount": 0,
+    "errorCount": 0,
+    "localStartupOnly": true,
+    "fullUiAcceptance": false
+  },
+  "fullUiAcceptance": false,
+  "physicalImeVerified": false,
+  "dpiMatrixVerified": false,
+  "audibleOutputVerified": false
+}
