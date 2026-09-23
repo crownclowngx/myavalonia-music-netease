@@ -31,6 +31,7 @@ public partial class MusicView : UserControl
         DrawerResize.DragStarted += (_, _) => { _resizing = true; _resizeDraft = Model?.Preferences?.DrawerWidth ?? 360; };
         DrawerResize.DragDelta += (_, e) => { if (_resizing) { _resizeDraft = Math.Clamp(_resizeDraft - e.Vector.X, 320, 480); Model?.Navigation.SetDesiredWidth(_resizeDraft); } };
         DrawerResize.DragCompleted += (_, _) => { if (_resizing) { _resizing = false; SaveDrawerWidth(_resizeDraft); } };
+        DrawerResize.PointerCaptureLost += (_, _) => CancelResize();
         DrawerResize.KeyDown += (_, e) =>
         {
             if (e.Key is not (Key.Left or Key.Right or Key.Home)) return;
@@ -51,7 +52,7 @@ public partial class MusicView : UserControl
         if (_model is not null) { if (_model.Preferences is not null) _model.Preferences.PropertyChanged += PreferencesChanged; _model.Navigation.PropertyChanged += NavigationChanged; _model.Navigation.SetDesiredWidth(_model.Preferences?.DrawerWidth ?? 360); _model.Navigation.SetAvailableSize(ContentStage.Bounds.Width, ContentStage.Bounds.Height); }
         Layout();
     }
-    private void Unbind() { if (_model is not null) { _model.Navigation.PropertyChanged -= NavigationChanged; if (_model.Preferences is not null) _model.Preferences.PropertyChanged -= PreferencesChanged; } _model = null; _browseFocus = null; _shownPanel = MusicSidePanel.None; _resizing = false; _drawerTransition.Reset(); Motion.Bind(null); }
+    private void Unbind() { CancelResize(); if (_model is not null) { _model.SearchBusy.SetActive(false); _model.Playlists?.Busy.SetActive(false); _model.Navigation.PropertyChanged -= NavigationChanged; if (_model.Preferences is not null) _model.Preferences.PropertyChanged -= PreferencesChanged; } _model = null; _browseFocus = null; _shownPanel = MusicSidePanel.None; _drawerTransition.Reset(); Motion.Bind(null); }
     private void PreferencesChanged(object? sender, PropertyChangedEventArgs e) { if (e.PropertyName == "DrawerWidth") _model?.Navigation.SetDesiredWidth(_model.Preferences?.DrawerWidth ?? 360); }
     private void NavigationChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -73,6 +74,10 @@ public partial class MusicView : UserControl
     private void Layout()
     {
         if (Model?.Navigation is not { } navigation) return;
+        Model.SearchBusy.SetActive(Motion.IsActive && navigation.IsSearch);
+        Model.Playlists?.Busy.SetActive(Motion.IsActive && navigation.IsLibrary);
+        RestoreInline.IsVisible = Bounds.Width >= 1000;
+        RestoreCompact.IsVisible = Bounds.Width < 1000;
         Drawer.Width = navigation.ActualDrawerWidth;
         ContentLayout.Margin = new(0, 0, navigation.IsBeside ? navigation.ActualDrawerWidth + 12 : 0, 0);
         _drawerTransition.SetOpen(navigation.IsOpen, navigation.ActualDrawerWidth, Motion.IsEnabled);
@@ -83,6 +88,7 @@ public partial class MusicView : UserControl
         Model?.Navigation.SetDesiredWidth(width);
     }
     private void ResetDrawerWidth(object? sender, RoutedEventArgs e) => SaveDrawerWidth(360);
+    private void CancelResize() { if (!_resizing) return; _resizing = false; Model?.Navigation.SetDesiredWidth(Model.Preferences?.DrawerWidth ?? 360); }
     private void ClearSearch(object? sender, RoutedEventArgs e) { if (Model is { } model) model.Keyword = ""; SearchInput.Focus(); }
     private void SearchKeyDown(object? sender, KeyEventArgs e)
     {
@@ -95,6 +101,7 @@ public partial class MusicView : UserControl
     private void PageKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Handled || Model is not { } m) return;
+        if (e.Key == Key.Escape && _resizing) { CancelResize(); e.Handled = true; return; }
         if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.Control) { SearchInput.Focus(); SearchInput.SelectAll(); e.Handled = true; return; }
         if (e.Key == Key.Escape && m.Navigation.CanBack) { m.Navigation.Back(); e.Handled = true; }
         // Space 不覆盖文本编辑、滑块、按钮和列表自身的选择语义，也不注册全局快捷键。

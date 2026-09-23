@@ -34,7 +34,7 @@ internal sealed class NeteasePlaylistApi(MusicRequestExecutor requests) : IPlayl
             var values = ids.EnumerateArray().Take(10000).Select(PositiveId).ToArray();
             var complete = sourceCount <= 10000 && sourceCount == Number(p, "trackCount");
             return new PlaylistTracks(id, RequiredText(p, "name"), Array.AsReadOnly(values), complete,
-                complete ? "" : "歌单曲目列表不完整或超过 10,000 首限制；可浏览已知曲目，暂不能播放全部。");
+                complete ? "" : "歌单曲目列表不完整或超过 10,000 首限制；可浏览已知曲目，暂不能播放全部。", Text(p, "coverImgUrl"), Text(p, "description"));
         }, ct);
     }
     public Task<IReadOnlyDictionary<long, MusicTrack>> TracksAsync(IReadOnlyList<long> ids, MusicSession session, CancellationToken ct)

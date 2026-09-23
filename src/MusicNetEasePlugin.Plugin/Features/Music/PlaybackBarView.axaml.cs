@@ -1,6 +1,8 @@
 using System.ComponentModel;
 using Avalonia;
 using Avalonia.Controls;
+using Avalonia.Controls.Primitives;
+using Avalonia.VisualTree;
 using Avalonia.Input;
 using Avalonia.Interactivity;
 using Avalonia.Media.Imaging;
@@ -25,6 +27,15 @@ public partial class PlaybackBarView : UserControl
         PlaybackProgress.AddHandler(PointerPressedEvent, (_, _) => _model?.Player.Timeline.Begin(), RoutingStrategies.Tunnel);
         PlaybackProgress.AddHandler(PointerReleasedEvent, async (_, _) => { if (_model is { } m) await m.Player.Timeline.CommitAsync(); }, RoutingStrategies.Tunnel);
         PlaybackProgress.PointerCaptureLost += (_, _) => _model?.Player.Timeline.Cancel();
+        PlaybackProgress.PointerMoved += (_, e) =>
+        {
+            var track = PlaybackProgress.GetVisualDescendants().OfType<Track>().FirstOrDefault();
+            if (track is null) return;
+            var thumb = track.Thumb?.Bounds.Width ?? 0;
+            var ratio = (e.GetPosition(track).X - thumb / 2) / Math.Max(1, track.Bounds.Width - thumb);
+            _model?.Player.Timeline.PreviewAtRatio(FlowDirection == Avalonia.Media.FlowDirection.RightToLeft ? 1 - ratio : ratio);
+        };
+        PlaybackProgress.PointerExited += (_, _) => _model?.Player.Timeline.ClearPreview();
         PlaybackProgress.AddHandler(KeyDownEvent, (_, e) => { if (SeekKey(e.Key)) _model?.Player.Timeline.Begin(); if (e.Key == Key.Escape) _model?.Player.Timeline.Cancel(); }, RoutingStrategies.Tunnel);
         PlaybackProgress.AddHandler(KeyUpEvent, async (_, e) => { if (SeekKey(e.Key) && _model is { } m) await m.Player.Timeline.CommitAsync(); }, RoutingStrategies.Tunnel);
         DataContextChanged += (_, _) => { if (VisualRoot is not null) Bind(); };
@@ -37,21 +48,27 @@ public partial class PlaybackBarView : UserControl
     private void Bind()
     {
         Unbind(); _model = DataContext as MusicWorkspace; Motion.Bind(_model?.Preferences);
-        if (_model is not null) { _model.Player.PropertyChanged += Changed; _model.Player.SetVisible(Motion.IsActive); }
+        if (_model is not null) { _model.Player.PropertyChanged += Changed; _model.Player.SetVisible(Motion.IsActive); _model.Player.Notice.PropertyChanged += NoticeChanged; }
+        Layout();
     }
     private void Unbind()
     {
-        if (_model is not null) { _model.Player.PropertyChanged -= Changed; _model.Player.SetVisible(false); _model.Player.Timeline.Cancel(); }
+        if (_model is not null) { _model.Player.PropertyChanged -= Changed; _model.Player.Notice.PropertyChanged -= NoticeChanged; _model.Player.SetVisible(false); _model.Player.Timeline.Cancel(); }
         _model = null; Motion.Bind(null);
     }
     private void Changed(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(PlayerBarWorkspace.StateText)) Motion.FadeIn(PlaybackState);
+        Layout();
     }
+    private void NoticeChanged(object? sender, PropertyChangedEventArgs e) => Layout();
     private void Layout()
     {
         WideVolume.IsVisible = Bounds.Width >= 1120;
         var compact = Bounds.Width < 850;
+        PlayerArtists.IsVisible = !compact;
+        ModePicker.IsVisible = Bounds.Width >= 650;
+        InlineNotice.IsVisible = !compact && !string.IsNullOrEmpty(_model?.Player.Notice.Text);
         if (_compact == compact) return;
         _compact = compact;
         Grid.SetColumn(AuxiliaryControls, compact ? 0 : 2);

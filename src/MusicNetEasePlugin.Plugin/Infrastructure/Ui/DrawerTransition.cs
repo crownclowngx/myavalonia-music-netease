@@ -23,6 +23,7 @@ internal sealed class DrawerTransition(Control shell)
         var changed = _open != open;
         _open = open;
         shell.IsHitTestVisible = open;
+        shell.IsEnabled = open;
         _translation.Transitions = null;
         if (open)
         {
@@ -49,5 +50,5 @@ internal sealed class DrawerTransition(Control shell)
         finally { if (ReferenceEquals(_closing, source)) _closing = null; source.Dispose(); }
     }
     private void Cancel() { var source = _closing; _closing = null; source?.Cancel(); }
-    public void Reset() { Cancel(); _open = false; _translation.Transitions = null; shell.IsVisible = false; shell.IsHitTestVisible = false; }
+    public void Reset() { Cancel(); _open = false; _translation.Transitions = null; shell.IsVisible = false; shell.IsHitTestVisible = false; shell.IsEnabled = false; }
 }

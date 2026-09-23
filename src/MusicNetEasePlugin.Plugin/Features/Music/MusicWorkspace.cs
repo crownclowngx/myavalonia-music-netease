@@ -35,18 +35,24 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     private string _searchedKeyword = "";
     private string _message = "";
     private bool _loading;
+    private bool _searchFailed;
+    private bool _hasSearched;
+    private string _requestedKeyword = "";
+    private int _requestedOffset;
     private bool _hasMore;
     private int _offset;
     private MusicTrack? _selected;
     public MusicWorkspace(IMusicCatalogApi catalog, IMusicSessionAccessor sessions, IPlayerSession playback,
-        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null, PlaybackPersistence? persistence = null)
+        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null, PlaybackPersistence? persistence = null, TimeProvider? time = null)
     {
         (_catalog, _sessions, _playback, _login, _ui) = (catalog, sessions, playback, login, ui);
+        SearchBusy = new(ui, time);
         Player = new(playback, ui, images, preferences);
         Preferences = preferences;
         Playlists = playlists;
         Queue = new(playback, ui);
-        Lyrics = lyrics is null ? null : new(lyrics, ui, preferences);
+        Lyrics = lyrics is null ? null : new(lyrics, ui, preferences, playback);
+        if (Lyrics is not null) Player.Timeline.PreviewLyrics = Lyrics.PreviewTextAt;
         History = persistence is null ? null : new(persistence, playback, ui);
         ShowLibraryCommand = new AsyncRelayCommand(async () =>
         {
@@ -54,6 +60,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
             if (Playlists is not null && Playlists.Playlists.Count == 0) await Playlists.LoadPlaylistsAsync(true);
         });
         SearchCommand = new AsyncRelayCommand(() => SearchAsync(0, Keyword), AsyncRelayCommandOptions.AllowConcurrentExecutions);
+        RetrySearchCommand = new AsyncRelayCommand(() => SearchAsync(_requestedOffset, _requestedKeyword));
         NextSearchPageCommand = new AsyncRelayCommand(() => SearchAsync(_offset + 30, _searchedKeyword), () => HasMore && !IsLoading);
         PreviousSearchPageCommand = new AsyncRelayCommand(() => SearchAsync(Math.Max(0, _offset - 30), _searchedKeyword), () => _offset > 0 && !IsLoading);
         PlayCommand = new AsyncRelayCommand(() => ExecutePlayerAsync(() => SelectedTrack is { } track ? _playback.PlayNowAsync(QueueEntry.FromTrack(track), _closing.Token) : Task.CompletedTask),
@@ -79,7 +86,12 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     public string Keyword { get => _keyword; set => SetProperty(ref _keyword, value); }
     public MusicTrack? SelectedTrack { get => _selected; set { if (SetProperty(ref _selected, value)) { PlayCommand.NotifyCanExecuteChanged(); AppendCommand.NotifyCanExecuteChanged(); PlayNextCommand.NotifyCanExecuteChanged(); } } }
     public string SearchMessage { get => _message; private set => SetProperty(ref _message, value); }
-    public bool IsLoading { get => _loading; private set { SetProperty(ref _loading, value); NextSearchPageCommand.NotifyCanExecuteChanged(); PreviousSearchPageCommand.NotifyCanExecuteChanged(); } }
+    public bool IsLoading { get => _loading; private set { if (SetProperty(ref _loading, value)) SearchBusy.Set(value); OnPropertyChanged(nameof(ShowSearchEmpty)); NextSearchPageCommand.NotifyCanExecuteChanged(); PreviousSearchPageCommand.NotifyCanExecuteChanged(); } }
+    public DelayedBusy SearchBusy { get; }
+    public bool SearchFailed { get => _searchFailed; private set { SetProperty(ref _searchFailed, value); OnPropertyChanged(nameof(ShowSearchEmpty)); } }
+    public bool ShowSearchEmpty => !IsLoading && !SearchFailed && Tracks.Count == 0;
+    public string EmptySearchText => _hasSearched ? "没有找到匹配歌曲，试试其他歌名或歌手。" : "搜索歌名或歌手，按 Enter 开始；也可以打开我的歌单。";
+    public IAsyncRelayCommand RetrySearchCommand { get; }
     public bool HasMore { get => _hasMore; private set { SetProperty(ref _hasMore, value); NextSearchPageCommand.NotifyCanExecuteChanged(); } }
     public string PageText => $"第 {_offset / 30 + 1} 页";
     public IAsyncRelayCommand SearchCommand { get; }
@@ -88,8 +100,12 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     public IAsyncRelayCommand PlayCommand { get; }
     public IAsyncRelayCommand AppendCommand { get; }
     public IAsyncRelayCommand PlayNextCommand { get; }
-    private Task EnqueueSelectedAsync(bool next) => ExecutePlayerAsync(() => SelectedTrack is { } track
-        ? _playback.EnqueueAsync([QueueEntry.FromTrack(track)], next, _closing.Token) : Task.CompletedTask);
+    private Task EnqueueSelectedAsync(bool next) => ExecutePlayerAsync(async () =>
+    {
+        if (SelectedTrack is not { } track) return;
+        var result = await _playback.EnqueueAsync([QueueEntry.FromTrack(track)], next, _closing.Token).ConfigureAwait(false);
+        Post(() => { if (_playback.Snapshot.AccountEpoch == result.AccountEpoch) Player.Notice.Show(result.Message); });
+    });
     private async Task ExecutePlayerAsync(Func<Task> work)
     {
         try { await work().ConfigureAwait(false); }
@@ -119,8 +135,9 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
             _searchWork = _searchWork.IsCompleted ? complete.Task : Task.WhenAll(_searchWork, complete.Task);
         }
         TryCancel(old);
-        IsLoading = true;
-        SearchMessage = "正在搜索…";
+        _requestedKeyword = keyword.Trim(); _requestedOffset = offset;
+        SearchFailed = false; IsLoading = true;
+        SearchMessage = "";
         _ = RunAsync();
         return complete.Task;
         async Task RunAsync()
@@ -132,6 +149,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
                 {
                     if (generation != _generation || cancellation.IsCancellationRequested || !_sessions.IsCurrent(session)) return;
                     Tracks.Clear();
+                    _hasSearched = true; OnPropertyChanged(nameof(EmptySearchText));
                     foreach (var track in page.Tracks) Tracks.Add(track);
                     SelectedTrack = null;
                     _offset = offset;
@@ -142,7 +160,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
                 });
             }
             catch (OperationCanceledException) { }
-            catch (Exception ex) { Post(() => { if (generation == _generation) SearchMessage = ex is MusicException ? ex.Message : "搜索未完成，请重试。"; }); }
+            catch (Exception ex) { Post(() => { if (generation == _generation && !cancellation.IsCancellationRequested && _sessions.IsCurrent(session)) { SearchFailed = true; SearchMessage = ex is MusicException ? ex.Message : "搜索未完成，请重试。"; } }); }
             finally
             {
                 Post(() => { if (generation == _generation) IsLoading = false; });
@@ -160,7 +178,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         lock (_sync) { _generation++; }
         TryCancel(_search);
         _offset = 0; _searchedKeyword = ""; OnPropertyChanged(nameof(PageText));
-        Tracks.Clear(); SelectedTrack = null; HasMore = false; IsLoading = false; SearchMessage = "";
+        Tracks.Clear(); SelectedTrack = null; HasMore = false; IsLoading = false; SearchMessage = ""; SearchFailed = false; _hasSearched = false; OnPropertyChanged(nameof(EmptySearchText));
     });
     private void Post(Action action) => _ui.Post(() => { if (!_closed) action(); });
     private static void TryCancel(CancellationTokenSource? cancellation)
@@ -182,6 +200,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         Playlists?.Dispose();
         Queue.Dispose();
         Player.Dispose();
+        SearchBusy.Dispose();
         Lyrics?.Dispose();
         History?.Dispose();
         _login.Changed -= LoginChanged;

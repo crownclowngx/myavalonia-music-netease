@@ -79,7 +79,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         }
         Notify(explicitReplacement: true); return work;
     }
-    public Task EnqueueAsync(IReadOnlyList<QueueEntry> entries, bool playNext, CancellationToken ct)
+    public Task<QueueAdditionResult> EnqueueAsync(IReadOnlyList<QueueEntry> entries, bool playNext, CancellationToken ct)
     {
         Validate(entries); var session = Capture(ct);
         lock (_sync)
@@ -92,7 +92,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
             _order.Add(entries, playNext); PublishOrder();
             if (empty) SetPending(PlaybackState.Stopped);
         }
-        Notify(explicitReplacement: true); return Task.CompletedTask;
+        Notify(explicitReplacement: true); return Task.FromResult(new QueueAdditionResult(entries.Count, playNext, session.Epoch));
     }
     public Task SelectAsync(Guid entryId, CancellationToken ct)
     {
@@ -211,6 +211,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
             _resumePosition = data.PositionMs;
             _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Playback = _snapshot.Playback with { PositionMs = data.PositionMs,
                 DurationMs = _order.Current?.Track?.DurationMs ?? 0, Volume = data.Volume, Message = entries.Length == 0 ? "" : "已恢复上次队列，点击继续播放。" } };
+            _snapshot = _snapshot with { Restoration = entries.Length == 0 ? null : new(Guid.NewGuid(), entries.Length, data.PositionMs) };
             volume = _single.SetVolumeAsync(data.Volume, CancellationToken.None);
         }
         await volume.ConfigureAwait(false); Notify(save: false); return true;
@@ -249,6 +250,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         var current = _order.Current;
         if (current is null) return Task.CompletedTask;
         _attempt = Guid.NewGuid(); _terminalConsumed = false;
+        _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Restoration = null };
         _resumePosition = startPosition;
         var track = current.Track ?? new MusicTrack(current.TrackId, $"歌曲 {current.TrackId}", "待加载", "", null, 0);
         // PlayAsync 只同步登记代次，执行体首先异步让出，保持本状态锁短暂；旧资源由单曲尾任务先释放。
@@ -283,7 +285,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     {
         _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, QueueRevision = _snapshot.QueueRevision + 1,
             Entries = Array.AsReadOnly(_order.Entries.ToArray()), CurrentEntryId = _order.CurrentId, Mode = _order.Mode,
-            CanNext = _order.CanNext, CanPrevious = _order.CanPrevious };
+            CanNext = _order.CanNext, CanPrevious = _order.CanPrevious, Restoration = null };
     }
     private void SingleChanged(object? sender, PlaybackSnapshot playback)
     {

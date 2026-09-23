@@ -77,6 +77,17 @@ public partial class SongRowView : UserControl
         }, RoutingStrategies.Tunnel);
     }
     public void OpenMenu() { SelectRow(); MoreButton.Flyout?.ShowAt(MoreButton); }
+    private void ShowDetails(object? sender, RoutedEventArgs e)
+    {
+        // 只展示当前已加载资料；绑定到行属性，虚拟化重用或资料补全不会遗留上首信息。
+        var content = new StackPanel { Spacing = 8, MaxWidth = 340 };
+        foreach (var property in new[] { nameof(Title), nameof(Artist), nameof(Album), nameof(Subtitle) })
+        {
+            var text = new SelectableTextBlock { TextWrapping = Avalonia.Media.TextWrapping.Wrap };
+            text.Bind(TextBlock.TextProperty, new Avalonia.Data.Binding(property) { Source = this }); content.Children.Add(text);
+        }
+        MoreButton.Flyout?.Hide(); new Flyout { Content = content }.ShowAt(MoreButton);
+    }
     private void ApplyLayout()
     {
         // 依据行自身的宽度布局；右侧队列打开后不沿用外部 Document 的宽度。

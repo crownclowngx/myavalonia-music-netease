@@ -10,7 +10,7 @@
     <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
     <ListBox.ItemTemplate><DataTemplate x:DataType="vm:QueueRow"><vm:SongRowView Title="{Binding Title}" Subtitle="{Binding Detail}" Current="{Binding IsCurrent}" PlayCommand="{Binding $parent[vm:QueueView].Model.PlayCommand}" RemoveCommand="{Binding $parent[vm:QueueView].Model.RemoveCommand}" UpCommand="{Binding $parent[vm:QueueView].Model.UpCommand}" DownCommand="{Binding $parent[vm:QueueView].Model.DownCommand}" /></DataTemplate></ListBox.ItemTemplate>
    </vm:SongListBox>
-   <TextBlock Text="队列还是空的，可从歌曲菜单加入。" IsVisible="{Binding IsEmpty}" TextWrapping="Wrap" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16" />
+   <StackPanel IsVisible="{Binding IsEmpty}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="16" Spacing="8"><TextBlock Text="队列还是空的，可从歌曲菜单加入。" TextWrapping="Wrap" /><Button Content="去搜索歌曲" Classes="netease-button" Click="BrowseSearch" HorizontalAlignment="Center" /></StackPanel>
   </Grid>
   <Border Grid.Row="3" Padding="8" Background="{DynamicResource NeteaseSelectionBrush}" IsVisible="{Binding ConfirmClear}"><StackPanel Spacing="6"><TextBlock Text="{Binding ClearText}" TextWrapping="Wrap" /><StackPanel Orientation="Horizontal" Spacing="6"><Button Content="确认清空" Command="{Binding ConfirmClearCommand}" Classes="netease-button primary" /><Button Content="取消" Command="{Binding CancelClearCommand}" Classes="netease-button" /></StackPanel></StackPanel></Border>
   <TextBlock Grid.Row="4" Text="{Binding Message}" TextWrapping="Wrap" Classes="netease-secondary" IsVisible="{Binding Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

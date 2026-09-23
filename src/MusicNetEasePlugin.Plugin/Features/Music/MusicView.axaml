@@ -11,22 +11,32 @@
    <Button Grid.Column="1" Classes="netease-button" Content="清空" IsVisible="{Binding Keyword, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Click="ClearSearch" AutomationProperties.Name="清空搜索关键词" />
    <Button x:Name="SearchButton" Grid.Column="2" Classes="netease-button primary" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="搜索" Command="{Binding SearchCommand}" />
   </Grid>
-  <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="12,0,12,8">
+  <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="12,0,12,8"><StackPanel Orientation="Horizontal" Spacing="6">
    <ToggleButton Content="搜索" IsChecked="{Binding Navigation.SearchSelected, Mode=OneWay}" Command="{Binding ShowSearchCommand}" AutomationProperties.Name="搜索页面" />
    <ToggleButton Content="我的歌单" IsChecked="{Binding Navigation.LibrarySelected, Mode=OneWay}" Command="{Binding ShowLibraryCommand}" AutomationProperties.Name="我的歌单页面" />
    <ToggleButton Content="最近播放" IsChecked="{Binding Navigation.HistorySelected, Mode=OneWay}" Command="{Binding ShowHistoryCommand}" AutomationProperties.Name="最近播放页面" />
   </StackPanel>
+   <Grid Grid.Column="1" IsVisible="{Binding Player.ShowRestoration}">
+    <StackPanel x:Name="RestoreInline" Orientation="Horizontal" Spacing="4"><TextBlock Text="{Binding Player.RestorationText}" MaxWidth="260" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><Button Content="继续播放" Classes="netease-button" Command="{Binding Player.ResumeCommand}" /><Button Content="收起" Classes="netease-button" Command="{Binding Player.DismissRestorationCommand}" /></StackPanel>
+    <Button x:Name="RestoreCompact" Content="恢复提示" Classes="netease-button" AutomationProperties.Name="查看上次恢复的位置并继续播放"><Button.Flyout><Flyout><StackPanel Spacing="8" MaxWidth="300"><TextBlock Text="{Binding Player.RestorationText}" TextWrapping="Wrap" /><Button Content="继续播放" Command="{Binding Player.ResumeCommand}" /><Button Content="收起恢复提示" Command="{Binding Player.DismissRestorationCommand}" /></StackPanel></Flyout></Button.Flyout></Button>
+   </Grid>
+  </Grid>
   <Grid x:Name="ContentStage" Grid.Row="2" Margin="12,0,12,8" ClipToBounds="True">
    <Grid x:Name="ContentLayout">
    <Grid x:Name="SearchPane" RowDefinitions="Auto,*,Auto" IsVisible="{Binding Navigation.IsSearch}">
     <Grid RowDefinitions="Auto,Auto" Margin="4,0,4,6">
-     <ProgressBar Height="2" IsVisible="{Binding IsLoading}"><ProgressBar.IsIndeterminate><MultiBinding Converter="{x:Static conv:BoolConverters.And}"><Binding Path="IsLoading" /><Binding ElementName="MusicRoot" Path="Motion.IsEnabled" /></MultiBinding></ProgressBar.IsIndeterminate></ProgressBar>
+     <ProgressBar Height="2" IsVisible="{Binding SearchBusy.IsVisible}"><ProgressBar.IsIndeterminate><MultiBinding Converter="{x:Static conv:BoolConverters.And}"><Binding Path="SearchBusy.IsVisible" /><Binding ElementName="MusicRoot" Path="Motion.IsEnabled" /></MultiBinding></ProgressBar.IsIndeterminate></ProgressBar>
      <TextBlock Grid.Row="1" Classes="netease-secondary" Text="{Binding SearchMessage}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding SearchMessage}" AutomationProperties.LiveSetting="Polite" />
     </Grid>
     <vm:SongListBox x:Name="TrackList" Grid.Row="1" Classes="netease-results" ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="歌曲搜索结果" ActivateCommand="{Binding PlayCommand}">
      <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
      <ListBox.ItemTemplate><DataTemplate x:DataType="models:MusicTrack"><vm:SongRowView Title="{Binding Name}" Subtitle="{Binding Artists}" Artist="{Binding Artists}" Album="{Binding Album}" TrackId="{Binding Id}" CurrentTrackId="{Binding $parent[vm:MusicView].Model.Player.CurrentTrackId}" Duration="{Binding DurationMs, Converter={StaticResource TrackDuration}}" PlayCommand="{Binding $parent[vm:MusicView].Model.PlayCommand}" NextCommand="{Binding $parent[vm:MusicView].Model.PlayNextCommand}" AppendCommand="{Binding $parent[vm:MusicView].Model.AppendCommand}" /></DataTemplate></ListBox.ItemTemplate>
     </vm:SongListBox>
+    <StackPanel Grid.Row="1" VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="340" Spacing="8" IsVisible="{Binding ShowSearchEmpty}">
+     <TextBlock Text="{Binding EmptySearchText}" TextWrapping="Wrap" TextAlignment="Center" Classes="netease-secondary" />
+     <Button Classes="netease-button" Content="浏览我的歌单" Command="{Binding ShowLibraryCommand}" HorizontalAlignment="Center" />
+    </StackPanel>
+    <Button Grid.Row="1" Content="重试搜索" Command="{Binding RetrySearchCommand}" Classes="netease-button" HorizontalAlignment="Center" VerticalAlignment="Top" IsVisible="{Binding SearchFailed}" />
     <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="0,4,0,0">
      <TextBlock Classes="netease-secondary" Text="双击或 Enter 播放 · 右键查看更多" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
      <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6"><Button Classes="netease-button" Content="上一页" Command="{Binding PreviousSearchPageCommand}" /><TextBlock Text="{Binding PageText}" Classes="netease-secondary" VerticalAlignment="Center" /><Button Classes="netease-button" Content="下一页" Command="{Binding NextSearchPageCommand}" /></StackPanel>

@@ -1,6 +1,12 @@
 namespace MusicNetEasePlugin.Application.Playback;
 
 public enum PlaybackMode { Sequential, RepeatList, RepeatOne, Shuffle }
+/// <summary>一次已接纳的追加结果；UI 不再观察总数变化猜测操作来源和意图。</summary>
+public sealed record QueueAdditionResult(int Added, bool PlayNext, long AccountEpoch)
+{
+    public string Message => Added == 0 ? "没有新增歌曲" : PlayNext ? $"将在当前歌曲后播放 · 本次 {Added} 首" : $"已加入队列 · 本次 {Added} 首";
+}
+public sealed record RestoredQueue(Guid Id, int Count, long PositionMs);
 /// <summary>同一歌曲可重复入队，因此操作必须使用 EntryId；TrackId 仅用于向网易解析资料和资源。</summary>
 public sealed record QueueEntry(Guid EntryId, long TrackId, string Source, long? SourceId = null, MusicTrack? Track = null)
 {
@@ -9,7 +15,7 @@ public sealed record QueueEntry(Guid EntryId, long TrackId, string Source, long?
 }
 public sealed record PlayerSessionSnapshot(long Revision, long QueueRevision, long AccountId, long AccountEpoch,
     IReadOnlyList<QueueEntry> Entries, Guid? CurrentEntryId, PlaybackMode Mode, PlaybackSnapshot Playback,
-    bool CanPrevious = false, bool CanNext = false)
+    bool CanPrevious = false, bool CanNext = false, RestoredQueue? Restoration = null)
 {
     public static PlayerSessionSnapshot Empty { get; } = new(0, 0, 0, 0, Array.Empty<QueueEntry>(), null, PlaybackMode.Sequential, new(0, PlaybackState.Idle));
 }
@@ -23,7 +29,7 @@ public interface IPlayerSession
     Task PlaySingleAsync(MusicTrack track, CancellationToken ct);
     /// <summary>明确的单曲试听意图：保留原队列，在当前项后插入并播放；已是当前曲目则继续。</summary>
     Task PlayNowAsync(QueueEntry entry, CancellationToken ct);
-    Task EnqueueAsync(IReadOnlyList<QueueEntry> entries, bool playNext, CancellationToken ct);
+    Task<QueueAdditionResult> EnqueueAsync(IReadOnlyList<QueueEntry> entries, bool playNext, CancellationToken ct);
     Task SelectAsync(Guid entryId, CancellationToken ct);
     Task NextAsync(bool previous, CancellationToken ct);
     Task RemoveAsync(Guid entryId, CancellationToken ct);

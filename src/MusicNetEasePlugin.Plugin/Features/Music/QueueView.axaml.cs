@@ -1,6 +1,7 @@
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Interactivity;
+using Avalonia.VisualTree;
 namespace MusicNetEasePlugin.Features.Music;
 /// <summary>队列只在首次挂载和用户明确点击时定位，不在进度通知中抢走滚动位置。</summary>
 public sealed partial class QueueView : UserControl
@@ -14,4 +15,5 @@ public sealed partial class QueueView : UserControl
         LayoutUpdated += (_, _) => { if (!_located && IsEffectivelyVisible && Model?.Current is { } current) { _located = true; QueueList.ScrollIntoView(current); } };
     }
     private void LocateCurrent(object? sender, RoutedEventArgs args) { if (Model?.Current is { } current) QueueList.ScrollIntoView(current); }
+    private void BrowseSearch(object? sender, RoutedEventArgs args) { var navigation = this.FindAncestorOfType<MusicView>()?.Model?.Navigation; navigation?.Browse(MusicBrowsePage.Search); navigation?.Back(); }
 }

@@ -9,7 +9,8 @@ public sealed record MusicPlaylist(long Id, string Name, string? Cover, int Trac
 }
 public sealed record PlaylistPage(IReadOnlyList<MusicPlaylist> Items, int NextOffset, bool HasMore);
 /// <summary>一次完整 ID 顺序快照；重复 ID 保留位置，资料缺失不会改变索引。超限/不完整不能提供播放全部。</summary>
-public sealed record PlaylistTracks(long PlaylistId, string Name, IReadOnlyList<long> TrackIds, bool IsComplete, string Message);
+public sealed record PlaylistTracks(long PlaylistId, string Name, IReadOnlyList<long> TrackIds, bool IsComplete, string Message,
+    string? Cover = null, string? Description = null);
 public interface IPlaylistCatalogApi
 {
     Task<PlaylistPage> PlaylistsAsync(int offset, MusicSession session, CancellationToken ct);

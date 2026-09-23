@@ -33,8 +33,8 @@ public sealed class HistoryWorkspace : ObservableObject, IDisposable
     {
         (_storage, _ui, _player) = (storage, ui, player); _time = time ?? TimeProvider.System;
         PlayCommand = new AsyncRelayCommand(() => Run(() => Selected is { } item ? player.PlayNowAsync(QueueEntry.FromTrack(item.ToTrack(), "最近播放"), default) : Task.CompletedTask), () => Selected is not null);
-        AppendCommand = new AsyncRelayCommand(() => Run(() => Selected is { } item ? player.EnqueueAsync([QueueEntry.FromTrack(item.ToTrack(), "最近播放")], false, default) : Task.CompletedTask), () => Selected is not null);
-        PlayNextCommand = new AsyncRelayCommand(() => Run(() => Selected is { } item ? player.EnqueueAsync([QueueEntry.FromTrack(item.ToTrack(), "最近播放")], true, default) : Task.CompletedTask), () => Selected is not null);
+        AppendCommand = new AsyncRelayCommand(() => Enqueue(false), () => Selected is not null);
+        PlayNextCommand = new AsyncRelayCommand(() => Enqueue(true), () => Selected is not null);
         player.Changed += PlayerChanged; PlayerChanged(player, player.Snapshot);
         RetryCommand = new AsyncRelayCommand(storage.RetryAsync);
         storage.Changed += Changed; Apply(storage.Snapshot);
@@ -43,11 +43,18 @@ public sealed class HistoryWorkspace : ObservableObject, IDisposable
     public HistoryRow? Selected { get => _selected; set { SetProperty(ref _selected, value); PlayCommand.NotifyCanExecuteChanged(); AppendCommand.NotifyCanExecuteChanged(); PlayNextCommand.NotifyCanExecuteChanged(); } }
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
     public string CountText => Rows.Count == 0 ? "本机还没有最近播放记录。" : $"本机最近播放 · {Rows.Count} 首";
+    public bool IsEmpty => Rows.Count == 0;
     public IAsyncRelayCommand PlayCommand { get; }
     public IAsyncRelayCommand AppendCommand { get; }
     public IAsyncRelayCommand PlayNextCommand { get; }
     public long? CurrentTrackId { get => _currentTrack; private set => SetProperty(ref _currentTrack, value); }
     public IAsyncRelayCommand RetryCommand { get; }
+    private Task Enqueue(bool next) => Run(async () =>
+    {
+        if (Selected is not { } item) return;
+        var result = await _player.EnqueueAsync([QueueEntry.FromTrack(item.ToTrack(), "最近播放")], next, default).ConfigureAwait(false);
+        _ui.Post(() => { if (!_closed && _player.Snapshot.AccountEpoch == result.AccountEpoch) Message = result.Message; });
+    });
     private async Task Run(Func<Task> work)
     {
         try { await work().ConfigureAwait(false); }
@@ -70,7 +77,7 @@ public sealed class HistoryWorkspace : ObservableObject, IDisposable
                 var group = date >= today ? "今天" : date == today.AddDays(-1) ? "昨天" : "更早";
                 Rows.Add(new(track, group == previousGroup ? "" : group)); previousGroup = group;
             }
-            Selected = Rows.FirstOrDefault(row => row.TrackId == selected); OnPropertyChanged(nameof(CountText));
+            Selected = Rows.FirstOrDefault(row => row.TrackId == selected); OnPropertyChanged(nameof(CountText)); OnPropertyChanged(nameof(IsEmpty));
         }
         _snapshot = snapshot; Message = snapshot.Message;
     }

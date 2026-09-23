@@ -1,7 +1,7 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Library.PlaylistView" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:vm="using:MusicNetEasePlugin.Features.Library" xmlns:music="using:MusicNetEasePlugin.Features.Music" xmlns:model="using:MusicNetEasePlugin.Application.Library" x:DataType="vm:PlaylistBrowser">
  <UserControl.Resources><music:TrackDurationConverter x:Key="Duration" /></UserControl.Resources>
  <Grid RowDefinitions="Auto,*" RowSpacing="6">
-  <TextBlock Text="{Binding Message}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Message}" Classes="netease-secondary" AutomationProperties.LiveSetting="Polite" />
+  <Grid ColumnDefinitions="*,Auto"><TextBlock Text="{Binding Message}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Message}" Classes="netease-secondary" AutomationProperties.LiveSetting="Polite" /><TextBlock Grid.Column="1" Text="正在读取歌单…" IsVisible="{Binding Busy.IsVisible}" Classes="netease-secondary" /></Grid>
   <Grid Grid.Row="1" IsVisible="{Binding IsList}" RowDefinitions="Auto,*,Auto" RowSpacing="6">
    <Grid ColumnDefinitions="*,Auto"><ComboBox Width="150" HorizontalAlignment="Left" ItemsSource="{Binding Filters}" SelectedIndex="{Binding FilterIndex, Mode=TwoWay}" AutomationProperties.Name="筛选已加载歌单" /><Button Grid.Column="1" Classes="netease-button" Content="刷新歌单" Command="{Binding RefreshCommand}" /></Grid>
    <Grid Grid.Row="1">
@@ -18,7 +18,13 @@
    <Button Grid.Row="2" Content="加载更多歌单" Command="{Binding MoreCommand}" IsVisible="{Binding HasMore}" Classes="netease-button" HorizontalAlignment="Center" />
   </Grid>
   <Grid Grid.Row="1" IsVisible="{Binding IsDetail}" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="4">
-   <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"><Button Classes="netease-button" Content="‹ 我的歌单" Command="{Binding BackCommand}" Click="ReturnToPlaylists" /><TextBlock Grid.Column="1" Text="{Binding Title}" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><Button Grid.Column="2" Content="播放全部" Classes="netease-button primary" Command="{Binding PlayAllCommand}" ToolTip.Tip="替换当前队列并从头播放" /></Grid>
+   <StackPanel Spacing="6">
+    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"><Button Classes="netease-button" Content="‹ 我的歌单" Command="{Binding BackCommand}" Click="ReturnToPlaylists" /><TextBlock Grid.Column="1" Text="{Binding Title}" ToolTip.Tip="{Binding Title}" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><Button Grid.Column="2" Content="播放全部" Classes="netease-button primary" Command="{Binding PlayAllCommand}" ToolTip.Tip="替换当前队列并从头播放" /></Grid>
+    <Grid x:Name="RichPlaylistHeader" ColumnDefinitions="64,*" ColumnSpacing="12">
+     <Border Width="64" Height="64" VerticalAlignment="Top" Background="{DynamicResource NeteaseSelectionBrush}" CornerRadius="6"><Grid><PathIcon Width="24" Height="24" Data="{DynamicResource NeteaseMusicIcon}" /><ui:ArtworkImage Address="{Binding Cover}" Stretch="UniformToFill" /></Grid></Border>
+     <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="{Binding CountText}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CountText}" Classes="netease-secondary" /><Expander Header="歌单简介" IsExpanded="{Binding DescriptionExpanded, Mode=TwoWay}" HorizontalAlignment="Stretch"><ScrollViewer MaxHeight="80"><SelectableTextBlock Text="{Binding Description}" TextWrapping="Wrap" /></ScrollViewer></Expander></StackPanel>
+    </Grid>
+   </StackPanel>
    <TextBlock Grid.Row="1" Text="{Binding ReplaceHint}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ReplaceHint}" />
    <music:SongListBox x:Name="PlaylistTrackList" Grid.Row="2" Classes="netease-results" ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ActivateCommand="{Binding PlayNowCommand}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="歌单歌曲">
     <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>

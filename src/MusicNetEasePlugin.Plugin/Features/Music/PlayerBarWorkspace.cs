@@ -26,15 +26,18 @@ public sealed class PlayerBarWorkspace : ObservableObject, IDisposable
     private int _lastVolume = 70;
     private byte[]? _coverBytes;
     private string _commandMessage = "";
+    private Guid? _dismissedRestoration;
     public PlayerBarWorkspace(IPlayerSession player, ILoginUiDispatcher ui, IAccountImageSource? images, UiPreferences? preferences)
     {
         (_player, _ui, _images, Preferences) = (player, ui, images, preferences);
         Timeline = new(player, ui); Notice = new(ui);
+        Notice.PropertyChanged += NoticeChanged;
         PauseCommand = new AsyncRelayCommand(() => Run(() => player.PauseAsync(true, _closing.Token)), () => State.State == PlaybackState.Playing);
         ResumeCommand = new AsyncRelayCommand(() => Run(() => player.PauseAsync(false, _closing.Token)), () => State.Track is not null && IsPaused);
         ToggleCommand = new AsyncRelayCommand(() => IsPaused ? ResumeCommand.ExecuteAsync(null) : PauseCommand.ExecuteAsync(null), () => PauseCommand.CanExecute(null) || ResumeCommand.CanExecute(null));
         StopCommand = new AsyncRelayCommand(() => Run(player.StopAsync), () => State.State is PlaybackState.Loading or PlaybackState.Playing or PlaybackState.Paused or PlaybackState.Failed);
         MuteCommand = new AsyncRelayCommand(() => Run(() => player.SetVolumeAsync(Volume == 0 ? _lastVolume : 0, _closing.Token)));
+        DismissRestorationCommand = new RelayCommand(() => { _dismissedRestoration = _session.Restoration?.Id; OnPropertyChanged(nameof(ShowRestoration)); });
         player.Changed += Changed;
         if (preferences is not null) preferences.PropertyChanged += PreferencesChanged;
         Apply(player.Snapshot);
@@ -52,9 +55,15 @@ public sealed class PlayerBarWorkspace : ObservableObject, IDisposable
     public bool IsPaused => State.State is PlaybackState.Paused or PlaybackState.Stopped or PlaybackState.Ended or PlaybackState.Failed or PlaybackState.Idle;
     public bool IsTrial => State.IsTrial;
     public bool IsLoading => State.State == PlaybackState.Loading;
+    public bool ShowPause => !IsPaused && !IsLoading;
+    public bool ShowRestoration => _session.Restoration is { } restoration && restoration.Id != _dismissedRestoration;
+    public string RestorationText => _session.Restoration is { } restoration ? $"已恢复 {restoration.Count} 首 · 上次停在 {restoration.PositionMs / 60000:00}:{restoration.PositionMs / 1000 % 60:00}" : "";
+    public IRelayCommand DismissRestorationCommand { get; }
     public string StateText => State.State switch { PlaybackState.Idle => "待播放", PlaybackState.Loading => "加载中", PlaybackState.Playing => "播放中",
         PlaybackState.Paused => "已暂停", PlaybackState.Stopped => "已停止", PlaybackState.Ended => "播放结束", _ => "播放失败" };
-    public string PlaybackMessage => string.IsNullOrEmpty(_commandMessage) ? State.Message : _commandMessage;
+    public string PlaybackMessage => string.IsNullOrEmpty(_commandMessage) ? _session.Restoration is null ? State.Message : "" : _commandMessage;
+    public string DisplayStateText => string.IsNullOrEmpty(Notice.Text) ? StateText : Notice.Text;
+    private void NoticeChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e) => OnPropertyChanged(nameof(DisplayStateText));
     public string PositionText => $"{State.PositionMs / 60000:00}:{State.PositionMs / 1000 % 60:00} / {State.DurationMs / 60000:00}:{State.DurationMs / 1000 % 60:00}";
     public int Volume { get => State.Volume; set { if (!_closed && value != Volume && value is >= 0 and <= 100) _ = Run(() => _player.SetVolumeAsync(value, _closing.Token)); } }
     public string VolumeText => Volume == 0 ? "已静音" : $"音量 {Volume}%";
@@ -77,8 +86,9 @@ public sealed class PlayerBarWorkspace : ObservableObject, IDisposable
         var old = _session;
         var previousText = PositionText;
         _session = snapshot;
-        if (_visible && old.AccountEpoch == snapshot.AccountEpoch && old.CurrentEntryId == snapshot.CurrentEntryId && snapshot.Entries.Count > old.Entries.Count)
-            Notice.Show($"已加入队列 · 共 {snapshot.Entries.Count} 首");
+        if (old.Restoration != snapshot.Restoration || old.AccountEpoch != snapshot.AccountEpoch)
+        { OnPropertyChanged(nameof(ShowRestoration)); OnPropertyChanged(nameof(RestorationText)); }
+        if (old.AccountEpoch != snapshot.AccountEpoch) { Notice.Clear(); _dismissedRestoration = null; }
         if (Volume > 0) _lastVolume = Volume;
         if (old.Playback.Track != State.Track)
         {
@@ -92,9 +102,11 @@ public sealed class PlayerBarWorkspace : ObservableObject, IDisposable
         {
             _commandMessage = "";
             OnPropertyChanged(nameof(StateText)); OnPropertyChanged(nameof(IsPaused)); OnPropertyChanged(nameof(IsLoading));
+            OnPropertyChanged(nameof(ShowPause));
+            OnPropertyChanged(nameof(DisplayStateText));
             PauseCommand.NotifyCanExecuteChanged(); ResumeCommand.NotifyCanExecuteChanged(); ToggleCommand.NotifyCanExecuteChanged(); StopCommand.NotifyCanExecuteChanged();
         }
-        if (old.Playback.State != State.State || old.Playback.Message != State.Message) OnPropertyChanged(nameof(PlaybackMessage));
+        if (old.Playback.State != State.State || old.Playback.Message != State.Message || old.Restoration != snapshot.Restoration) OnPropertyChanged(nameof(PlaybackMessage));
     }
 
     /// <summary>由实际挂载的播放区报告可见性。后台播放保持不变，只撤销封面下载及迟到图片回填。</summary>
@@ -133,7 +145,7 @@ public sealed class PlayerBarWorkspace : ObservableObject, IDisposable
         _closed = true; _closing.Cancel(); CancelCover();
         _player.Changed -= Changed;
         if (Preferences is not null) Preferences.PropertyChanged -= PreferencesChanged;
-        Timeline.Dispose(); Notice.Dispose();
+        Timeline.Dispose(); Notice.PropertyChanged -= NoticeChanged; Notice.Dispose();
         _coverWork.GetAwaiter().GetResult();
         _coverCancellation?.Dispose(); _closing.Dispose(); CoverBytes = null;
     }

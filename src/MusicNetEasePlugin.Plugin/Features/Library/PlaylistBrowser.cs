@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using MusicNetEasePlugin.Application.Authentication;
 using MusicNetEasePlugin.Application.Library;
 using MusicNetEasePlugin.Application.Playback;
+using MusicNetEasePlugin.Features.Music;
 
 namespace MusicNetEasePlugin.Features.Library;
 
@@ -41,10 +42,13 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     private int _tabIndex;
     private int _filter;
     private long? _currentTrack;
+    private bool _descriptionExpanded;
+    private bool _failed;
     public PlaylistBrowser(IPlaylistCatalogApi api, IMusicSessionAccessor sessions, ILoginUiDispatcher ui, IPlayerSession? player = null)
     {
         (_api, _sessions, _ui) = (api, sessions, ui);
         _player = player;
+        Busy = new(ui);
         RefreshCommand = new AsyncRelayCommand(() => LoadPlaylistsAsync(true), () => !_closed, AsyncRelayCommandOptions.AllowConcurrentExecutions);
         MoreCommand = new AsyncRelayCommand(() => LoadPlaylistsAsync(false), () => HasMore && !IsLoading);
         OpenCommand = new AsyncRelayCommand(() => SelectedPlaylist is { } p ? OpenAsync(p.Id) : Task.CompletedTask, () => SelectedPlaylist is not null && !IsLoading);
@@ -67,17 +71,23 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     public ObservableCollection<PlaylistTrackRow> Tracks { get; } = [];
     public MusicPlaylist? SelectedPlaylist { get => _selected; set { SetProperty(ref _selected, value); OpenCommand.NotifyCanExecuteChanged(); } }
     public PlaylistTrackRow? SelectedTrack { get => _selectedTrack; set { SetProperty(ref _selectedTrack, value); CommandsChanged(); } }
-    public PlaylistTracks? Snapshot { get => _snapshot; private set { SetProperty(ref _snapshot, value); OnPropertyChanged(nameof(Title)); } }
+    public PlaylistTracks? Snapshot { get => _snapshot; private set { if (!SetProperty(ref _snapshot, value)) return; DescriptionExpanded = false; OnPropertyChanged(nameof(Title)); OnPropertyChanged(nameof(Cover)); OnPropertyChanged(nameof(Description)); OnPropertyChanged(nameof(CountText)); } }
     public string Title => Snapshot?.Name ?? "尚未打开歌单";
+    public string? Cover => Snapshot?.Cover ?? Playlists.FirstOrDefault(p => p.Id == Snapshot?.PlaylistId)?.Cover;
+    public string Description => string.IsNullOrWhiteSpace(Snapshot?.Description) ? "暂无歌单简介。" : Snapshot.Description;
+    public bool DescriptionExpanded { get => _descriptionExpanded; set => SetProperty(ref _descriptionExpanded, value); }
+    public string CountText => Snapshot is not { } s ? "" : $"{(s.IsComplete ? "共" : "已知")} {s.TrackIds.Count} 首 · 本页 {Tracks.Count} 首 · 已缓存资料 {CachedTracks} 首";
+    public DelayedBusy Busy { get; }
+    public bool Failed { get => _failed; private set => SetProperty(ref _failed, value); }
     public int TabIndex { get => _tabIndex; set { if (SetProperty(ref _tabIndex, value)) { OnPropertyChanged(nameof(IsList)); OnPropertyChanged(nameof(IsDetail)); } } }
     public bool IsList => TabIndex == 0;
     public bool IsDetail => TabIndex == 1;
     public bool IsEmpty => VisiblePlaylists.Count == 0;
-    public string EmptyText => Playlists.Count == 0 ? "还没有歌单，刷新后读取当前账号。" : "已加载的歌单没有匹配项，可切换筛选或继续加载。";
+    public string EmptyText => IsLoading ? "" : Playlists.Count == 0 ? "当前没有可显示的歌单，点击刷新歌单重新读取。" : "已加载的歌单没有匹配项，可切换筛选或继续加载。";
     public string ReplaceHint => Snapshot is { IsComplete: false } s ? s.Message : "播放全部 / 从这里播放会替换当前队列";
     public string PageText => Snapshot is null ? "" : $"第 {_trackOffset / 50 + 1} 页 · {Snapshot.TrackIds.Count} 首";
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
-    public bool IsLoading { get => _loading; private set { SetProperty(ref _loading, value); CommandsChanged(); } }
+    public bool IsLoading { get => _loading; private set { if (SetProperty(ref _loading, value)) Busy.Set(value); OnPropertyChanged(nameof(EmptyText)); CommandsChanged(); } }
     public bool HasMore { get => _hasMore; private set { SetProperty(ref _hasMore, value); MoreCommand.NotifyCanExecuteChanged(); } }
     internal int CachedTracks { get { lock (_cache) return _cache.Count; } }
     public IAsyncRelayCommand RefreshCommand { get; }
@@ -123,7 +133,11 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
             QueueEntry Create(long id) { lock (_cache) return new(Guid.NewGuid(), id, "歌单", snapshot.PlaylistId, _cache.GetValueOrDefault(id)); }
             using var acceptance = CancellationTokenSource.CreateLinkedTokenSource(_closing.Token, session.Revoked);
             if (replace) await _player.ReplaceAsync(snapshot.TrackIds.Select(Create).ToArray(), fromSelected ? selected!.Index : 0, acceptance.Token).ConfigureAwait(false);
-            else await _player.EnqueueAsync([Create(selected!.TrackId)], next, acceptance.Token).ConfigureAwait(false);
+            else
+            {
+                var result = await _player.EnqueueAsync([Create(selected!.TrackId)], next, acceptance.Token).ConfigureAwait(false);
+                _ui.Post(() => { if (!_closed && _sessions.IsCurrent(session)) Message = result.Message; });
+            }
         }
         catch (OperationCanceledException) { }
         catch (MusicException ex) { _ui.Post(() => { if (!_closed) Message = ex.Message; }); }
@@ -190,7 +204,7 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
         foreach (var index in Enumerable.Range(offset, Math.Min(50, snapshot.TrackIds.Count - offset)))
         { var id = snapshot.TrackIds[index]; Tracks.Add(new(index, id, details.GetValueOrDefault(id))); }
         Message = snapshot.IsComplete ? Tracks.Count == 0 ? "这个歌单还没有歌曲。" : "资料缺失的歌曲仍保留原位置。" : snapshot.Message;
-        OnPropertyChanged(nameof(PageText)); CommandsChanged();
+        OnPropertyChanged(nameof(PageText)); OnPropertyChanged(nameof(CountText)); CommandsChanged();
         OnPropertyChanged(nameof(ReplaceHint));
     }
     private async Task RunAsync(Func<MusicSession, long, CancellationToken, Task> work)
@@ -213,10 +227,10 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
             HasMore = false; IsLoading = false; _offset = 0; Message = "请先登录网易云音乐。";
             Filter(); TabIndex = 0;
         }));
-        Apply(session, generation, () => { IsLoading = true; Message = "正在加载…"; });
+        Apply(session, generation, () => { IsLoading = true; Failed = false; Message = ""; });
         try { await work(session, generation, operation.Token).ConfigureAwait(false); }
         catch (OperationCanceledException) { }
-        catch (Exception ex) { Apply(session, generation, () => Message = ex is MusicException ? ex.Message : "歌单读取失败，请刷新重试。"); }
+        catch (Exception ex) { Apply(session, generation, () => { Failed = true; Message = ex is MusicException ? ex.Message : "歌单读取失败，请刷新重试。"; }); }
         finally
         {
             Apply(session, generation, () => IsLoading = false);
@@ -239,7 +253,7 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     public void Dispose()
     {
         if (_closed) return;
-        _closed = true; Interlocked.Increment(ref _generation); _closing.Cancel(); _account.Dispose(); _closing.Dispose();
+        _closed = true; Busy.Dispose(); Interlocked.Increment(ref _generation); _closing.Cancel(); _account.Dispose(); _closing.Dispose();
         if (_player is not null) _player.Changed -= PlayerChanged;
         Playlists.Clear(); Tracks.Clear(); lock (_cache) _cache.Clear();
     }

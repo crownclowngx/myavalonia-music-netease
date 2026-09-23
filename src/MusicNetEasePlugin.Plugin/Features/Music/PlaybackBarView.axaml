@@ -11,8 +11,9 @@
     </Button>
     <StackPanel Grid.Column="1" Spacing="2" VerticalAlignment="Center">
      <TextBlock Text="{Binding Player.TrackName}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.CurrentTrack}" />
+     <TextBlock x:Name="PlayerArtists" Text="{Binding Player.Artists}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.Artists}" />
      <StackPanel Orientation="Horizontal" Spacing="6">
-      <TextBlock x:Name="PlaybackState" Classes="netease-secondary" Text="{Binding Player.StateText}" />
+      <TextBlock x:Name="PlaybackState" Classes="netease-secondary" Text="{Binding Player.DisplayStateText}" MaxWidth="240" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.DisplayStateText}" AutomationProperties.LiveSetting="Polite" />
       <TextBlock Text="试听" IsVisible="{Binding Player.IsTrial}" FontSize="12" Foreground="{DynamicResource NeteaseWarningBrush}" />
       <Button x:Name="PlaybackNotice" Classes="netease-button" MinHeight="32" Padding="2,0" FontSize="11" Content="查看提示" IsVisible="{Binding Player.PlaybackMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" AutomationProperties.Name="查看播放提示">
        <Button.Flyout><Flyout><StackPanel MaxWidth="320" Spacing="8"><TextBlock Text="{Binding Player.PlaybackMessage}" TextWrapping="Wrap" /><Button Content="继续 / 重试播放" Command="{Binding Player.ResumeCommand}" /></StackPanel></Flyout></Button.Flyout>
@@ -22,7 +23,8 @@
    </Grid>
    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
     <Button x:Name="PreviousTrackButton" Classes="netease-button icon" Command="{Binding Queue.PreviousCommand}" ToolTip.Tip="上一首" AutomationProperties.Name="上一首"><PathIcon Width="18" Height="18" Data="{StaticResource NeteasePreviousIcon}" /></Button>
-    <Button x:Name="PauseButton" Classes="netease-button primary transport" Command="{Binding Player.PauseCommand}" IsVisible="{Binding !Player.IsPaused}" ToolTip.Tip="暂停" AutomationProperties.Name="暂停"><PathIcon Width="20" Height="20" Data="{StaticResource NeteasePauseIcon}" /></Button>
+    <Button x:Name="PauseButton" Classes="netease-button primary transport" Command="{Binding Player.PauseCommand}" IsVisible="{Binding Player.ShowPause}" ToolTip.Tip="暂停" AutomationProperties.Name="暂停"><PathIcon Width="20" Height="20" Data="{StaticResource NeteasePauseIcon}" /></Button>
+    <Button x:Name="LoadingButton" Classes="netease-button primary transport" IsVisible="{Binding Player.IsLoading}" IsEnabled="False" Content="…" ToolTip.Tip="正在加载音频" AutomationProperties.Name="正在加载音频" />
     <Button x:Name="ResumeButton" Classes="netease-button primary transport" Command="{Binding Player.ResumeCommand}" IsVisible="{Binding Player.IsPaused}" ToolTip.Tip="继续播放" AutomationProperties.Name="继续"><PathIcon Width="20" Height="20" Data="{StaticResource NeteasePlayIcon}" /></Button>
     <Button x:Name="NextTrackButton" Classes="netease-button icon" Command="{Binding Queue.NextCommand}" ToolTip.Tip="下一首" AutomationProperties.Name="下一首"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseNextIcon}" /></Button>
    </StackPanel>
@@ -34,17 +36,25 @@
     </Button>
     <ToggleButton x:Name="LyricsToggle" Content="歌词" IsChecked="{Binding Navigation.IsLyrics, Mode=OneWay}" Command="{Binding ShowLyricsCommand}" AutomationProperties.Name="{Binding Navigation.LyricsAction}" />
     <ToggleButton x:Name="QueueToggle" Content="{Binding Queue.ButtonText}" IsChecked="{Binding Navigation.IsQueue, Mode=OneWay}" Command="{Binding ShowQueueCommand}" ToolTip.Tip="{Binding Queue.CountText}" AutomationProperties.Name="{Binding Navigation.QueueAction}" />
-    <Button Classes="netease-button icon" ToolTip.Tip="更多播放操作" AutomationProperties.Name="更多播放操作"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseMoreIcon}" />
-     <Button.Flyout><MenuFlyout><MenuItem Header="停止并回到开头" Command="{Binding Player.StopCommand}" /></MenuFlyout></Button.Flyout>
+    <Button x:Name="MorePlaybackButton" Classes="netease-button icon" ToolTip.Tip="更多播放操作与曲目信息" AutomationProperties.Name="更多播放操作"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseMoreIcon}" />
+     <Button.Flyout><Flyout><StackPanel MaxWidth="320" Spacing="6">
+      <SelectableTextBlock Text="{Binding Player.TrackName}" TextWrapping="Wrap" /><SelectableTextBlock Text="{Binding Player.Artists}" TextWrapping="Wrap" /><SelectableTextBlock Text="{Binding Player.Album}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding Player.Timeline.SeekReason}" TextWrapping="Wrap" IsVisible="{Binding Player.Timeline.SeekReason, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      <TextBlock Text="{Binding Player.Timeline.BufferText}" TextWrapping="Wrap" IsVisible="{Binding Player.IsLoading}" />
+      <TextBlock Text="{Binding Player.Notice.Text}" TextWrapping="Wrap" />
+      <ComboBox ItemsSource="{Binding Queue.Modes}" SelectedIndex="{Binding Queue.ModeIndex, Mode=TwoWay}" AutomationProperties.Name="更多中的播放模式" />
+      <Button Content="停止并回到开头" Command="{Binding Player.StopCommand}" />
+     </StackPanel></Flyout></Button.Flyout>
     </Button>
    </StackPanel>
    <Grid Grid.Row="1" Grid.ColumnSpan="3" ColumnDefinitions="*,100" ColumnSpacing="8">
-    <Slider x:Name="PlaybackProgress" Value="{Binding Player.Timeline.Position, Mode=TwoWay}" Minimum="0" Maximum="{Binding Player.Timeline.Maximum}" IsEnabled="{Binding Player.Timeline.CanSeek}" SmallChange="5000" LargeChange="15000" Height="26" MinHeight="26" AutomationProperties.Name="播放进度定位" ToolTip.Tip="{Binding Player.Timeline.DraftText}">
+    <Slider x:Name="PlaybackProgress" Value="{Binding Player.Timeline.Position, Mode=TwoWay}" Minimum="0" Maximum="{Binding Player.Timeline.Maximum}" IsEnabled="{Binding Player.Timeline.CanSeek}" SmallChange="5000" LargeChange="15000" Height="26" MinHeight="26" AutomationProperties.Name="播放进度定位" AutomationProperties.HelpText="{Binding Player.Timeline.SeekReason}" ToolTip.Tip="{Binding Player.Timeline.PreviewText}">
      <Slider.Resources><GridLength x:Key="SliderPreContentMargin">3</GridLength><GridLength x:Key="SliderPostContentMargin">3</GridLength></Slider.Resources>
     </Slider>
-    <TextBlock Grid.Column="1" Classes="netease-secondary" Text="{Binding Player.PositionText}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="11" />
+    <TextBlock Grid.Column="1" Classes="netease-secondary" Text="{Binding Player.PositionText}" IsVisible="{Binding Player.Timeline.CanSeek}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="11" />
+    <Button Grid.Column="1" Content="定位说明" IsVisible="{Binding !Player.Timeline.CanSeek}" MinHeight="26" Padding="2,0" AutomationProperties.Name="{Binding Player.Timeline.SeekReason}"><Button.Flyout><Flyout><TextBlock Text="{Binding Player.Timeline.SeekReason}" TextWrapping="Wrap" MaxWidth="280" /></Flyout></Button.Flyout></Button>
    </Grid>
-   <StackPanel Grid.Row="3" Grid.ColumnSpan="3"><TextBlock Text="{Binding Player.Notice.Text}" IsVisible="{Binding Player.Notice.Text, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Classes="netease-secondary" AutomationProperties.LiveSetting="Polite" /><TextBlock x:Name="BufferStatus" Text="{Binding Player.Timeline.BufferText}" IsVisible="{Binding Player.IsLoading}" FontSize="12" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.Timeline.BufferText}" /></StackPanel>
+   <TextBlock x:Name="InlineNotice" Grid.Row="3" Grid.ColumnSpan="3" Text="{Binding Player.Notice.Text}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.Notice.Text}" AutomationProperties.LiveSetting="Polite" />
   </Grid>
  </Border>
 </UserControl>

@@ -14,7 +14,8 @@
   </WrapPanel>
   <TextBlock Grid.Row="1" Text="{Binding Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
   <Grid Grid.Row="2">
-   <ListBox Classes="netease-results" MaxWidth="720" HorizontalAlignment="Stretch" x:Name="LyricList" ItemsSource="{Binding Lines}" AutoScrollToSelectedItem="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="同步歌词">
+   <ListBox Classes="netease-results" MaxWidth="720" HorizontalAlignment="Stretch" x:Name="LyricList" ItemsSource="{Binding Lines}" SelectedItem="{Binding Selected, Mode=TwoWay}" AutoScrollToSelectedItem="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="同步歌词">
+    <ListBox.ContextMenu><ContextMenu><MenuItem Header="跳到此句" Command="{Binding JumpCommand}" /><MenuItem Header="{Binding JumpReason}" IsEnabled="False" IsVisible="{Binding JumpReason, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" /></ContextMenu></ListBox.ContextMenu>
     <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
     <ListBox.ItemTemplate><DataTemplate x:DataType="vm:LyricRow">
      <StackPanel Margin="4,8" Spacing="4">
@@ -27,8 +28,9 @@
    </ListBox>
    <ScrollViewer IsVisible="{Binding PlainText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><TextBlock Text="{Binding PlainText}" TextWrapping="Wrap" /></ScrollViewer>
   </Grid>
-  <Expander Grid.Row="3" Header="未匹配的翻译" IsVisible="{Binding UnmatchedTranslation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+  <StackPanel Grid.Row="3"><TextBlock Text="{Binding JumpMessage}" TextWrapping="Wrap" IsVisible="{Binding JumpMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+  <Expander Header="未匹配的翻译" IsVisible="{Binding UnmatchedTranslation, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
    <ScrollViewer MaxHeight="100"><TextBlock Text="{Binding UnmatchedTranslation}" TextWrapping="Wrap" /></ScrollViewer>
-  </Expander>
+  </Expander></StackPanel>
  </Grid>
 </UserControl>

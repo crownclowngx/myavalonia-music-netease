@@ -10,7 +10,12 @@ public sealed partial class PlaylistView : UserControl
 {
     public static readonly DirectProperty<PlaylistView, PlaylistBrowser?> ModelProperty = AvaloniaProperty.RegisterDirect<PlaylistView, PlaylistBrowser?>(nameof(Model), view => view.Model);
     public PlaylistBrowser? Model => DataContext as PlaylistBrowser;
-    public PlaylistView() { InitializeComponent(); DataContextChanged += (_, _) => RaisePropertyChanged(ModelProperty, null, Model); }
+    public PlaylistView()
+    {
+        InitializeComponent(); DataContextChanged += (_, _) => RaisePropertyChanged(ModelProperty, null, Model);
+        // 紧凑 Dock 保留曲目区高度；封面和简介仅在宽高均足够时展开，列表实例与滚动位置不变。
+        SizeChanged += (_, _) => RichPlaylistHeader.IsVisible = Bounds.Width >= 700 && Bounds.Height >= 450;
+    }
     private async void OpenPlaylist(object? sender, RoutedEventArgs e)
     {
         if (Model is not { } model || sender is not Control { DataContext: MusicPlaylist item }) return;

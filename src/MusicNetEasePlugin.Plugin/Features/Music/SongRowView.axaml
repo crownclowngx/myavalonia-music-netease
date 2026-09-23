@@ -3,14 +3,15 @@
   <PathIcon x:Name="CurrentMarker" IsVisible="False" Width="12" Height="12" Data="{DynamicResource NeteasePlayIcon}" Foreground="{DynamicResource NeteaseAccentBrush}" AutomationProperties.Name="当前曲目" />
   <Grid x:Name="TextLayout" Grid.Column="1" ColumnDefinitions="*" ColumnSpacing="12" VerticalAlignment="Center">
    <StackPanel Spacing="3"><TextBlock Text="{Binding #RowRoot.Title}" TextTrimming="CharacterEllipsis" FontWeight="Medium" ToolTip.Tip="{Binding #RowRoot.Title}" /><TextBlock x:Name="DetailText" Text="{Binding #RowRoot.Subtitle}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding #RowRoot.Subtitle}" /></StackPanel>
-   <TextBlock x:Name="ArtistColumn" Grid.Column="1" IsVisible="False" Text="{Binding #RowRoot.Artist}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
-   <TextBlock x:Name="AlbumColumn" Grid.Column="2" IsVisible="False" Text="{Binding #RowRoot.Album}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+   <TextBlock x:Name="ArtistColumn" Grid.Column="1" IsVisible="False" Text="{Binding #RowRoot.Artist}" ToolTip.Tip="{Binding #RowRoot.Artist}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+   <TextBlock x:Name="AlbumColumn" Grid.Column="2" IsVisible="False" Text="{Binding #RowRoot.Album}" ToolTip.Tip="{Binding #RowRoot.Album}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
   </Grid>
   <TextBlock Grid.Column="2" Text="{Binding #RowRoot.Duration}" Classes="netease-secondary" VerticalAlignment="Center" HorizontalAlignment="Right" />
   <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
    <Button Classes="netease-button icon" Command="{Binding #RowRoot.ActivateCommand}" ToolTip.Tip="播放这首歌" AutomationProperties.Name="立即播放"><PathIcon Width="16" Height="16" Data="{DynamicResource NeteasePlayIcon}" /></Button>
    <Button x:Name="MoreButton" Classes="netease-button icon" ToolTip.Tip="歌曲操作" AutomationProperties.Name="歌曲操作"><PathIcon Width="16" Height="16" Data="{DynamicResource NeteaseMoreIcon}" />
     <Button.Flyout><MenuFlyout>
+     <MenuItem Header="完整曲目信息" Click="ShowDetails" />
      <MenuItem x:Name="NextItem" Header="下一首播放" Command="{Binding #RowRoot.NextCommand}" IsVisible="False" />
      <MenuItem x:Name="AppendItem" Header="加入队列" Command="{Binding #RowRoot.AppendCommand}" IsVisible="False" />
      <MenuItem x:Name="FromHereItem" Header="从这里播放整份歌单（替换队列）" Command="{Binding #RowRoot.FromHereCommand}" IsVisible="False" />
