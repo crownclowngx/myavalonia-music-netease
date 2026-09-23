@@ -39,6 +39,7 @@ V 编号表示实施文档序号，M 编号表示能力里程碑，均不是插�
 | [V2 / M1 播放验证矩阵](maintenance/netease-v2-m1-playback-verification.md) | 搜索、播放、路径/Tool、Dock、共享运行库与平台边界；页面寿命已同步 V4 |
 | [V3 界面验证矩阵](maintenance/netease-v3-ui-verification.md) | 主题、尺寸、动效、资源回收与实机回归方法 |
 | [V4 / M2 日常播放器验证矩阵](maintenance/netease-v4-m2-daily-player-verification.md) | 默认完整 V4 检查：M2 场景、M1/V3 回归、门禁自测与实机回归方法 |
+| [V5 交互与 UI 专用验证计划](maintenance/netease-v5-ui-interaction-verification-plan.md) | 待实施的 V5 场景、单元/组件/资源检查、门禁失败注入与证据要求；尚未执行 |
 | [开发部署、正式发布与验收](maintenance/deployment-and-release.md) | 私有依赖、干净部署目录、正式 ZIP 和真实 Host 回归流程 |
 
 以上矩阵继续作为后续回归依据，V1–V4 手工验收已收口。自动测试、用户手工验收和部署分别引用各自记录；正式发布与跨平台适配不包含在本次完成结论中。
