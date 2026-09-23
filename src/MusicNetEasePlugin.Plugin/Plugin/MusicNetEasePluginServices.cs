@@ -12,6 +12,7 @@ using MusicNetEasePlugin.Features.Music;
 using MusicNetEasePlugin.Application.Appearance;
 using MusicNetEasePlugin.Application.Library;
 using MusicNetEasePlugin.Features.Library;
+using MusicNetEasePlugin.Application.Lyrics;
 
 namespace MusicNetEasePlugin.Plugin;
 
@@ -59,12 +60,14 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<PlaybackCoordinator>();
         services.TryAddSingleton<PlaybackQueueCoordinator>();
         services.TryAddSingleton<IPlayerSession>(provider => provider.GetRequiredService<PlaybackQueueCoordinator>());
+        services.TryAddSingleton<ILyricsApi, NeteaseLyricsApi>();
+        services.TryAddSingleton<LyricsCoordinator>();
         // Host 在 Document Scope 中提供 Lifetime；工厂避免普通服务容器预检被要求创建一个虚假的 Document。
         services.TryAddScoped(provider => new MusicWorkspace(provider.GetRequiredService<IMusicCatalogApi>(),
             provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<IPlayerSession>(),
             provider.GetRequiredService<LoginCoordinator>(), provider.GetRequiredService<ILoginUiDispatcher>(),
             provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>(),
-            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>()));
+            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>(), provider.GetRequiredService<LyricsCoordinator>()));
         return services;
     }
 }

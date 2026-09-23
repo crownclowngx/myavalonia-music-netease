@@ -1,0 +1,24 @@
+<UserControl x:Class="MusicNetEasePlugin.Features.Music.LyricsView"
+ xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:LyricsWorkspace">
+ <UserControl.Styles>
+  <Style Selector="TextBlock.current"><Setter Property="FontWeight" Value="Bold" /><Setter Property="Foreground" Value="{DynamicResource NeteaseAccentBrush}" /></Style>
+ </UserControl.Styles>
+ <Grid RowDefinitions="Auto,Auto,*" Margin="12,6">
+  <WrapPanel>
+   <Button Content="回到当前歌词" Command="{Binding FollowCommand}" Margin="0,0,6,4" />
+   <Button Content="重试歌词" Command="{Binding RetryCommand}" Margin="0,0,6,4" />
+   <TextBlock Text="已暂停跟随" IsVisible="{Binding !Following}" VerticalAlignment="Center" />
+  </WrapPanel>
+  <TextBlock Grid.Row="1" Text="{Binding Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+  <Grid Grid.Row="2">
+   <ListBox x:Name="LyricList" ItemsSource="{Binding Lines}" AutoScrollToSelectedItem="False" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="同步歌词">
+    <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+    <ListBox.ItemTemplate><DataTemplate x:DataType="vm:LyricRow">
+     <TextBlock Text="{Binding Text}" Classes.current="{Binding IsCurrent}" TextWrapping="Wrap" Margin="4,8" />
+    </DataTemplate></ListBox.ItemTemplate>
+   </ListBox>
+   <ScrollViewer IsVisible="{Binding PlainText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"><TextBlock Text="{Binding PlainText}" TextWrapping="Wrap" /></ScrollViewer>
+  </Grid>
+ </Grid>
+</UserControl>

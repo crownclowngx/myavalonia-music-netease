@@ -6,6 +6,7 @@ using MusicNetEasePlugin.Application.Playback;
 using MyAvaloniaManagement.PluginSdk;
 using MusicNetEasePlugin.Application.Appearance;
 using MusicNetEasePlugin.Features.Library;
+using MusicNetEasePlugin.Application.Lyrics;
 
 namespace MusicNetEasePlugin.Features.Music;
 
@@ -45,7 +46,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     private MusicTrack? _selected;
     private PlaybackSnapshot _snapshot = new(0, PlaybackState.Idle);
     public MusicWorkspace(IMusicCatalogApi catalog, IMusicSessionAccessor sessions, IPlayerSession playback,
-        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null)
+        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null)
     {
         (_catalog, _sessions, _playback, _login, _ui) = (catalog, sessions, playback, login, ui);
         _images = images;
@@ -53,6 +54,8 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         Playlists = playlists;
         Queue = new(playback, ui);
         Timeline = new(playback, ui);
+        Lyrics = lyrics is null ? null : new(lyrics, ui);
+        ShowLyricsCommand = new RelayCommand(() => Pane = 3);
         ShowSearchCommand = new RelayCommand(() => Pane = 0);
         ShowQueueCommand = new RelayCommand(() => Pane = 2);
         ShowLibraryCommand = new AsyncRelayCommand(async () =>
@@ -80,11 +83,14 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     public PlaylistBrowser? Playlists { get; }
     public QueueWorkspace Queue { get; }
     public TimelineWorkspace Timeline { get; }
+    public LyricsWorkspace? Lyrics { get; }
     private int _pane;
-    private int Pane { get => _pane; set { if (SetProperty(ref _pane, value)) { OnPropertyChanged(nameof(IsSearch)); OnPropertyChanged(nameof(IsLibrary)); OnPropertyChanged(nameof(IsQueue)); } } }
+    private int Pane { get => _pane; set { if (SetProperty(ref _pane, value)) { OnPropertyChanged(nameof(IsSearch)); OnPropertyChanged(nameof(IsLibrary)); OnPropertyChanged(nameof(IsQueue)); OnPropertyChanged(nameof(IsLyrics)); } } }
     public bool IsSearch => Pane == 0;
     public bool IsLibrary => Pane == 1;
     public bool IsQueue => Pane == 2;
+    public bool IsLyrics => Pane == 3;
+    public IRelayCommand ShowLyricsCommand { get; }
     public IRelayCommand ShowSearchCommand { get; }
     public IRelayCommand ShowQueueCommand { get; }
     public IAsyncRelayCommand ShowLibraryCommand { get; }
@@ -255,6 +261,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         Playlists?.Dispose();
         Queue.Dispose();
         Timeline.Dispose();
+        Lyrics?.Dispose();
         _login.Changed -= LoginChanged;
         _playback.Changed -= PlaybackChanged;
         // V4 队列由插件容器拥有。页面只撤销自己的搜索、图片与订阅，不再停止已接纳的歌曲。

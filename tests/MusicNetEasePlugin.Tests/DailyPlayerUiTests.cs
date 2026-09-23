@@ -7,6 +7,7 @@ using MusicNetEasePlugin.Application.Library;
 using MusicNetEasePlugin.Features.Library;
 using MusicNetEasePlugin.Features.Music;
 using MusicNetEasePlugin.Application.Playback;
+using MusicNetEasePlugin.Application.Lyrics;
 using Avalonia.Input;
 using Xunit;
 
@@ -16,6 +17,34 @@ namespace MusicNetEasePlugin.Tests;
 public sealed class DailyPlayerUiTests
 {
     public static AppBuilder BuildAvaloniaApp() => UiCompositionTests.BuildAvaloniaApp();
+    [Fact, Trait("M2", "Y06,U05")]
+    public async Task 生产歌词视图手动浏览停止跟随并经二十次重挂可恢复()
+    {
+        using var session = HeadlessUnitTestSession.StartNew(typeof(DailyPlayerUiTests));
+        await session.Dispatch(async () =>
+        {
+            await using var f = new PlaybackFixture(); var api = new LyricsTests.LyricsFake();
+            api.Get = (_, _) => Task.FromResult(new RawLyrics(string.Join('\n', Enumerable.Range(0, 1000).Select(i => $"[{i / 60:00}:{i % 60:00}]歌词 {i}"))));
+            await using var lyrics = new LyricsCoordinator(f.Queue, f.Sessions, api); using var model = new LyricsWorkspace(lyrics, new ImmediateUi());
+            var view = new LyricsView { DataContext = model }; var window = new Window { Content = view, Width = 520, Height = 420 };
+            try
+            {
+                window.Show(); await f.Queue.PlaySingleAsync(MusicCatalog.Track(1), default); await lyrics.Pending; DesktopUiTests.Pump(window);
+                var list = view.FindControl<ListBox>("LyricList")!;
+                Assert.True(list.GetVisualDescendants().OfType<ListBoxItem>().First().Focus());
+                window.KeyPress(Key.Down, RawInputModifiers.None, default, null); window.KeyRelease(Key.Down, RawInputModifiers.None, default, null);
+                Assert.False(model.Following);
+                f.Audio.Emit(f.Queue.Snapshot.Playback.Generation, PlaybackState.Playing, 300000); DesktopUiTests.Pump(window);
+                Assert.Equal(300, model.CurrentLine); Assert.False(model.Following);
+                for (var i = 0; i < 20; i++) { window.Content = null; window.Content = view; DesktopUiTests.Pump(window); }
+                model.FollowCommand.Execute(null); DesktopUiTests.Pump(window); Assert.True(model.Following);
+                Assert.InRange(list.GetVisualDescendants().OfType<ListBoxItem>().Count(), 1, 30); Assert.Single(f.Audio.Opened);
+                f.Sessions.Revoke(); DesktopUiTests.Pump(window); Assert.Empty(model.Lines);
+            }
+            finally { window.Close(); }
+            return true;
+        }, default);
+    }
     [Fact, Trait("M2", "B05,U04")]
     public async Task 生产进度滑块键盘合并提交且换曲取消鼠标草稿()
     {
