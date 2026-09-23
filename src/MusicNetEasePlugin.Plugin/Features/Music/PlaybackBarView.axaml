@@ -51,7 +51,7 @@
     <Slider x:Name="PlaybackProgress" Value="{Binding Player.Timeline.Position, Mode=TwoWay}" Minimum="0" Maximum="{Binding Player.Timeline.Maximum}" IsEnabled="{Binding Player.Timeline.CanSeek}" SmallChange="5000" LargeChange="15000" Height="26" MinHeight="26" AutomationProperties.Name="播放进度定位" AutomationProperties.HelpText="{Binding Player.Timeline.SeekReason}" ToolTip.Tip="{Binding Player.Timeline.PreviewText}">
      <Slider.Resources><GridLength x:Key="SliderPreContentMargin">3</GridLength><GridLength x:Key="SliderPostContentMargin">3</GridLength></Slider.Resources>
     </Slider>
-    <TextBlock Grid.Column="1" Classes="netease-secondary" Text="{Binding Player.PositionText}" IsVisible="{Binding Player.Timeline.CanSeek}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="11" />
+    <TextBlock Grid.Column="1" Classes="netease-secondary" Text="{Binding Player.Timeline.PositionText}" IsVisible="{Binding Player.Timeline.CanSeek}" VerticalAlignment="Center" HorizontalAlignment="Right" FontSize="11" />
     <Button Grid.Column="1" Content="定位说明" IsVisible="{Binding !Player.Timeline.CanSeek}" MinHeight="26" Padding="2,0" AutomationProperties.Name="{Binding Player.Timeline.SeekReason}"><Button.Flyout><Flyout><TextBlock Text="{Binding Player.Timeline.SeekReason}" TextWrapping="Wrap" MaxWidth="280" /></Flyout></Button.Flyout></Button>
    </Grid>
    <TextBlock x:Name="InlineNotice" Grid.Row="3" Grid.ColumnSpan="3" Text="{Binding Player.Notice.Text}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.Notice.Text}" AutomationProperties.LiveSetting="Polite" />

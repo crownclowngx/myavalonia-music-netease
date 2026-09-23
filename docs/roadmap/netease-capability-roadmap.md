@@ -6,7 +6,7 @@
 
 V 编号是实施文档序号，M 编号是能力里程碑，均不表示插件包版本或交付日期。已完成方案统一见[归档索引](../archive/README.md)，当前行为由 `reference` 维护。
 
-针对现有 M0–M2 能力的体验改造，另见 [V5 轻量交互与 UI 优化方案](netease-v5-lightweight-interaction-and-ui-plan.md)：主体已接入，但交互差项及验收未收口，见 [V5 完成度复核](../maintenance/netease-v5-completion-audit-20260923.md)。[V6 歌词抽屉与交互体验候选评估](netease-v6-interaction-candidates-evaluation.md)列出本轮 18 项体验候选，等待用户选择后再生成修改文档；两者均不代表下列 M3–M5 已启动。
+针对现有 M0–M2 能力的体验改造，V6 的 18 项已全量接入，见 [专用修改方案](netease-v6-drawer-and-interaction-change-plan.md)和[实施记录](../maintenance/netease-v6-drawer-and-interaction-implementation.md)。[原候选评估](netease-v6-interaction-candidates-evaluation.md)保留取舍依据；[V5 完成度复核](../maintenance/netease-v5-completion-audit-20260923.md)中的性能与实机待验继续独立跟踪。V5/V6 均不表示下列 M3–M5 已启动。
 
 ## 1. 已完成基线与实际边界
 
@@ -99,7 +99,7 @@ flowchart LR
 - [ ] M4：推荐、榜单、歌手/专辑与私人 FM，尚未实施。
 - [ ] M5：按需选择扩展分支，尚未启动。
 
-默认本地开发检查为 V5，包含适用的 M1/V3/V4 回归，方法见[V5 专用验证计划](../maintenance/netease-v5-ui-interaction-verification-plan.md)。V6 目前仅作候选评估，尚无 V6 门禁参数。后续改动分别更新当前契约、快速开始、回归矩阵和带日期记录；完成状态须注明实现、自动检查及人工验收各自的依据。
+默认本地开发检查为 V6，保留适用的 M1/V3/M2/V5 回归，方法见[V6 专用验证矩阵](../maintenance/netease-v6-drawer-and-interaction-verification-plan.md)。后续改动分别更新当前契约、快速开始、回归矩阵和专用记录；实现、自动检查和人工验收分别记录依据。
 
 ## 5. 依据与关联文档
 

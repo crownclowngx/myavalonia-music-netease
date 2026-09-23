@@ -1,7 +1,7 @@
 # MusicNetEasePlugin 文档导航
 
 > 本插件唯一文档总导航；更新日期：2026-09-23。
-> 当前实现：V5 主体已接入，启动故障已修复；整体尚未正式完成，见 [完成度复核](maintenance/netease-v5-completion-audit-20260923.md)。V1–V4 已实现，用户已确认手工验收完成；对应能力里程碑 M0–M2 已完成。
+> 当前实现：V6-01～18 已接入，见 [专用实施记录](maintenance/netease-v6-drawer-and-interaction-implementation.md)。V5 原有性能与实机待验继续按 [完成度复核](maintenance/netease-v5-completion-audit-20260923.md)跟踪。V1–V4 用户已确认手工验收完成；对应能力里程碑 M0–M2 已完成。
 > 验收依据：[V1–V4 验收收口记录](archive/records/netease-v1-v4-acceptance-20260923.md)。后续 M3–M5 尚未实施，下一步另行讨论。
 
 ## 当前使用与实现
@@ -14,12 +14,12 @@
 | 歌单、队列与歌词如何工作 | [日常播放器当前实现](reference/netease-daily-player.md) | 四模式、定位、歌词、历史、静默恢复与页面寿命 |
 | 界面如何工作 | [Document / Tool 当前界面契约](reference/netease-desktop-ui.md) | 紧凑布局、深浅主题、动效、偏好存储与资源所有权 |
 | V5 交互与 UI 依据什么优化 | [V5 轻量交互与 UI 优化方案](roadmap/netease-v5-lightweight-interaction-and-ui-plan.md) | 官方与开源客户端对照、逐页交互、视觉规范、资源预算和实施验收计划；D 验收及交互差项未收口 |
-| 歌词抽屉和其他交互如何选择 | [V6 交互体验候选评估](roadmap/netease-v6-interaction-candidates-evaluation.md) | 18 项候选、已有能力与差项、用户评估栏、工程约束及后续专用文档安排；尚未生成实施修改方案 |
+| 歌词抽屉与其他交互如何实现 | [V6 专用修改方案](roadmap/netease-v6-drawer-and-interaction-change-plan.md) | 18 项全量范围与状态/业务/视图分工；[原候选评估](roadmap/netease-v6-interaction-candidates-evaluation.md)保留依据 |
 | 登录与请求如何工作 | [HTTP 与会话契约](reference/netease-http-session.md) | 微信/App 登录、Flurl、端点、会话、取消和生命周期 |
 | 后续有哪些候选能力 | [能力路线图](roadmap/netease-capability-roadmap.md) | 已完成 M0–M2，待讨论的 M3–M5 范围与依赖 |
 | 上游还有哪些能力 | [api-enhanced 能力清单](reference/netease-api-enhanced-capabilities.md) | 固定提交的模块索引与移植边界；不代表全部已支持 |
 
-V 编号表示方案/实施文档序号，M 编号表示能力里程碑，均不是插件包版本。V6 目前只是候选评估，编号递增不表示 V5 已完成。当前以已验收的 Windows x64 日常播放器为基线。
+V 编号表示方案/实施文档序号，M 编号表示能力里程碑，均不是插件包版本。V6 已全量接入，编号递增不表示 V5 的性能、实机待验自动收口。
 
 ## 开发参考
 
@@ -42,6 +42,8 @@ V 编号表示方案/实施文档序号，M 编号表示能力里程碑，均不
 | [V4 / M2 日常播放器验证矩阵](maintenance/netease-v4-m2-daily-player-verification.md) | V4 历史完整检查：M2 场景、M1/V3 回归、门禁自测与实机回归方法 |
 | [V5 交互与 UI 专用验证计划](maintenance/netease-v5-ui-interaction-verification-plan.md) | 现行 V5 场景、单元/组件/资源检查、门禁失败注入与证据要求 |
 | [V5 专用实施记录](maintenance/netease-v5-ui-interaction-implementation.md) | 实现差异、自动证据、资源对比、SOLID 分工和实机边界 |
+| [V6 专用验证矩阵](maintenance/netease-v6-drawer-and-interaction-verification-plan.md) | 默认本地开发门禁、15 场景、真实控件与证据来源检查 |
+| [V6 专用实施记录](maintenance/netease-v6-drawer-and-interaction-implementation.md) | 18 项落地、提交、验证结果和人工验收边界 |
 | [V5 完成度重新核查](maintenance/netease-v5-completion-audit-20260923.md) | 未完整实现的体验、未达标/待验证项、可选增强与待用户决定的范围 |
 | [V5 启动故障修复](archive/records/netease-v5/startup-fix-20260923.md) | 注册所有权修复、309 项回归、实际 Host 启动前后复测及重新部署 |
 | [开发部署、正式发布与验收](maintenance/deployment-and-release.md) | 私有依赖、干净部署目录、正式 ZIP 和真实 Host 回归流程 |

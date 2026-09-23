@@ -45,7 +45,8 @@ public sealed class TimelineWorkspace : ObservableObject, IDisposable
     }
     public void ClearPreview() { _preview = null; OnPropertyChanged(nameof(PreviewText)); }
     public double Maximum => Math.Max(1, _snapshot.Playback.DurationMs - 1);
-    public double Position { get => _editing ? _draft : _snapshot.Playback.PositionMs; set { if (_editing) { _draft = Math.Clamp(value, 0, Maximum); OnPropertyChanged(); OnPropertyChanged(nameof(DraftText)); OnPropertyChanged(nameof(PreviewText)); } } }
+    public string PositionText => $"{(long)Position / 60000:00}:{(long)Position / 1000 % 60:00} / {_snapshot.Playback.DurationMs / 60000:00}:{_snapshot.Playback.DurationMs / 1000 % 60:00}";
+    public double Position { get => _editing ? _draft : _snapshot.Playback.PositionMs; set { if (_editing && double.IsFinite(value)) { _draft = Math.Clamp(value, 0, Maximum); OnPropertyChanged(); OnPropertyChanged(nameof(PositionText)); OnPropertyChanged(nameof(DraftText)); OnPropertyChanged(nameof(PreviewText)); } } }
     public bool IsEditing => _editing;
     public string DraftText => _editing ? $"定位到 {(long)_draft / 60000:00}:{(long)_draft / 1000 % 60:00}" : _snapshot.Playback.IsSeeking ? "正在定位…" : "";
     public string BufferText => _snapshot.Playback.State != PlaybackState.Loading ? "" : _snapshot.Playback.Buffer is not { } buffer ? "等待音频…" :
@@ -64,7 +65,7 @@ public sealed class TimelineWorkspace : ObservableObject, IDisposable
         try { await _player.SeekAsync(id, generation, target, _closing.Token).ConfigureAwait(false); }
         catch (OperationCanceledException) { }
     }
-    public void Cancel() { _editing = false; ClearPreview(); OnPropertyChanged(nameof(IsEditing)); OnPropertyChanged(nameof(Position)); OnPropertyChanged(nameof(DraftText)); }
+    public void Cancel() { _editing = false; ClearPreview(); OnPropertyChanged(nameof(IsEditing)); OnPropertyChanged(nameof(Position)); OnPropertyChanged(nameof(PositionText)); OnPropertyChanged(nameof(DraftText)); }
     private void Changed(object? sender, PlayerSessionSnapshot snapshot) { if (_visible) _ui.Post(() => { if (!_closed && _visible) Apply(snapshot); }); }
     private void Apply(PlayerSessionSnapshot snapshot)
     {
@@ -72,7 +73,7 @@ public sealed class TimelineWorkspace : ObservableObject, IDisposable
         if (snapshot.CurrentEntryId != _snapshot.CurrentEntryId || snapshot.Playback.Generation != _snapshot.Playback.Generation) { _editing = false; _preview = null; }
         _snapshot = snapshot;
         if (!CanSeek) { _editing = false; _preview = null; }
-        foreach (var name in new[] { nameof(Position), nameof(Maximum), nameof(CanSeek), nameof(SeekReason), nameof(PreviewText), nameof(IsEditing), nameof(DraftText), nameof(BufferText) }) OnPropertyChanged(name);
+        foreach (var name in new[] { nameof(Position), nameof(PositionText), nameof(Maximum), nameof(CanSeek), nameof(SeekReason), nameof(PreviewText), nameof(IsEditing), nameof(DraftText), nameof(BufferText) }) OnPropertyChanged(name);
     }
     public void Dispose() { if (_closed) return; _closed = true; _player.Changed -= Changed; _closing.Cancel(); _closing.Dispose(); }
 }

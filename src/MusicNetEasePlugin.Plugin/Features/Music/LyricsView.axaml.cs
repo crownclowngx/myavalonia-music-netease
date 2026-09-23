@@ -46,14 +46,15 @@ public partial class LyricsView : UserControl
         if (!IsEffectivelyVisible || _model is not { Following: true, CurrentLine: >= 0 } model) return;
         var generation = _scrollGeneration; var line = model.CurrentLine;
         _scroll ??= LyricList.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
-        var previous = _scroll?.Offset ?? default;
-        LyricList.ScrollIntoView(line);
-        // 虚拟化容器必须先实现，再用真实行高定位。换歌、隐藏或用户滚动会作废这次收尾。
+        // 等抽屉完成本轮布局再请求实现目标行；在零尺寸/隐藏布局中 ScrollIntoView
+        // 会留下尚未归属索引的临时容器，尤其首次展开时会与当前行重叠。
         Dispatcher.UIThread.Post(() =>
         {
             if (generation != _scrollGeneration || !IsEffectivelyVisible || model != _model || !model.Following) return;
             LyricList.UpdateLayout();
             _scroll ??= LyricList.GetVisualDescendants().OfType<ScrollViewer>().FirstOrDefault();
+            var previous = _scroll?.Offset ?? default;
+            if (LyricList.ContainerFromIndex(line) is null) { LyricList.ScrollIntoView(line); LyricList.UpdateLayout(); }
             if (_scroll is not { } viewer || LyricList.ContainerFromIndex(line) is not Control item ||
                 item.TranslatePoint(new Point(0, item.Bounds.Height / 2), viewer) is not { } center) return;
             var target = new Vector(viewer.Offset.X, Math.Clamp(viewer.Offset.Y + center.Y - viewer.Viewport.Height / 2, 0, Math.Max(0, viewer.Extent.Height - viewer.Viewport.Height)));

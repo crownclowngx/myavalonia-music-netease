@@ -1,0 +1,105 @@
+{
+  "schemaVersion": 1,
+  "methods": {
+    "MusicNetEasePlugin.Tests.V6NavigationTests.侧栏互斥但浏览独立且窗口限位不改期望宽度": 1,
+    "MusicNetEasePlugin.Tests.V6NavigationTests.旧配置迁移并独立保存抽屉宽度和舒适密度": 2,
+    "MusicNetEasePlugin.Tests.V6DrawerUiTests.真实抽屉键盘缩放重挂保持浏览与播放且关闭归还焦点": 1,
+    "MusicNetEasePlugin.Tests.V6InteractionTests.歌词定位保留暂停且换曲和试听映射不可信时拒绝旧行": 1,
+    "MusicNetEasePlugin.Tests.V6InteractionTests.时间预览不提交定位且未知时长与切歌清除草稿": 1,
+    "MusicNetEasePlugin.Tests.V6InteractionTests.追加结果只报告本次数量而恢复和换曲不会伪报入队": 1,
+    "MusicNetEasePlugin.Tests.V6InteractionTests.延迟加载快速完成不闪烁且完成关闭后迟到回调不能复活": 1,
+    "MusicNetEasePlugin.Tests.V6InteractionTests.歌单头区分总数本页与缓存并保持翻页简介及准确追加反馈": 1,
+    "MusicNetEasePlugin.Tests.V6InteractionUiTests.歌词当前行居中手动停止跟随后恢复且紧凑播放控制可达": 1,
+    "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体": 2,
+    "MusicNetEasePlugin.Tests.V6QueueTests.重复歌曲按条目排序撤销保留当前媒体进度且旧版本不能提交": 1,
+    "MusicNetEasePlugin.Tests.V6QueueTests.删除当前项后撤销仅补回条目不回退下一首且最后一首恢复保持停止": 1,
+    "MusicNetEasePlugin.Tests.V6QueueTests.多页面只保留最近逆操作而追加换歌换模式和账号撤销旧资格": 1,
+    "MusicNetEasePlugin.Tests.V6QueueTests.撤销移除保留下一首优先段而容量已满后的旧撤销不能插入": 1,
+    "MusicNetEasePlugin.Tests.V6QueueUiTests.真实手柄拖动释放单次提交边缘滚动取消和重挂不触发播放": 1,
+    "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致": 2,
+    "MusicNetEasePlugin.Tests.LightweightInteractionTests.隐藏歌词和播放条不投递进度刷新且回到页面立即同步": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留": 1,
+    "MusicNetEasePlugin.Tests.UiPreferencesTests.快速修改串行保存且失败不撤销本次减少动效": 1,
+    "MusicNetEasePlugin.Tests.SearchDocumentTests.搜索只投影最新响应并在失败后保留原页允许重试": 1,
+    "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试": 1,
+    "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产进度滑块键盘合并提交且换曲取消鼠标草稿": 1
+  },
+  "scenarios": {
+    "N01": [
+      "MusicNetEasePlugin.Tests.V6NavigationTests.侧栏互斥但浏览独立且窗口限位不改期望宽度",
+      "MusicNetEasePlugin.Tests.V6DrawerUiTests.真实抽屉键盘缩放重挂保持浏览与播放且关闭归还焦点",
+      "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体"
+    ],
+    "N02": [
+      "MusicNetEasePlugin.Tests.V6NavigationTests.侧栏互斥但浏览独立且窗口限位不改期望宽度",
+      "MusicNetEasePlugin.Tests.V6NavigationTests.旧配置迁移并独立保存抽屉宽度和舒适密度",
+      "MusicNetEasePlugin.Tests.V6DrawerUiTests.真实抽屉键盘缩放重挂保持浏览与播放且关闭归还焦点",
+      "MusicNetEasePlugin.Tests.UiPreferencesTests.快速修改串行保存且失败不撤销本次减少动效"
+    ],
+    "U01": [
+      "MusicNetEasePlugin.Tests.V6NavigationTests.旧配置迁移并独立保存抽屉宽度和舒适密度",
+      "MusicNetEasePlugin.Tests.V6DrawerUiTests.真实抽屉键盘缩放重挂保持浏览与播放且关闭归还焦点",
+      "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体",
+      "MusicNetEasePlugin.Tests.UiPreferencesTests.快速修改串行保存且失败不撤销本次减少动效"
+    ],
+    "N03": [
+      "MusicNetEasePlugin.Tests.V6DrawerUiTests.真实抽屉键盘缩放重挂保持浏览与播放且关闭归还焦点",
+      "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.歌曲行键盘菜单中文组合和导航在真实视图中保持一致"
+    ],
+    "R01": [
+      "MusicNetEasePlugin.Tests.V6DrawerUiTests.真实抽屉键盘缩放重挂保持浏览与播放且关闭归还焦点",
+      "MusicNetEasePlugin.Tests.V6InteractionTests.延迟加载快速完成不闪烁且完成关闭后迟到回调不能复活",
+      "MusicNetEasePlugin.Tests.V6InteractionUiTests.歌词当前行居中手动停止跟随后恢复且紧凑播放控制可达",
+      "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体",
+      "MusicNetEasePlugin.Tests.V6QueueUiTests.真实手柄拖动释放单次提交边缘滚动取消和重挂不触发播放",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.隐藏歌词和播放条不投递进度刷新且回到页面立即同步",
+      "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留"
+    ],
+    "L02": [
+      "MusicNetEasePlugin.Tests.V6InteractionTests.歌词定位保留暂停且换曲和试听映射不可信时拒绝旧行"
+    ],
+    "P04": [
+      "MusicNetEasePlugin.Tests.V6InteractionTests.歌词定位保留暂停且换曲和试听映射不可信时拒绝旧行",
+      "MusicNetEasePlugin.Tests.V6InteractionTests.时间预览不提交定位且未知时长与切歌清除草稿",
+      "MusicNetEasePlugin.Tests.DailyPlayerUiTests.生产进度滑块键盘合并提交且换曲取消鼠标草稿"
+    ],
+    "P01": [
+      "MusicNetEasePlugin.Tests.V6InteractionTests.时间预览不提交定位且未知时长与切歌清除草稿",
+      "MusicNetEasePlugin.Tests.V6InteractionUiTests.歌词当前行居中手动停止跟随后恢复且紧凑播放控制可达",
+      "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体"
+    ],
+    "P02": [
+      "MusicNetEasePlugin.Tests.V6InteractionTests.追加结果只报告本次数量而恢复和换曲不会伪报入队",
+      "MusicNetEasePlugin.Tests.V6InteractionTests.歌单头区分总数本页与缓存并保持翻页简介及准确追加反馈"
+    ],
+    "P03": [
+      "MusicNetEasePlugin.Tests.V6InteractionTests.追加结果只报告本次数量而恢复和换曲不会伪报入队"
+    ],
+    "B01": [
+      "MusicNetEasePlugin.Tests.V6InteractionTests.延迟加载快速完成不闪烁且完成关闭后迟到回调不能复活",
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.搜索只投影最新响应并在失败后保留原页允许重试",
+      "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试"
+    ],
+    "B02": [
+      "MusicNetEasePlugin.Tests.V6InteractionTests.歌单头区分总数本页与缓存并保持翻页简介及准确追加反馈",
+      "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试"
+    ],
+    "L01": [
+      "MusicNetEasePlugin.Tests.V6InteractionUiTests.歌词当前行居中手动停止跟随后恢复且紧凑播放控制可达",
+      "MusicNetEasePlugin.Tests.LightweightInteractionTests.隐藏歌词和播放条不投递进度刷新且回到页面立即同步"
+    ],
+    "Q01": [
+      "MusicNetEasePlugin.Tests.V6QueueTests.重复歌曲按条目排序撤销保留当前媒体进度且旧版本不能提交",
+      "MusicNetEasePlugin.Tests.V6QueueTests.多页面只保留最近逆操作而追加换歌换模式和账号撤销旧资格",
+      "MusicNetEasePlugin.Tests.V6QueueUiTests.真实手柄拖动释放单次提交边缘滚动取消和重挂不触发播放"
+    ],
+    "Q02": [
+      "MusicNetEasePlugin.Tests.V6QueueTests.重复歌曲按条目排序撤销保留当前媒体进度且旧版本不能提交",
+      "MusicNetEasePlugin.Tests.V6QueueTests.删除当前项后撤销仅补回条目不回退下一首且最后一首恢复保持停止",
+      "MusicNetEasePlugin.Tests.V6QueueTests.多页面只保留最近逆操作而追加换歌换模式和账号撤销旧资格",
+      "MusicNetEasePlugin.Tests.V6QueueTests.撤销移除保留下一首优先段而容量已满后的旧撤销不能插入",
+      "MusicNetEasePlugin.Tests.V6QueueUiTests.真实手柄拖动释放单次提交边缘滚动取消和重挂不触发播放"
+    ]
+  }
+}

@@ -1,9 +1,10 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Music.LyricsView" x:Name="LyricsRoot"
  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:LyricsWorkspace">
+ xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:LyricsWorkspace" Classes.comfortable="{Binding Preferences.ComfortableDensity}">
  <UserControl.Styles>
   <Style Selector="TextBlock.lyric"><Setter Property="FontSize" Value="24" /><Setter Property="Foreground" Value="{DynamicResource NeteaseSecondaryTextBrush}" /></Style>
   <Style Selector="vm|LyricsView.compact TextBlock.lyric"><Setter Property="FontSize" Value="20" /></Style>
+  <Style Selector="vm|LyricsView.comfortable TextBlock.lyric"><Setter Property="FontSize" Value="22" /></Style>
   <Style Selector="TextBlock.current"><Setter Property="FontWeight" Value="SemiBold" /><Setter Property="Foreground" Value="{DynamicResource NeteaseTextBrush}" /></Style>
  </UserControl.Styles>
  <Grid RowDefinitions="Auto,Auto,*,Auto" Margin="8,0">

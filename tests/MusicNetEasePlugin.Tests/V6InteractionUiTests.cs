@@ -32,7 +32,7 @@ public sealed class V6InteractionUiTests
                 var list = lyricsView.FindControl<ListBox>("LyricList")!; var scroll = list.GetVisualDescendants().OfType<ScrollViewer>().First();
                 var row = (Control)list.ContainerFromIndex(model.Lyrics!.CurrentLine)!;
                 var center = row.TranslatePoint(new Point(0, row.Bounds.Height / 2), scroll)!.Value.Y;
-                Assert.InRange(Math.Abs(center - scroll.Viewport.Height / 2), 0, 5);
+                var centerDeviation = Math.Abs(center - scroll.Viewport.Height / 2); Assert.InRange(centerDeviation, 0, 5);
                 model.Lyrics.StopFollowing(); var offset = scroll.Offset;
                 f.Player.Audio.Emit(f.Player.Queue.Snapshot.Playback.Generation, PlaybackState.Playing, 48000); DesktopUiTests.Pump(window);
                 Assert.Equal(offset, scroll.Offset); model.Lyrics.FollowCommand.Execute(null); DesktopUiTests.Pump(window); Assert.NotEqual(offset, scroll.Offset);
@@ -47,7 +47,7 @@ public sealed class V6InteractionUiTests
                 }
                 Assert.False(bar.FindControl<TextBlock>("PlayerArtists")!.IsVisible); Assert.True(bar.Bounds.Height <= 140);
                 Save(window, "v6-compact-player.png");
-                TestEvidence.Write("v6-interaction-ui.json", new { CenterDeviation = Math.Abs(center - scroll.Viewport.Height / 2), CompactHeight = bar.Bounds.Height, AudioOpened = f.Player.Audio.Opened.Count, ManualFollowRestored = true });
+                TestEvidence.Write("v6-interaction-ui.json", new { schemaVersion = 1, realHost = false, CenterDeviation = centerDeviation, CompactHeight = bar.Bounds.Height, AudioOpened = f.Player.Audio.Opened.Count, ManualFollowRestored = true });
             }
             finally { window.Close(); }
             return true;

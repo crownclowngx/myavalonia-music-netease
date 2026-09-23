@@ -18,6 +18,8 @@ public partial class MusicView : UserControl
     private readonly DrawerTransition _drawerTransition;
     private double _resizeDraft = 360;
     private bool _resizing;
+    private IPointer? _resizePointer;
+    private double _resizeStartX, _resizeStartWidth;
     public static readonly DirectProperty<MusicView, MusicWorkspace?> ModelProperty = AvaloniaProperty.RegisterDirect<MusicView, MusicWorkspace?>(nameof(Model), view => view.Model);
     public MusicWorkspace? Model => DataContext as MusicWorkspace;
     public ViewMotion Motion { get; }
@@ -28,9 +30,16 @@ public partial class MusicView : UserControl
         DataContextChanged += (_, _) => { RaisePropertyChanged(ModelProperty, _model, Model); if (VisualRoot is not null) Bind(); };
         ContentStage.SizeChanged += (_, _) => { Model?.Navigation.SetAvailableSize(ContentStage.Bounds.Width, ContentStage.Bounds.Height); Layout(); };
         Motion.PropertyChanged += (_, e) => { if (e.PropertyName is nameof(ViewMotion.IsActive) or nameof(ViewMotion.IsEnabled)) Layout(); };
-        DrawerResize.DragStarted += (_, _) => { _resizing = true; _resizeDraft = Model?.Preferences?.DrawerWidth ?? 360; };
-        DrawerResize.DragDelta += (_, e) => { if (_resizing) { _resizeDraft = Math.Clamp(_resizeDraft - e.Vector.X, 320, 480); Model?.Navigation.SetDesiredWidth(_resizeDraft); } };
-        DrawerResize.DragCompleted += (_, _) => { if (_resizing) { _resizing = false; SaveDrawerWidth(_resizeDraft); } };
+        // 使用 Document 坐标计算拖动差值，避免调整宽度后手柄自身坐标改变导致累加误差。
+        // 手动管理捕获可明确区分正常松手与被其他控件夺走捕获，只有正常松手写入偏好。
+        DrawerResize.PointerPressed += (_, e) =>
+        {
+            if (!e.GetCurrentPoint(DrawerResize).Properties.IsLeftButtonPressed) return;
+            _resizing = true; _resizeStartX = e.GetPosition(this).X; _resizeDraft = _resizeStartWidth = Model?.Preferences?.DrawerWidth ?? 360;
+            DrawerResize.Focus(); _resizePointer = e.Pointer; e.Pointer.Capture(DrawerResize); e.PreventGestureRecognition(); e.Handled = true;
+        };
+        DrawerResize.PointerMoved += (_, e) => { if (_resizing) { _resizeDraft = Math.Clamp(_resizeStartWidth - (e.GetPosition(this).X - _resizeStartX), 320, 480); Model?.Navigation.SetDesiredWidth(_resizeDraft); e.Handled = true; } };
+        DrawerResize.PointerReleased += (_, e) => { if (_resizing) { _resizing = false; SaveDrawerWidth(_resizeDraft); _resizePointer = null; e.Pointer.Capture(null); e.Handled = true; } };
         DrawerResize.PointerCaptureLost += (_, _) => CancelResize();
         DrawerResize.KeyDown += (_, e) =>
         {
@@ -68,7 +77,8 @@ public partial class MusicView : UserControl
             if (previous == MusicSidePanel.None && focused is Control control && !control.GetVisualAncestors().Contains(Drawer)) _browseFocus = focused;
             CloseDrawerButton.Focus();
         }
-        else if (_browseFocus is Control { IsEffectivelyVisible: true } control && control.GetVisualAncestors().Contains(this)) control.Focus();
+        else if (_browseFocus is Control { IsEffectivelyVisible: true, IsEffectivelyEnabled: true } control && control.GetVisualAncestors().Contains(this))
+        { if (!control.Focus()) PlayerBar.FocusPanelButton(previous == MusicSidePanel.Queue); }
         else PlayerBar.FocusPanelButton(previous == MusicSidePanel.Queue);
     }
     private void Layout()
@@ -88,7 +98,7 @@ public partial class MusicView : UserControl
         Model?.Navigation.SetDesiredWidth(width);
     }
     private void ResetDrawerWidth(object? sender, RoutedEventArgs e) => SaveDrawerWidth(360);
-    private void CancelResize() { if (!_resizing) return; _resizing = false; Model?.Navigation.SetDesiredWidth(Model.Preferences?.DrawerWidth ?? 360); }
+    private void CancelResize() { if (!_resizing) return; _resizing = false; Model?.Navigation.SetDesiredWidth(Model.Preferences?.DrawerWidth ?? 360); var pointer = _resizePointer; _resizePointer = null; if (pointer?.Captured == DrawerResize) pointer.Capture(null); }
     private void ClearSearch(object? sender, RoutedEventArgs e) { if (Model is { } model) model.Keyword = ""; SearchInput.Focus(); }
     private void SearchKeyDown(object? sender, KeyEventArgs e)
     {

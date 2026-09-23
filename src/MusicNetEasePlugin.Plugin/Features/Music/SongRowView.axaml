@@ -1,7 +1,7 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Music.SongRowView" x:Name="RowRoot" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
  <Grid x:Name="RowLayout" ColumnDefinitions="16,*,42,Auto" ColumnSpacing="6" MinHeight="48">
   <PathIcon x:Name="CurrentMarker" IsVisible="False" Width="12" Height="12" Data="{DynamicResource NeteasePlayIcon}" Foreground="{DynamicResource NeteaseAccentBrush}" AutomationProperties.Name="当前曲目" />
-  <Grid x:Name="TextLayout" Grid.Column="1" ColumnDefinitions="*" ColumnSpacing="12" VerticalAlignment="Center">
+  <Grid x:Name="TextLayout" Grid.Column="1" ColumnDefinitions="*,0,0" ColumnSpacing="12" VerticalAlignment="Center">
    <StackPanel Spacing="3"><TextBlock Text="{Binding #RowRoot.Title}" TextTrimming="CharacterEllipsis" FontWeight="Medium" ToolTip.Tip="{Binding #RowRoot.Title}" /><TextBlock x:Name="DetailText" Text="{Binding #RowRoot.Subtitle}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding #RowRoot.Subtitle}" /></StackPanel>
    <TextBlock x:Name="ArtistColumn" Grid.Column="1" IsVisible="False" Text="{Binding #RowRoot.Artist}" ToolTip.Tip="{Binding #RowRoot.Artist}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
    <TextBlock x:Name="AlbumColumn" Grid.Column="2" IsVisible="False" Text="{Binding #RowRoot.Album}" ToolTip.Tip="{Binding #RowRoot.Album}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />

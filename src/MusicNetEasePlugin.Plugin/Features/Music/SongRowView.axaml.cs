@@ -15,6 +15,7 @@ namespace MusicNetEasePlugin.Features.Music;
 /// </summary>
 public partial class SongRowView : UserControl
 {
+    private Flyout? _details;
     public static readonly StyledProperty<string> TitleProperty = AvaloniaProperty.Register<SongRowView, string>(nameof(Title), "");
     public static readonly StyledProperty<string> SubtitleProperty = AvaloniaProperty.Register<SongRowView, string>(nameof(Subtitle), "");
     public static readonly StyledProperty<string> DurationProperty = AvaloniaProperty.Register<SongRowView, string>(nameof(Duration), "");
@@ -52,6 +53,8 @@ public partial class SongRowView : UserControl
         // 此适配命令只处理行选择，业务语义仍完全复用页面传入的 PlayCommand。
         ActivateCommand = new RelayCommand(() => { SelectRow(); if (PlayCommand?.CanExecute(null) == true) PlayCommand.Execute(null); }, () => PlayCommand is not null);
         InitializeComponent();
+        DetachedFromVisualTree += (_, _) => { MoreButton.Flyout?.Hide(); _details?.Hide(); };
+        DataContextChanged += (_, _) => _details?.Hide();
         SizeChanged += (_, _) => ApplyLayout();
         PropertyChanged += (_, e) =>
         {
@@ -86,13 +89,17 @@ public partial class SongRowView : UserControl
             var text = new SelectableTextBlock { TextWrapping = Avalonia.Media.TextWrapping.Wrap };
             text.Bind(TextBlock.TextProperty, new Avalonia.Data.Binding(property) { Source = this }); content.Children.Add(text);
         }
-        MoreButton.Flyout?.Hide(); new Flyout { Content = content }.ShowAt(MoreButton);
+        MoreButton.Flyout?.Hide(); _details?.Hide(); _details = new Flyout { Content = content }; _details.ShowAt(MoreButton);
     }
     private void ApplyLayout()
     {
         // 依据行自身的宽度布局；右侧队列打开后不沿用外部 Document 的宽度。
         var wide = Bounds.Width >= 760;
-        TextLayout.ColumnDefinitions = new(wide ? "3*,2*,2*" : "*");
+        // 保持三个逻辑列稳定，只改宽度。把三列换成单列会使回收容器暂时缓存第 0 列，
+        // 再展开时歌名/歌手/专辑重叠；宽度切换不应改变子控件的列身份。
+        TextLayout.ColumnDefinitions[0].Width = new(wide ? 3 : 1, GridUnitType.Star);
+        TextLayout.ColumnDefinitions[1].Width = wide ? new(2, GridUnitType.Star) : new(0);
+        TextLayout.ColumnDefinitions[2].Width = wide ? new(2, GridUnitType.Star) : new(0);
         ArtistColumn.IsVisible = wide; AlbumColumn.IsVisible = wide; DetailText.IsVisible = !wide;
         RowLayout.MinHeight = wide ? 40 : 48;
         RowLayout.ColumnDefinitions = new(string.IsNullOrEmpty(Duration) ? "16,*,0,Auto" : "16,*,42,Auto");

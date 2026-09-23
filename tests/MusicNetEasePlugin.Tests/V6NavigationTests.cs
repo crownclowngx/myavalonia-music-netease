@@ -60,8 +60,17 @@ public sealed class V6DrawerUiTests
                 var drawer = view.FindControl<Border>("Drawer")!;
                 Assert.True(drawer.IsEffectivelyVisible); Assert.True(model.Navigation.IsSearch); Assert.True(model.Navigation.IsBeside);
                 Assert.True(view.FindControl<Button>("CloseDrawerButton")!.IsFocused);
-                var handle = view.FindControl<Thumb>("DrawerResize")!; handle.Focus();
+                var handle = view.FindControl<Border>("DrawerResize")!; handle.Focus();
                 Press(window, Key.Left); DesktopUiTests.Pump(window); Assert.Equal(380, preferences.DrawerWidth);
+                var handlePoint = handle.TranslatePoint(new Point(4, 30), window)!.Value;
+                window.MouseDown(handlePoint, MouseButton.Left); window.MouseMove(handlePoint + new Vector(-30, 0)); DesktopUiTests.Pump(window);
+                Assert.Equal(380, preferences.DrawerWidth); Assert.Equal(410, model.Navigation.ActualDrawerWidth);
+                window.MouseUp(handlePoint + new Vector(-30, 0), MouseButton.Left); DesktopUiTests.Pump(window); Assert.Equal(410, preferences.DrawerWidth);
+                handlePoint = handle.TranslatePoint(new Point(4, 30), window)!.Value;
+                window.MouseDown(handlePoint, MouseButton.Left); window.MouseMove(handlePoint + new Vector(-20, 0)); Press(window, Key.Escape);
+                window.MouseUp(handlePoint + new Vector(-20, 0), MouseButton.Left); DesktopUiTests.Pump(window);
+                Assert.True(model.Navigation.IsOpen); Assert.Equal(410, preferences.DrawerWidth); Assert.Equal(410, model.Navigation.ActualDrawerWidth);
+                preferences.DrawerWidth = 380;
                 window.Width = 520; window.Height = 420; DesktopUiTests.Pump(window); Assert.False(model.Navigation.IsBeside); Assert.Equal(380, preferences.DrawerWidth);
                 Assert.True(drawer.Bounds.Width <= view.Bounds.Width);
                 Press(window, Key.Escape); DesktopUiTests.Pump(window); Assert.False(drawer.IsVisible); Assert.False(drawer.IsHitTestVisible); Assert.True(search.IsFocused);

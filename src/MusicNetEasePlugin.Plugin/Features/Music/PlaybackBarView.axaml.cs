@@ -59,7 +59,7 @@ public partial class PlaybackBarView : UserControl
     private void Changed(object? sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(PlayerBarWorkspace.StateText)) Motion.FadeIn(PlaybackState);
-        Layout();
+        if (e.PropertyName == nameof(PlayerBarWorkspace.DisplayStateText)) Layout();
     }
     private void NoticeChanged(object? sender, PropertyChangedEventArgs e) => Layout();
     private void Layout()

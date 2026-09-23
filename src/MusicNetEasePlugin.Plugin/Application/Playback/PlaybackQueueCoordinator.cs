@@ -201,7 +201,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     public Task StopAsync()
     {
         Task work;
-        lock (_sync) { _failedCandidates.Clear(); work = StopToPending(PlaybackState.Stopped); }
+        lock (_sync) { _failedCandidates.Clear(); _snapshot = _snapshot with { Restoration = null }; work = StopToPending(PlaybackState.Stopped); }
         Notify(); return work;
     }
     public Task PauseAsync(bool paused, CancellationToken ct)

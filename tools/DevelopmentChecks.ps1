@@ -279,3 +279,4 @@ function Assert-MarkdownLinks {
 }
 
 . (Join-Path $PSScriptRoot 'V5DevelopmentChecks.ps1')
+. (Join-Path $PSScriptRoot 'V6DevelopmentChecks.ps1')
