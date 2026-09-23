@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v6-queue-dark-520.png",
+  "width": 520,
+  "height": 420,
+  "sha256": "0267EC977F42B4E87511C356D5E006A428EB6BBBA8F5A9974C2C91F63BE65BDE",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-120505-c9613781",
+    "revision": "52d0bd9e29faa44d94ae5af5b38a78ef720d2492",
+    "sourceSha256": "7F89DDAB4989389355995562A4F8D29747A133DCDEE7C75F03E6B6B5E1107C82"
+  }
+}

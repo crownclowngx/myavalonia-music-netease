@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v5-settings-dark.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "FE95887A4FB6121248D196366115CB02232DE3E265A77C678A3DB7F8DBAE3AD3",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-120505-c9613781",
+    "revision": "52d0bd9e29faa44d94ae5af5b38a78ef720d2492",
+    "sourceSha256": "7F89DDAB4989389355995562A4F8D29747A133DCDEE7C75F03E6B6B5E1107C82"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v5-failure-light.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "1C8E1286B2B0F088D6372B28AA297527DCDF86A115711A3D86717B0BCE0879A0",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260923-120505-c9613781",
+    "revision": "52d0bd9e29faa44d94ae5af5b38a78ef720d2492",
+    "sourceSha256": "7F89DDAB4989389355995562A4F8D29747A133DCDEE7C75F03E6B6B5E1107C82"
+  }
+}

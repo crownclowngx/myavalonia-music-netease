@@ -1,5 +1,7 @@
 # V6 · 歌词抽屉与交互体验专用修改方案
 
+> 实施更新：V6-01～18 已全部接入，本地 V6 门禁通过；最终代码、原始证据与实机边界见 [专用实施记录](../maintenance/netease-v6-drawer-and-interaction-implementation.md)。
+
 > 2026-09-23：用户已明确批准完整执行 [V6-01～V6-18](netease-v6-interaction-candidates-evaluation.md)，含原先的可选候选。本文冻结实施范围，不把旧 V5 的实机待验自动算作完成。
 > SOLID 优先，普通 MVVM、构造注入与小型数据类型；中文注释解释状态、竞态及资源寿命。不使用 AIFLOW、Windows CI 或发布门禁。
 

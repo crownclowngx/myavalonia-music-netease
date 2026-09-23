@@ -2,3 +2,4 @@
 # 原始 JSON 含 Windows CRLF，允许行末 CR，但继续检查真正的尾随空格、空行和 Tab 前空格。
 docs/archive/records/netease-v5/gate-20260923/* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
 docs/archive/records/netease-v5/startup-fix-20260923/** -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
+docs/archive/records/netease-v6/gate-20260923/* -text whitespace=blank-at-eol,blank-at-eof,space-before-tab,cr-at-eol
