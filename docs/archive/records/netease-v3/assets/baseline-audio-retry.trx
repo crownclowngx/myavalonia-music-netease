@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TestRun id="429ed7c1-c546-462c-b004-63a75bb4ff9a" name="crown@GAOXU 2026-09-23 09:41:12" runUser="GAOXU\crown" xmlns="http://microsoft.com/schemas/VisualStudio/TeamTest/2010">
+  <Times creation="2026-09-23T09:41:12.7324535+08:00" queuing="2026-09-23T09:41:12.7324538+08:00" start="2026-09-23T09:41:10.3657898+08:00" finish="2026-09-23T09:41:12.7377088+08:00" />
+  <TestSettings name="default" id="68643f4a-0a0e-4f9a-a8e4-a37ad921beb7">
+    <Deployment runDeploymentRoot="crown_GAOXU_2026-09-23_09_41_12" />
+  </TestSettings>
+  <Results>
+    <UnitTestResult executionId="345fd7b2-f9ac-4d23-b3a3-3c2fda8a76aa" testId="28721215-7c2d-f010-f7e4-54b35dad2069" testName="MusicNetEasePlugin.Tests.AudioAdapterTests.生产适配复用引擎真实解码并释放每次媒体句柄" computerName="GAOXU" duration="00:00:01.8468337" startTime="2026-09-23T09:41:10.8095203+08:00" endTime="2026-09-23T09:41:12.6641740+08:00" testType="13cdc9d9-ddb5-4fa4-a97d-d965ccfc6d4b" outcome="Passed" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" relativeResultsDirectory="345fd7b2-f9ac-4d23-b3a3-3c2fda8a76aa" />
+  </Results>
+  <TestDefinitions>
+    <UnitTest name="MusicNetEasePlugin.Tests.AudioAdapterTests.生产适配复用引擎真实解码并释放每次媒体句柄" storage="d:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\tests\musicneteaseplugin.tests\bin\debug\net10.0\musicneteaseplugin.tests.dll" id="28721215-7c2d-f010-f7e4-54b35dad2069">
+      <Execution id="345fd7b2-f9ac-4d23-b3a3-3c2fda8a76aa" />
+      <TestMethod codeBase="D:\code\local\avalonia_dock_plug_test\myavalonia-music-netease\tests\MusicNetEasePlugin.Tests\bin\Debug\net10.0\MusicNetEasePlugin.Tests.dll" adapterTypeName="executor://xunit/VsTestRunner3/netcore/" className="MusicNetEasePlugin.Tests.AudioAdapterTests" name="生产适配复用引擎真实解码并释放每次媒体句柄" />
+    </UnitTest>
+  </TestDefinitions>
+  <TestEntries>
+    <TestEntry testId="28721215-7c2d-f010-f7e4-54b35dad2069" executionId="345fd7b2-f9ac-4d23-b3a3-3c2fda8a76aa" testListId="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+  </TestEntries>
+  <TestLists>
+    <TestList name="列表中未列出的结果" id="8c84fa94-04c1-424b-9868-57a2d4851a1d" />
+    <TestList name="所有已加载的结果" id="19431567-8539-422a-85d7-44ee4e166bda" />
+  </TestLists>
+  <ResultSummary outcome="Completed">
+    <Counters total="1" executed="1" passed="1" failed="0" error="0" timeout="0" aborted="0" inconclusive="0" passedButRunAborted="0" notRunnable="0" notExecuted="0" disconnected="0" warning="0" completed="0" inProgress="0" pending="0" />
+    <Output>
+      <StdOut>[xUnit.net 00:00:00.00] xUnit.net VSTest Adapter v3.1.5+1b188a7b0a (64-bit .NET 10.0.10)&#xD;
+[xUnit.net 00:00:00.07]   Discovering: MusicNetEasePlugin.Tests&#xD;
+[xUnit.net 00:00:00.12]   Discovered:  MusicNetEasePlugin.Tests&#xD;
+[xUnit.net 00:00:00.14]   Starting:    MusicNetEasePlugin.Tests&#xD;
+[00000206281bd700] cache_read stream error: cannot pre fill buffer&#xD;
+[0000020627ee5f70] mjpeg demux error: cannot peek&#xD;
+[00000206281b6290] main input error: Your input can't be opened&#xD;
+[00000206281b6290] main input error: VLC is unable to open the MRL 'file:///C:/Users/crown/AppData/Local/Temp/netease-m1-tests/d5b39bab09e543a1ba3c366fcb204d70/invalid.mp3'. Check the log for details.&#xD;
+[xUnit.net 00:00:02.01]   Finished:    MusicNetEasePlugin.Tests&#xD;
+</StdOut>
+    </Output>
+  </ResultSummary>
+</TestRun>

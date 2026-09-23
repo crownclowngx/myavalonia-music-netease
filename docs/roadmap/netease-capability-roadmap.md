@@ -5,7 +5,7 @@
 > 起点：用户已确认登录没有问题，后续以登录可用为前提推进音乐能力。
 > 状态：M1 核心实现与自动/联网解码已完成，真实听感和 Host/Dock 验收待完成；M2–M5 尚未实施。里程碑编号不代表插件版本或交付日期。
 > M1 专项：[V2 搜索与单曲播放实施方案](netease-v2-m1-playback-plan.md)与[专用开发验证矩阵](../maintenance/netease-v2-m1-playback-verification.md)已编写，实施状态由专项方案跟踪。
-> 当前界面优化：[V3：Document / Tool 紧凑桌面界面改造](netease-v3-desktop-ui-and-theme-plan.md)为待实施方案，覆盖已有 M1 的现代紧凑布局、双色主题及轻量动效，不代表 M2 能力已经启动或实现。
+> 当前界面优化：[V3：Document / Tool 紧凑桌面界面改造](netease-v3-desktop-ui-and-theme-plan.md)已实现已有 M1 的现代紧凑布局、双色主题及轻量动效；真实 Host/缩放/性能验收由 V3 专项矩阵承接，不代表 M2 能力已经启动或实现。
 
 **建议主线：登录可用 → 搜歌并播放一首 → 歌单连续播放与歌词 → 管理自己的音乐 → 推荐发现。**
 

@@ -1,7 +1,7 @@
 # 网易云音乐 V3：Document / Tool 紧凑桌面布局、深浅主题与轻量动效改造方案
 
 > 对象：仅 `MusicNetEasePlugin` 的音乐 Document、账号与播放设置 Tool，以及复用它们的 Standalone。
-> 状态：待实施方案；本次完成源码分析与文档，不代表界面、自动验证或实机验收已经完成。
+> 状态：V3 核心实现及本地自动验证完成；真实 Host/Dock、系统主题联动、缩放与硬件性能验收待完成。实施状态见第 10 节。
 > 创建日期：2026-09-23。调研基线：`3018bb30ea6152fa4f7addf312540aad99df395e`；编写前本插件工作树干净。
 > 编号：承接 V1 登录、V2 搜索与单曲播放，采用 **V3**；属于改造序号，不修改插件包、SDK 或能力里程碑编号。
 > 关联：[当前播放契约](../reference/netease-music-playback.md) · [V2 运行库、Tool 与 Dock 设计](netease-v2-libvlc-tool-and-dock-design.md) · [能力路线图](netease-capability-roadmap.md)。
@@ -10,7 +10,9 @@
 
 ## 1. 现状判断：浅色背景在哪里，“像手机”从哪里来
 
-### 1.1 已确认的源码事实
+### 1.1 改造前源码事实（基线 3018bb3）
+
+以下描述改造前问题，链接指向当前文件便于对照；现行行为以[当前界面契约](../reference/netease-desktop-ui.md)为准。
 
 | 位置 | 当前实现 | 影响与改造判断 |
 | --- | --- | --- |
@@ -36,7 +38,7 @@
 
 ## 2. 范围与实现约束
 
-- 改动集中于本插件的 `Features/Main`、`Features/Music`、`Features/Settings`、拟新增的局部样式资源、Standalone 和相关 UI 测试。
+- 改动集中于本插件的 `Features/Main`、`Features/Music`、`Features/Settings`、局部样式资源、Standalone 和相关 UI 测试。
 - 保留 `myavalonia.plugin.music.netease.document.main` 与 `myavalonia.plugin.music.netease.tool.account-settings` 身份、既有注册和默认右侧 Tool；布局更新继续识别已保存的 Dock 项目。
 - 继续使用现有登录、搜索、分页、单曲播放、暂停、继续、停止、音量和 LibVLC 设置能力。歌单、队列、歌词、上一首/下一首、进度拖动及关闭页面后连续播放仍归后续能力里程碑；本轮界面不放置这些未实现的操作。
 - 保持 SOLID 分工，样式和尺寸行为归 View，业务状态由现有模型投影；确有需要时增加少量只读显示属性。代码注释用中文说明主题来源、控件重挂和资源所有权。
@@ -126,7 +128,7 @@ Tool 服务于账号管理与环境设置，不承担第二套播放器或登录
 
 ### 5.1 资源组织与作用域
 
-拟新增 `src/MusicNetEasePlugin.Plugin/Styles/NeteaseThemeResources.axaml` 和 `NeteaseControlStyles.axaml`，分别承载语义画刷与 `netease-*` 类样式。三个生产 View 使用同一份资源源文件，资源包含在 Plugin 内，Standalone 与 Tests 复用生产 View 即可获得相同资源。
+已新增 `src/MusicNetEasePlugin.Plugin/Styles/NeteaseThemeResources.axaml` 和 `NeteaseControlStyles.axaml`，分别承载语义画刷与 `netease-*` 类样式。三个生产 View 使用同一份资源源文件，资源包含在 Plugin 内，Standalone 与 Tests 复用生产 View 即可获得相同资源。
 
 - 在 View 局部合并资源，使用 `ResourceDictionary.ThemeDictionaries` 分别定义 Light 和 Dark。插件不修改 `Application.Current.Resources`、Host 的 `App*` 键或全局 `Button` / `TextBox` 样式。
 - Document / Tool 不主动选择主题，从所在窗口和 Host 继承。Standalone 仅在预览入口提供“跟随系统 / 浅色 / 深色”切换，不另存一套插件主题偏好。
@@ -137,7 +139,7 @@ Avalonia 官方说明支持以主题字典和动态资源响应主题变化；�
 
 ### 5.2 建议的最小颜色集合
 
-以下为设计初值，实施时以 Host 实际效果校准；均为拟新增键，不表示现有资源已提供。
+以下设计初值已进入局部资源字典；真实 Host 实机效果仍需校准。标准控件模板内部可能继续使用所在控件主题的画刷。
 
 | 语义键 | Light | Dark | 用途 |
 | --- | --- | --- | --- |
@@ -231,8 +233,8 @@ Avalonia 官方说明支持以主题字典和动态资源响应主题变化；�
 | [MainView](../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml) 及其 code-behind | Document 壳、紧凑账号摘要和登录区；移除固定浅色容器；维护二维码与头像位图订阅 |
 | [MusicView](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) 及其 code-behind | 弹性结果区域、列式列表与底部播放条；保留封面释放及搜索回车行为 |
 | [MusicSettingsView](../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsView.axaml) 及其 code-behind | 分组、目录编辑与真实状态展示；保留文件选择器的挂载代次、模型身份与草稿版本校验 |
-| `Styles/Netease*.axaml`（拟新增） | 局部双色资源、紧凑类样式、少量短过渡；不承担业务状态判断 |
-| 插件 UI 偏好与必要 View 可见性处理（拟新增） | 保存单一减少动态效果选项，投影有效开关；隐藏时收口自有动效，不接管播放器寿命 |
+| `Styles/Netease*.axaml`（已实现） | 局部双色资源、紧凑类样式、少量短过渡；不承担业务状态判断 |
+| 插件 UI 偏好与必要 View 可见性处理（已实现） | 保存单一减少动态效果选项，投影有效开关；隐藏时收口自有动效，不接管播放器寿命 |
 | [MainDocument](../../src/MusicNetEasePlugin.Plugin/Features/Main/MainDocument.cs)、[MusicWorkspace](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicWorkspace.cs)、[MusicSettingsTool](../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsTool.cs) | 仅补必要显示投影，不重写登录、媒体协议、播放所有权或运行库加载规则 |
 | [Standalone MainWindow](../../src/MusicNetEasePlugin.Standalone/MainWindow.axaml) | 预览主题与宽窄尺寸，复用真实 View；不把宽 Tab 页当作窄 Dock Tool 的验收 |
 | [UiCompositionTests](../../tests/MusicNetEasePlugin.Tests/UiCompositionTests.cs)、[PlaybackUiTests](../../tests/MusicNetEasePlugin.Tests/PlaybackUiTests.cs) | 更新真实布局夹具与语义断言，补充主题、尺寸和状态保留覆盖 |
@@ -279,13 +281,13 @@ Avalonia 官方说明支持以主题字典和动态资源响应主题变化；�
 
 自动测试应断言实际颜色解析、布局边界、操作可达性和状态保留，不以截图文件存在代替视觉审阅，也不只搜索 XAML 字符串宣布通过。沿用 `UiCompositionTests` 的真实 View / Fluent Headless 入口，并在真实 Host 的主题组合下补验；两者不能互相替代。
 
-`PlaybackUiTests` 当前为 MusicView 外包 ScrollViewer，实施弹性高度布局时应同步改为受约束的真实容器，避免测试夹具掩盖页面尺寸问题。已有通过按钮中文文本定位的断言，随合并暂停/继续等变化改为稳定控件标识与命令语义断言，不删除原行为覆盖。
+`PlaybackUiTests` 已将 MusicView 外包 ScrollViewer 改为受约束的真实容器，避免夹具掩盖页面尺寸问题；暂停按钮断言使用稳定名称。原有重挂、草稿与目录选择器覆盖保留，异步 Dispatch 改为明确可等待的泛型重载。
 
 实施期间继续执行既有本地 M1 门禁；若修改必测方法或截图名称，同步核对 `tools/m1-test-map.json`、证据产物检查和维护矩阵。V3 专项要有自己的实际执行证据，不能复用旧截图作为新布局通过证明。
 
 ```powershell
-# 实施阶段的既有回归入口；本次仅编写方案，不运行业务门禁。
-pwsh -NoProfile -File tools/verify-development.ps1 -Milestone M1
+# 当前本地开发入口，包含 M1 全量回归和 V3 专项证据检查。
+pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V3
 
 # 文档检查。
 . ./tools/DevelopmentChecks.ps1
@@ -293,4 +295,25 @@ Assert-MarkdownLinks (Get-Location).Path
 git diff --check
 ```
 
-最终交付至少包含 Document 未登录/已登录播放中、Tool 默认/错误或待重启的深浅两套截图，以及窄 Document、窄 Tool 与浮窗实例；补充短动效录屏或交互记录及开/关动效的资源对照结果。记录内容尺寸、显示缩放、实际主题和产物身份；验证用账号及路径适当脱敏。本文件当前只定义这些交付标准，不预填通过结果。
+完整验收目标仍包含 Document 未登录/播放中、Tool 默认/错误或待重启的深浅截图、窄尺寸和真浮窗；动效交互及同机成本对照要单独留证。当前自动截图与采样、尚缺的真 Host 和逐态视觉记录见下节，不用自动结果代替完整实机验收。
+
+## 10. 本轮实施状态与取舍
+
+实现提交 `0a491b2`，实际结果见[实施记录](../archive/records/netease-v3/ui-implementation-20260923.md)，可重复方法见[V3 专项验证](../maintenance/netease-v3-ui-verification.md)。
+
+| 阶段 | 状态与证据范围 |
+| --- | --- |
+| V3.0 | 记录源码与 Headless 基线；真实 Host 改造前截图未新增，首次离线解码超时保留在记录 |
+| V3.1 | 局部双色字典、三个 View 动态资源和 Standalone 主题选择已实现；热切换及同款基础控件主题组合通过自动检查 |
+| V3.2 | 账号摘要、紧凑登录、弹性列式列表、固定播放条已实现；三个 Document 尺寸通过边界断言 |
+| V3.3 | Tool 分组与侧栏/底部形态已实现；草稿/已保存/候选/实际加载语义保持 |
+| V3.4 | 背景短过渡、有限淡入、持久偏好和隐藏收口已实现；无位移和常驻装饰动画 |
+| V3.5 | 本地自动门禁、截图与 Headless 采样完成；真实 Dock/浮窗/系统主题、缩放、逐态视觉与硬件帧时间仍待验收 |
+
+具体取舍：
+
+- 动效只采用 100/120 ms 背景过渡和 140 ms 局部淡入，未增加展开收起、位移或循环装饰。
+- 控件主题内部的过渡仍归主题管理；插件开关只撤销额外动效，不宣称禁用系统所有动画。
+- 无可靠公开系统减少动画端口证据，因此提供插件持久开关，不调用 Host 内部服务。
+- Document 自动验收下限 520×420，更小尺寸暂不保证所有操作；Tool 底部形态允许纵向滚动。
+- 本轮同款 Fluent/Semi/Ursa 组合与跨 Window 重挂是 Headless 验证，未启动真实 Dock、部署、Windows CI 或发布门禁。

@@ -11,7 +11,8 @@
 | 下一步开发什么 | [能力路线图](roadmap/netease-capability-roadmap.md) | M1–M5 能力范围、先后依赖、验收标准与首轮任务拆分 |
 | 如何播放与配置运行库 | [搜索播放快速开始](quick-start/netease-playback.md)、[当前播放契约](reference/netease-music-playback.md) | 搜索、单曲控制、共享路径、开发产物与探针 |
 | 如何实现 M1 | [V2：搜索与单曲播放方案](roadmap/netease-v2-m1-playback-plan.md) | SOLID 分工、S0–S5 进度与剩余验收 |
-| 如何优化当前 Document 和 Tool | [V3：紧凑桌面界面改造方案](roadmap/netease-v3-desktop-ui-and-theme-plan.md) | 待实施；现代紧凑布局、浅色背景定位、双色资源、轻量动效及性能验收 |
+| 如何优化当前 Document 和 Tool | [V3：紧凑桌面界面改造方案](roadmap/netease-v3-desktop-ui-and-theme-plan.md) | 已实现；现代紧凑布局、双色资源与轻量动效，真实 Dock/性能验收继续跟踪 |
+| 当前界面如何工作 | [V3 当前界面契约](reference/netease-desktop-ui.md) | 布局断点、局部主题、动效寿命、偏好存储与 SOLID 分工 |
 | 多个插件如何使用 LibVLC | [V2：运行库、Tool 与 Dock 专项设计](roadmap/netease-v2-libvlc-tool-and-dock-design.md) | 内置优先/指定目录、设置生效、VideoSecurityPlayer 踩坑对照；共享目录已解码，真实共存待验收 |
 | 当前具体实现了什么 | [HTTP 与会话契约](reference/netease-http-session.md) | 微信/App 登录、已接入端点、Flurl、会话、取消和生命周期 |
 | 上游还有哪些能力 | [api-enhanced 能力清单](reference/netease-api-enhanced-capabilities.md) | 固定提交的模块索引与移植边界；不代表插件已支持 |
@@ -35,6 +36,7 @@
 | --- | --- |
 | [登录开发验证矩阵](maintenance/netease-login-verification.md) | 协议、HTTP、状态、存储、UI、微信专项测试与人工验证范围；本地开发检查入口 |
 | [V2 / M1 专用开发验证矩阵](maintenance/netease-v2-m1-playback-verification.md) | 搜索、播放、路径/Tool、Dock、共享运行库、资源与各平台验收；自动映射和人工边界分开维护 |
+| [V3 界面专用开发验证](maintenance/netease-v3-ui-verification.md) | V3 默认本地门禁、主题与尺寸、动效/回收证据及未完成的实机矩阵 |
 | [开发部署、正式发布与验收](maintenance/deployment-and-release.md) | 私有依赖声明、干净部署目录、正式 ZIP 和真实 Host 验收；按实际任务选择流程 |
 
 当前开发不使用 AIFLOW、Windows CI 或发布门禁。发布说明保留为正式交付时的参考；文档整理不会触发构建、部署或发布。
@@ -45,7 +47,7 @@
 
 最近一次开发部署见[M1 公共 LibVLC 配置与部署记录](archive/records/netease-v2/shared-libvlc-deployment-20260923.md)：已部署到指定 Controls，配置 Common 路径并确认 Host 实际加载该库；标准清理完成，批量删除受自动审批限制的剩余文件单独列明。此前微信与 App 版记录保留在归档中。
 
-最新功能实施见[V2 / M1 实现与验证记录](archive/records/netease-v2/m1-implementation-20260923.md)，包括本地门禁、真实 MP3 解码、共享目录与两种开发暂存产物；后续实际部署另见上述专用记录。
+最新界面实施见[V3 实现与验证记录](archive/records/netease-v3/ui-implementation-20260923.md)，包含自动门禁、截图审阅、动效观察及明确未执行的实机项目；本轮没有部署。此前播放能力见[V2 / M1 记录](archive/records/netease-v2/m1-implementation-20260923.md)。
 
 ## 文档目录与维护约定
 

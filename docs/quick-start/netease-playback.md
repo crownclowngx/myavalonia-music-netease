@@ -21,14 +21,18 @@
 
 Tool 关闭只隐藏，再打开保留草稿。扫码入口仍在“新建”的网易云音乐 Document 中；当前 SDK 没有让 Tool 直接打开 Document 的公开端口。
 
+## V3 界面与动效
+
+Document 和 Tool 跟随所在 Host 窗口的深浅主题。结果列表独立滚动，底部播放条固定；窄窗口自动减少显示列。Tool 底部“界面 → 减少动态效果”立即关闭本插件额外过渡并保存偏好，账号和播放配置不受影响。完整说明见[当前界面契约](../reference/netease-desktop-ui.md)。
+
 ## 开发验证与运行
 
 ```powershell
-pwsh -NoProfile -File tools/verify-development.ps1 -Milestone M1
+pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V3
 dotnet run --project src/MusicNetEasePlugin.Standalone -c Debug --no-build
 ```
 
-Standalone 的音乐与设置页签复用生产模型和 View，账号数据使用独立目录。M1 门禁执行 locked restore、Debug 零警告构建、全部登录/音乐测试、真实无声离线解码、TRX/场景映射、生产 View 渲染及文档检查；不连接网易、不读取用户会话、不启动 Host 或系统音频输出。
+Standalone 支持主题切换和并排/窄 Document/窄 Tool/底部 Tool 预览，复用生产模型和 View，账号数据使用独立目录。V3 门禁在 M1 基础上增加界面专项、17 张主题截图及动效观察；执行 locked restore、Debug 零警告构建、全部登录/音乐测试、真实无声离线解码、TRX/场景映射、生产 View 渲染及文档检查；不连接网易、不读取用户会话、不启动 Host 或系统音频输出。
 
 需要显式验证真实账号和 MP3 解码时：
 
@@ -66,4 +70,4 @@ dotnet msbuild src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj `
 | 加载等待较久 | 本阶段先完整缓冲，最大 64 MiB、总预算 120 秒；可停止或换曲 |
 | 无地址 / 暂不可播 | 按当前账号返回值提示，可换歌或稍后重试，不自动请求更高权限 |
 | 设置保存成功但来源仍是内置 | 符合内置优先规则；共享目录模式使用不携带原生库的产物 |
-| 窗口较窄 | 内容可纵向滚动，设置按钮自动换行 |
+| 窗口较窄 | Document 自动收缩列并保留播放条；Tool 分组纵向滚动，宽度充足时并排 |

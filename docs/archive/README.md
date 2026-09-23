@@ -28,3 +28,7 @@ V1 最后一次部署见第 4 项，后续部署见下面的 V2 记录。各记�
 | --- | --- | --- |
 | 2026-09-23 | [M1 搜索、单曲播放与 LibVLC 设置实现](records/netease-v2/m1-implementation-20260923.md) | 自动回归、真实 MP3 解码、视频目录复用、内置/精简开发产物；真实听感及 Host/Dock 待验收 |
 | 2026-09-23 | [M1 公共 LibVLC 配置与开发部署](records/netease-v2/shared-libvlc-deployment-20260923.md) | 指定 Controls 部署、Common 路径配置、公共库解码及 Host 实际加载；标准清理与自动审批阻止的剩余项 |
+
+| 日期 | V3 实施记录 | 证明范围 |
+| --- | --- | --- |
+| 2026-09-23 | [紧凑桌面界面、主题与轻量动效](records/netease-v3/ui-implementation-20260923.md) | 本地自动门禁、真实 View 截图、同款基础主题组合与有限动效回收；真实 Host/Dock、缩放和硬件帧时间待验收，无部署 |
