@@ -1,0 +1,62 @@
+[
+  {
+    "bytes": 298,
+    "files": 1,
+    "path": "src/MusicNetEasePlugin.Plugin/bin"
+  },
+  {
+    "bytes": 236189,
+    "files": 13,
+    "path": "src/MusicNetEasePlugin.Plugin/obj"
+  },
+  {
+    "bytes": 0,
+    "files": 0,
+    "path": "src/MusicNetEasePlugin.Standalone/bin"
+  },
+  {
+    "bytes": 384857,
+    "files": 11,
+    "path": "src/MusicNetEasePlugin.Standalone/obj"
+  },
+  {
+    "bytes": 0,
+    "files": 0,
+    "path": "tests/MusicNetEasePlugin.Tests/bin"
+  },
+  {
+    "bytes": 289267,
+    "files": 10,
+    "path": "tests/MusicNetEasePlugin.Tests/obj"
+  },
+  {
+    "bytes": 0,
+    "files": 0,
+    "path": "tools/MusicNetEasePlugin.LoginProbe/bin"
+  },
+  {
+    "bytes": 300803,
+    "files": 10,
+    "path": "tools/MusicNetEasePlugin.LoginProbe/obj"
+  },
+  {
+    "bytes": 5971808,
+    "files": 13,
+    "path": "artifacts/m1-common-deployment-20260923"
+  },
+  {
+    "bytes": 117717519,
+    "files": 450,
+    "path": "artifacts/m1-development-20260923"
+  },
+  {
+    "bytes": 298,
+    "files": 1,
+    "path": "artifacts/v3-common-deployment-20260923-104516/bin"
+  },
+  {
+    "bytes": 6035354,
+    "files": 12,
+    "path": "artifacts/v3-common-deployment-20260923-104516/Controls"
+  }
+]

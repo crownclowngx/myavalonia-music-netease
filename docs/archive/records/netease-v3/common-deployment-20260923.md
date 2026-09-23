@@ -32,3 +32,22 @@ V3 源码全量本地开发验证此前已通过 168 项测试及 63 项门禁�
 本轮没有启动 Host，未将文件部署成功等同于真实 Dock、主题或播放验收。启动目标 Host 后加载本次 V3 产物，后续实机项目继续由[V3 专项矩阵](../../../maintenance/netease-v3-ui-verification.md)跟踪。
 
 本次为开发部署，没有使用 AIFLOW、Windows CI、正式 ZIP 或发布门禁，没有推送远端。
+
+## 部署后清理
+
+用户随后要求清理中间产物。先核对清理范围仅在本插件仓库，保留部署目录、Common、验证证据、参考资料和本次回滚副本。
+
+批量递归删除编译/暂存目录的动作被自动审批审核拒绝，仅返回 `blocked by policy`，没有更具体原因；没有尝试换工具或拆分删除绕过限制。随后执行标准 `dotnet clean MusicNetEasePlugin.slnx -c Debug`，以及同一 `IncludeLibVlcRuntime=false` / 独立 OutputPath 的 Plugin clean，两次均成功。
+
+常规 bin/obj 共减少 1,966,477,471 字节，另清理本次独立编译输出约 81.5 MiB，合计约 **1.91 GiB**。Standalone、Tests、LoginProbe 的 bin 已无文件；未删除测试证据、上游参考或回滚备份。
+
+标准 clean 不负责删除干净部署暂存目录及部分还原/生成文件。剩余中间文件约 **124.87 MiB**，见[清理后清单](assets/cleanup-remaining.json)：
+
+| 范围 | 剩余内容 |
+| --- | --- |
+| Plugin 普通 bin 与本次独立 bin | 各 1 个生成 manifest |
+| 四个项目 obj | 44 个还原/缓存文件 |
+| 旧 M1 两个暂存根 | 463 个文件，含既有内置库暂存 |
+| 本次 V3 暂存 Controls | 12 个干净插件文件 |
+
+因此清理未全部完成。清理后再次逐个验证目标部署 12 文件和 Common 425 文件的 SHA256，均与部署时一致；不影响已部署插件使用。详细标准 clean 日志保留在本次本地 artifacts 记录目录。
