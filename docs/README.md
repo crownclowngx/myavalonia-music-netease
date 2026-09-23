@@ -2,6 +2,7 @@
 
 > 本插件唯一文档总导航；更新日期：2026-09-23。
 > 当前基线：登录、搜索、单曲播放与设置 Tool 已实现；真实账号 MP3 及两种运行库来源已解码，M1 真实 Host/Dock 与听感验收待完成；歌单等后续能力尚未实现。
+> 下一实施阶段：V4 / M2 日常播放器；方案与专用验证矩阵已编写，功能和 V4 门禁尚未实施。
 
 ## 使用与后续开发
 
@@ -11,6 +12,7 @@
 | 下一步开发什么 | [能力路线图](roadmap/netease-capability-roadmap.md) | M1–M5 能力范围、先后依赖、验收标准与首轮任务拆分 |
 | 如何播放与配置运行库 | [搜索播放快速开始](quick-start/netease-playback.md)、[当前播放契约](reference/netease-music-playback.md) | 搜索、单曲控制、共享路径、开发产物与探针 |
 | 如何实现 M1 | [V2：搜索与单曲播放方案](roadmap/netease-v2-m1-playback-plan.md) | SOLID 分工、S0–S5 进度与剩余验收 |
+| 如何实施 M2 日常播放器 | [V4：M2 日常播放器实施指导](roadmap/netease-v4-m2-daily-player-plan.md) | 待实施；歌单、队列、模式、定位、歌词、恢复、页面寿命迁移与 V4.0–V4.6 退出条件 |
 | 如何优化当前 Document 和 Tool | [V3：紧凑桌面界面改造方案](roadmap/netease-v3-desktop-ui-and-theme-plan.md) | 已实现；现代紧凑布局、双色资源与轻量动效，真实 Dock/性能验收继续跟踪 |
 | 当前界面如何工作 | [V3 当前界面契约](reference/netease-desktop-ui.md) | 布局断点、局部主题、动效寿命、偏好存储与 SOLID 分工 |
 | 多个插件如何使用 LibVLC | [V2：运行库、Tool 与 Dock 专项设计](roadmap/netease-v2-libvlc-tool-and-dock-design.md) | 内置优先/指定目录、设置生效、VideoSecurityPlayer 踩坑对照；共享目录已解码，真实共存待验收 |
@@ -37,6 +39,7 @@
 | [登录开发验证矩阵](maintenance/netease-login-verification.md) | 协议、HTTP、状态、存储、UI、微信专项测试与人工验证范围；本地开发检查入口 |
 | [V2 / M1 专用开发验证矩阵](maintenance/netease-v2-m1-playback-verification.md) | 搜索、播放、路径/Tool、Dock、共享运行库、资源与各平台验收；自动映射和人工边界分开维护 |
 | [V3 界面专用开发验证](maintenance/netease-v3-ui-verification.md) | V3 默认本地门禁、主题与尺寸、动效/回收证据及未完成的实机矩阵 |
+| [V4 / M2 日常播放器专用验证](maintenance/netease-v4-m2-daily-player-verification.md) | 待实施；58 个自动场景、门禁失败注入、真实连续听歌/恢复/Host 验收及专用证据约定 |
 | [开发部署、正式发布与验收](maintenance/deployment-and-release.md) | 私有依赖声明、干净部署目录、正式 ZIP 和真实 Host 验收；按实际任务选择流程 |
 
 当前开发不使用 AIFLOW、Windows CI 或发布门禁。发布说明保留为正式交付时的参考；文档整理不会触发构建、部署或发布。
