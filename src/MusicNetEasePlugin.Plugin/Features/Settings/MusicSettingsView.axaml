@@ -50,6 +50,7 @@
     <Border Classes="netease-divider" Padding="0,0,0,6"><TextBlock Classes="netease-section" Text="界面" /></Border>
     <CheckBox Content="显示封面与头像" IsChecked="{Binding Preferences.ShowArtwork, Mode=TwoWay}" />
     <CheckBox Content="显示歌词翻译" IsChecked="{Binding Preferences.ShowTranslation, Mode=TwoWay}" />
+    <CheckBox Content="舒适阅读密度（关闭为紧凑）" IsChecked="{Binding Preferences.ComfortableDensity, Mode=TwoWay}" />
     <CheckBox x:Name="ReduceMotionToggle" Content="减少动态效果" IsChecked="{Binding Preferences.ReduceMotion, Mode=TwoWay}" FontSize="13" MinHeight="28" />
     <TextBlock Classes="netease-secondary" Text="{Binding Preferences.Message}" TextWrapping="Wrap" />
     <Button Classes="netease-button" Content="重试保存界面偏好" Command="{Binding Preferences.RetrySaveCommand}" HorizontalAlignment="Left" IsVisible="{Binding Preferences.Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />

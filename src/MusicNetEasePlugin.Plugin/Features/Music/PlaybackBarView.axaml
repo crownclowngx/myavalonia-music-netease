@@ -32,8 +32,8 @@
     <Button x:Name="VolumeButton" Classes="netease-button" Content="音量" ToolTip.Tip="{Binding Player.VolumeText}" AutomationProperties.Name="调整音量">
      <Button.Flyout><Flyout><StackPanel Spacing="6" Width="190"><TextBlock Text="{Binding Player.VolumeText}" /><Slider x:Name="VolumeSlider" Value="{Binding Player.Volume, Mode=TwoWay}" Minimum="0" Maximum="100" AutomationProperties.Name="音量" /><Button Content="静音 / 恢复音量" Command="{Binding Player.MuteCommand}" /></StackPanel></Flyout></Button.Flyout>
     </Button>
-    <Button Classes="netease-button" Content="歌词" Classes.selected="{Binding Navigation.IsLyrics}" Command="{Binding ShowLyricsCommand}" />
-    <Button Classes="netease-button" Content="{Binding Queue.ButtonText}" Classes.selected="{Binding Navigation.IsQueue}" Command="{Binding ShowQueueCommand}" ToolTip.Tip="{Binding Queue.CountText}" AutomationProperties.Name="播放队列" />
+    <ToggleButton x:Name="LyricsToggle" Content="歌词" IsChecked="{Binding Navigation.IsLyrics, Mode=OneWay}" Command="{Binding ShowLyricsCommand}" AutomationProperties.Name="{Binding Navigation.LyricsAction}" />
+    <ToggleButton x:Name="QueueToggle" Content="{Binding Queue.ButtonText}" IsChecked="{Binding Navigation.IsQueue, Mode=OneWay}" Command="{Binding ShowQueueCommand}" ToolTip.Tip="{Binding Queue.CountText}" AutomationProperties.Name="{Binding Navigation.QueueAction}" />
     <Button Classes="netease-button icon" ToolTip.Tip="更多播放操作" AutomationProperties.Name="更多播放操作"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseMoreIcon}" />
      <Button.Flyout><MenuFlyout><MenuItem Header="停止并回到开头" Command="{Binding Player.StopCommand}" /></MenuFlyout></Button.Flyout>
     </Button>

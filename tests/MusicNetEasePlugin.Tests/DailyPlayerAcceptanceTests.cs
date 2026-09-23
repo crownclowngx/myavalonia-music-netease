@@ -42,8 +42,11 @@ public sealed class DailyPlayerAcceptanceTests
                 foreach (var (width, height, pane) in new[] { (1200, 720, "我的歌单"), (800, 600, "播放队列"), (520, 420, "歌词") })
                 {
                     window.Width = width; window.Height = height; await Click(page.View, pane); Pump(window);
+                    // 这里只等有限的 200ms 入场结束，再检查最终命中几何；业务竞态测试仍使用可控时钟。
+                    await Task.Delay(240); Pump(window);
                     foreach (var button in page.View.GetVisualDescendants().OfType<Button>().Where(b => b.IsEffectivelyVisible && b.Content is string)) Inside(button, page.View);
-                    var list = page.View.GetVisualDescendants().OfType<ListBox>().Single(b => b.IsEffectivelyVisible);
+                    var listName = pane == "歌词" ? "LyricList" : pane == "播放队列" ? "QueueList" : "PlaylistTrackList";
+                    var list = page.View.GetVisualDescendants().OfType<ListBox>().Single(b => b.Name == listName && b.IsEffectivelyVisible);
                     Assert.True(list.Bounds.Height > 50, $"{pane}: {list.Bounds}");
                     Assert.InRange(list.GetVisualDescendants().OfType<ListBoxItem>().Count(), 1, 30);
                     Inside(page.View.GetVisualDescendants().OfType<Slider>().Single(s => s.Name == "PlaybackProgress"), page.View);
@@ -111,7 +114,7 @@ public sealed class DailyPlayerAcceptanceTests
     private static string Theme(bool dark) => dark ? "dark" : "light";
     private static async Task Click(Control root, string content)
     {
-        var button = root.GetVisualDescendants().OfType<Button>().First(b => b.IsEffectivelyVisible && (Equals(b.Content, content) || Avalonia.Automation.AutomationProperties.GetName(b) == content));
+        var button = root.GetVisualDescendants().OfType<Button>().First(b => b.IsEffectivelyVisible && (Equals(b.Content, content) || Avalonia.Automation.AutomationProperties.GetName(b) == content || Avalonia.Automation.AutomationProperties.GetName(b) == "展开" + content));
         Assert.True(button.IsEnabled, content); Assert.NotNull(button.Command);
         if (button.Command is IAsyncRelayCommand asyncCommand) await asyncCommand.ExecuteAsync(button.CommandParameter);
         else button.Command.Execute(button.CommandParameter);

@@ -69,7 +69,7 @@ public sealed class LightweightResourceTests
         Assert.Equal(new(true, true, true), await store.LoadAsync(default));
         await store.SaveAsync(new(false, false, false), default);
         Assert.Equal(new(false, false, false), await store.LoadAsync(default));
-        Assert.Contains("\"schemaVersion\":2", (await File.ReadAllTextAsync(path)).Replace(" ", ""));
+        Assert.Contains("\"schemaVersion\":3", (await File.ReadAllTextAsync(path)).Replace(" ", ""));
     }
     internal sealed class ImmediateImages(Func<string?, byte[]?> load) : IAccountImageSource
     { public Task<byte[]?> LoadAsync(string? address, CancellationToken cancellationToken) => Task.FromResult(load(address)); }

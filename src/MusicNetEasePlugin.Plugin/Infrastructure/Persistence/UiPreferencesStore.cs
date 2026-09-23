@@ -11,7 +11,8 @@ internal sealed class UiPreferencesStore(string directory) : IUiPreferencesStore
 {
     private readonly string _path = Path.Combine(directory, "ui-preferences.json");
     private static readonly JsonSerializerOptions Options = new(JsonSerializerDefaults.Web);
-    private sealed record Settings(int SchemaVersion, bool ReduceMotion, bool? ShowArtwork = null, bool? ShowTranslation = null);
+    private sealed record Settings(int SchemaVersion, bool ReduceMotion, bool? ShowArtwork = null, bool? ShowTranslation = null,
+        double? DrawerWidth = null, bool? ComfortableDensity = null);
 
     public async Task<UiPreferencesData> LoadAsync(CancellationToken cancellationToken)
     {
@@ -24,6 +25,8 @@ internal sealed class UiPreferencesStore(string directory) : IUiPreferencesStore
         {
             { SchemaVersion: 1 } => new(value.ReduceMotion),
             { SchemaVersion: 2, ShowArtwork: { } artwork, ShowTranslation: { } translation } => new(value.ReduceMotion, artwork, translation),
+            { SchemaVersion: 3, ShowArtwork: { } artwork, ShowTranslation: { } translation,
+                DrawerWidth: >= 320 and <= 480, ComfortableDensity: { } comfortable } => new(value.ReduceMotion, artwork, translation, value.DrawerWidth.Value, comfortable),
             _ => throw new JsonException("界面偏好版本或字段无效。")
         };
     }
@@ -34,7 +37,9 @@ internal sealed class UiPreferencesStore(string directory) : IUiPreferencesStore
         try
         {
             Directory.CreateDirectory(Path.GetDirectoryName(_path)!);
-            await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(new Settings(2, preferences.ReduceMotion, preferences.ShowArtwork, preferences.ShowTranslation), Options), cancellationToken).ConfigureAwait(false);
+            if (!double.IsFinite(preferences.DrawerWidth) || preferences.DrawerWidth is < 320 or > 480)
+                throw new ArgumentOutOfRangeException(nameof(preferences), "抽屉期望宽度必须在 320–480 DIP 之间。");
+            await File.WriteAllTextAsync(temporary, JsonSerializer.Serialize(new Settings(3, preferences.ReduceMotion, preferences.ShowArtwork, preferences.ShowTranslation, preferences.DrawerWidth, preferences.ComfortableDensity), Options), cancellationToken).ConfigureAwait(false);
             cancellationToken.ThrowIfCancellationRequested();
             File.Move(temporary, _path, true);
         }

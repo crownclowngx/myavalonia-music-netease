@@ -20,10 +20,11 @@ public sealed class LightweightNavigationTests
         navigation.SetAvailableSize(1200, 650); navigation.ShowQueueCommand.Execute(null);
         Assert.True(navigation.IsQueueBeside); Assert.True(navigation.IsLibrary);
         navigation.ShowLyricsCommand.Execute(null); Assert.True(navigation.IsLyrics); Assert.True(navigation.LibrarySelected);
-        navigation.SetAvailableSize(800, 550); Assert.True(navigation.IsQueuePage); Assert.False(navigation.IsLyrics);
-        navigation.Back(); Assert.True(navigation.IsLyrics); Assert.False(navigation.IsQueue);
-        navigation.Back(); Assert.True(navigation.IsLibrary);
-        navigation.ShowQueueCommand.Execute(null); navigation.SetAvailableSize(1120, 549); Assert.True(navigation.IsQueuePage);
+        // V6 用互斥抽屉替代内容页；原浏览记忆和共享播放器不变。
+        navigation.SetAvailableSize(800, 550); Assert.False(navigation.IsBeside); Assert.True(navigation.IsLyrics); Assert.True(navigation.IsLibrary);
+        navigation.Back(); Assert.False(navigation.IsOpen); Assert.False(navigation.IsQueue);
+        Assert.True(navigation.IsLibrary);
+        navigation.ShowQueueCommand.Execute(null); navigation.SetAvailableSize(1120, 549); Assert.False(navigation.IsQueuePage);
         navigation.SetAvailableSize(1120, 550); Assert.True(navigation.IsQueueBeside);
         navigation.Browse(MusicBrowsePage.History); Assert.True(navigation.IsHistory); Assert.True(navigation.IsQueueBeside);
     }
@@ -101,9 +102,9 @@ public sealed class LightweightInteractionTests
                 var chosen = page.Music.SelectedTrack; page.Music.ShowLyricsCommand.Execute(null); await fixture.Lyrics.Pending; DesktopUiTests.Pump(window);
                 page.Music.ShowQueueCommand.Execute(null); DesktopUiTests.Pump(window); Assert.True(page.Music.Navigation.IsQueueBeside);
                 Save(window, $"v5-detail-{Theme(dark)}-1200.png");
-                window.Width = 800; window.Height = 600; DesktopUiTests.Pump(window); Assert.True(page.Music.Navigation.IsQueuePage);
+                window.Width = 800; window.Height = 600; DesktopUiTests.Pump(window); Assert.True(page.Music.Navigation.IsQueue); Assert.False(page.Music.Navigation.IsBeside);
                 Save(window, $"v5-detail-{Theme(dark)}-800.png");
-                page.Music.Navigation.Back(); window.Width = 520; window.Height = 420; DesktopUiTests.Pump(window);
+                page.Music.ShowLyricsCommand.Execute(null); window.Width = 520; window.Height = 420; DesktopUiTests.Pump(window);
                 Assert.True(page.Music.Navigation.IsLyrics); Save(window, $"v5-detail-{Theme(dark)}-520.png");
                 page.Music.Navigation.Back(); DesktopUiTests.Pump(window); Assert.Same(chosen, page.Music.SelectedTrack); Assert.Equal("中文", page.Music.Keyword);
                 Assert.InRange(list.GetVisualDescendants().OfType<ListBoxItem>().Count(), 1, 15);

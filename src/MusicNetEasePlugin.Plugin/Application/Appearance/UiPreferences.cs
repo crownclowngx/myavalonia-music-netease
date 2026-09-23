@@ -5,7 +5,8 @@ using MusicNetEasePlugin.Application.Authentication;
 namespace MusicNetEasePlugin.Application.Appearance;
 
 /// <summary>仅保存本插件的界面偏好，文件边界与账号、运行库配置分开。</summary>
-public sealed record UiPreferencesData(bool ReduceMotion = false, bool ShowArtwork = true, bool ShowTranslation = true);
+public sealed record UiPreferencesData(bool ReduceMotion = false, bool ShowArtwork = true, bool ShowTranslation = true,
+    double DrawerWidth = 360, bool ComfortableDensity = false);
 
 public interface IUiPreferencesStore
 {
@@ -28,6 +29,8 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
     private bool _reduceMotion;
     private bool _showArtwork = true;
     private bool _showTranslation = true;
+    private double _drawerWidth = 360;
+    private bool _comfortableDensity;
     private bool _disposed;
     private string _message = "";
 
@@ -53,6 +56,17 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
     }
 
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
+    /// <summary>保存用户希望的逻辑宽度；窗口收窄只限制布局，不能覆盖这个偏好。</summary>
+    public double DrawerWidth
+    {
+        get => _drawerWidth;
+        set { if (!_disposed && double.IsFinite(value) && SetProperty(ref _drawerWidth, Math.Clamp(value, 320, 480))) { Interlocked.Increment(ref _revision); Save(); } }
+    }
+    public bool ComfortableDensity
+    {
+        get => _comfortableDensity;
+        set { if (!_disposed && SetProperty(ref _comfortableDensity, value)) { Interlocked.Increment(ref _revision); Save(); } }
+    }
     public IRelayCommand RetrySaveCommand => field ??= new RelayCommand(Save);
     internal Task PendingSave => _saving;
 
@@ -71,6 +85,8 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
                 SetProperty(ref _reduceMotion, value.ReduceMotion, nameof(ReduceMotion));
                 SetProperty(ref _showArtwork, value.ShowArtwork, nameof(ShowArtwork));
                 SetProperty(ref _showTranslation, value.ShowTranslation, nameof(ShowTranslation));
+                SetProperty(ref _drawerWidth, value.DrawerWidth, nameof(DrawerWidth));
+                SetProperty(ref _comfortableDensity, value.ComfortableDensity, nameof(ComfortableDensity));
             });
         }
         catch (OperationCanceledException) { }
@@ -82,7 +98,7 @@ public sealed class UiPreferences(IUiPreferencesStore store, ILoginUiDispatcher 
     {
         if (_disposed) return;
         var revision = _revision;
-        var value = new UiPreferencesData(ReduceMotion, ShowArtwork, ShowTranslation);
+        var value = new UiPreferencesData(ReduceMotion, ShowArtwork, ShowTranslation, DrawerWidth, ComfortableDensity);
         // 保留所有未完成任务供容器释放收口；同一时刻只有一个写操作触达文件。
         var next = SaveAsync(revision, value);
         _saving = _saving.IsCompleted ? next : Task.WhenAll(_saving, next);

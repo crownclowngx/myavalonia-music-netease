@@ -17,6 +17,7 @@ public partial class PlaybackBarView : UserControl
     private MusicWorkspace? _model;
     private bool? _compact;
     public ViewMotion Motion { get; }
+    internal void FocusPanelButton(bool queue) => (queue ? QueueToggle : LyricsToggle).Focus();
     public PlaybackBarView()
     {
         Motion = new(this);

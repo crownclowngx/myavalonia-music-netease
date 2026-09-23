@@ -2,20 +2,22 @@
  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:vm="using:MusicNetEasePlugin.Features.Music" xmlns:models="using:MusicNetEasePlugin.Application.Playback"
  xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:conv="using:Avalonia.Data.Converters" xmlns:library="using:MusicNetEasePlugin.Features.Library" x:DataType="vm:MusicWorkspace"
- Background="{DynamicResource NeteaseDocumentBackgroundBrush}" Foreground="{DynamicResource NeteaseTextBrush}" FontSize="13">
+ Background="{DynamicResource NeteaseDocumentBackgroundBrush}" Foreground="{DynamicResource NeteaseTextBrush}" FontSize="13" Classes.netease-comfortable="{Binding Preferences.ComfortableDensity}">
  <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseThemeResources.axaml" /></ResourceDictionary.MergedDictionaries><vm:TrackDurationConverter x:Key="TrackDuration" /></ResourceDictionary></UserControl.Resources>
  <UserControl.Styles><StyleInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseControlStyles.axaml" /></UserControl.Styles>
  <Grid RowDefinitions="Auto,Auto,*,Auto">
-  <Grid ColumnDefinitions="*,Auto" Margin="12,8,12,6" ColumnSpacing="8">
+  <Grid ColumnDefinitions="*,Auto,Auto" Margin="12,8,12,6" ColumnSpacing="8">
    <TextBox x:Name="SearchInput" Classes="netease-input" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索歌名或歌手 · Enter" KeyDown="SearchKeyDown" AutomationProperties.Name="搜索歌名或歌手" />
-   <Button x:Name="SearchButton" Grid.Column="1" Classes="netease-button primary" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="搜索" Command="{Binding SearchCommand}" />
+   <Button Grid.Column="1" Classes="netease-button" Content="清空" IsVisible="{Binding Keyword, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Click="ClearSearch" AutomationProperties.Name="清空搜索关键词" />
+   <Button x:Name="SearchButton" Grid.Column="2" Classes="netease-button primary" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="搜索" Command="{Binding SearchCommand}" />
   </Grid>
   <StackPanel Grid.Row="1" Orientation="Horizontal" Spacing="6" Margin="12,0,12,8">
-   <Button Content="搜索" Classes="netease-button" Classes.selected="{Binding Navigation.SearchSelected}" Command="{Binding ShowSearchCommand}" />
-   <Button Content="我的歌单" Classes="netease-button" Classes.selected="{Binding Navigation.LibrarySelected}" Command="{Binding ShowLibraryCommand}" />
-   <Button Content="最近播放" Classes="netease-button" Classes.selected="{Binding Navigation.HistorySelected}" Command="{Binding ShowHistoryCommand}" />
+   <ToggleButton Content="搜索" IsChecked="{Binding Navigation.SearchSelected, Mode=OneWay}" Command="{Binding ShowSearchCommand}" AutomationProperties.Name="搜索页面" />
+   <ToggleButton Content="我的歌单" IsChecked="{Binding Navigation.LibrarySelected, Mode=OneWay}" Command="{Binding ShowLibraryCommand}" AutomationProperties.Name="我的歌单页面" />
+   <ToggleButton Content="最近播放" IsChecked="{Binding Navigation.HistorySelected, Mode=OneWay}" Command="{Binding ShowHistoryCommand}" AutomationProperties.Name="最近播放页面" />
   </StackPanel>
-  <Grid x:Name="ContentLayout" Grid.Row="2" ColumnDefinitions="*,0" ColumnSpacing="0" Margin="12,0,12,8">
+  <Grid x:Name="ContentStage" Grid.Row="2" Margin="12,0,12,8" ClipToBounds="True">
+   <Grid x:Name="ContentLayout">
    <Grid x:Name="SearchPane" RowDefinitions="Auto,*,Auto" IsVisible="{Binding Navigation.IsSearch}">
     <Grid RowDefinitions="Auto,Auto" Margin="4,0,4,6">
      <ProgressBar Height="2" IsVisible="{Binding IsLoading}"><ProgressBar.IsIndeterminate><MultiBinding Converter="{x:Static conv:BoolConverters.And}"><Binding Path="IsLoading" /><Binding ElementName="MusicRoot" Path="Motion.IsEnabled" /></MultiBinding></ProgressBar.IsIndeterminate></ProgressBar>
@@ -31,21 +33,21 @@
     </Grid>
    </Grid>
    <library:PlaylistView IsVisible="{Binding #MusicRoot.Model.Navigation.IsLibrary}" DataContext="{Binding Playlists}" />
-   <Grid IsVisible="{Binding Navigation.IsLyrics}" RowDefinitions="Auto,*">
-    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8" Margin="0,0,0,6"><Button Classes="netease-button" Content="‹ 返回" Command="{Binding Navigation.BackCommand}" /><TextBlock Grid.Column="1" Text="{Binding Player.CurrentTrack}" TextTrimming="CharacterEllipsis" FontWeight="SemiBold" VerticalAlignment="Center" /></Grid>
-    <Grid x:Name="LyricsLayout" Grid.Row="1" ColumnDefinitions="0,*" ColumnSpacing="16">
-     <StackPanel x:Name="LargeCover" IsVisible="False" Spacing="12" Margin="8,20" VerticalAlignment="Top">
-      <Border Width="200" Height="200" CornerRadius="8" ClipToBounds="True" Background="{DynamicResource NeteaseSelectionBrush}"><Grid><PathIcon Width="64" Height="64" Data="{DynamicResource NeteaseMusicIcon}" Foreground="{DynamicResource NeteaseAccentBrush}" /><ui:ArtworkImage Bytes="{Binding Player.CoverBytes}" Stretch="UniformToFill" /></Grid></Border>
-      <TextBlock Text="{Binding Player.TrackName}" TextWrapping="Wrap" FontSize="20" FontWeight="SemiBold" /><TextBlock Text="{Binding Player.Artists}" TextWrapping="Wrap" Classes="netease-secondary" />
-     </StackPanel>
-     <vm:LyricsView Grid.Column="1" DataContext="{Binding Lyrics}" />
-    </Grid>
-   </Grid>
    <vm:HistoryView IsVisible="{Binding #MusicRoot.Model.Navigation.IsHistory}" DataContext="{Binding History}" />
-   <Grid x:Name="QueuePanel" Grid.Column="1" IsVisible="{Binding Navigation.IsQueue}" RowDefinitions="Auto,*" Background="{DynamicResource NeteasePanelBrush}">
-    <Grid ColumnDefinitions="*,Auto" Margin="8,4"><TextBlock Text="播放队列" FontWeight="SemiBold" VerticalAlignment="Center" /><Button Grid.Column="1" Classes="netease-button" Content="关闭" Command="{Binding ShowQueueCommand}" AutomationProperties.Name="关闭播放队列" /></Grid>
-    <vm:QueueView Grid.Row="1" DataContext="{Binding Queue}" />
    </Grid>
+   <Border x:Name="Drawer" IsVisible="False" HorizontalAlignment="Right" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="1,0,0,0">
+    <Grid ColumnDefinitions="8,*">
+     <Thumb x:Name="DrawerResize" Cursor="SizeWestEast" Focusable="True" Background="{DynamicResource NeteaseBorderBrush}" AutomationProperties.Name="调整抽屉宽度，左右键调整，Home 恢复默认" />
+     <Grid Grid.Column="1" RowDefinitions="Auto,*" Margin="8,4">
+      <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,6"><TextBlock Text="{Binding Navigation.PanelTitle}" FontWeight="SemiBold" VerticalAlignment="Center" /><Button Grid.Column="1" Classes="netease-button" Content="默认宽度" Click="ResetDrawerWidth" /><Button x:Name="CloseDrawerButton" Grid.Column="2" Classes="netease-button" Content="收起 ›" Command="{Binding Navigation.BackCommand}" AutomationProperties.Name="收起侧边抽屉" /></Grid>
+      <Grid Grid.Row="1" IsVisible="{Binding Navigation.IsLyrics}" RowDefinitions="Auto,*">
+       <StackPanel Margin="8,2,8,4"><TextBlock Text="{Binding Player.TrackName}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Player.CurrentTrack}" FontWeight="SemiBold" /><TextBlock Text="{Binding Player.Artists}" TextTrimming="CharacterEllipsis" Classes="netease-secondary" /></StackPanel>
+       <vm:LyricsView Grid.Row="1" DataContext="{Binding Lyrics}" />
+      </Grid>
+      <Grid x:Name="QueuePanel" Grid.Row="1" IsVisible="{Binding Navigation.IsQueue}"><vm:QueueView DataContext="{Binding Queue}" /></Grid>
+     </Grid>
+    </Grid>
+   </Border>
   </Grid>
   <vm:PlaybackBarView x:Name="PlayerBar" Grid.Row="3" />
  </Grid>
