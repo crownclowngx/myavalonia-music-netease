@@ -1,0 +1,77 @@
+{
+  "target": "D:\\data\\avalonia\\Controls\\MusicNetEasePlugin",
+  "otherPluginDirectoriesUnchanged": 12,
+  "hostLaunchVerified": false,
+  "hostWasStopped": true,
+  "commonDirectory": "D:\\data\\avalonia\\Common\\libvlc",
+  "includeLibVlcRuntime": false,
+  "configuration": "Debug",
+  "deployedAt": "2026-09-23T10:46:49.5761988+08:00",
+  "commonFilesVerified": 425,
+  "files": [
+    {
+      "sha256": "E5EEAF6D263C493619982FD3638E6135077311D08C961E1FE128F9107D29EBC6",
+      "length": 4924576,
+      "path": "BouncyCastle.Cryptography.dll"
+    },
+    {
+      "sha256": "7FF7965161F6ACC809F7154CD3BA1F56E0290974D4FCFC5944BD4C9030996383",
+      "length": 39936,
+      "path": "Flurl.dll"
+    },
+    {
+      "sha256": "CB204C6865563BC7F023F4655977CF5263536A75069B0E7E1D72A900A66F1EB5",
+      "length": 113152,
+      "path": "Flurl.Http.dll"
+    },
+    {
+      "sha256": "EA886CA99677A28C2B15D11F8DDD52EF5F22D7E17600F1A31C0F6DD91DC9E4FE",
+      "length": 229888,
+      "path": "LibVLCSharp.dll"
+    },
+    {
+      "sha256": "3F828A0007BB1C6D18AE668B2918DFAC988888E1D2566E70BE03FABC65257D00",
+      "length": 16843,
+      "path": "MusicNetEasePlugin.Plugin.deps.json"
+    },
+    {
+      "sha256": "446C945C8CC1F55163A8DFABCB924F160F43C2DF087089C417EEC3633A03B63A",
+      "length": 366592,
+      "path": "MusicNetEasePlugin.Plugin.dll"
+    },
+    {
+      "sha256": "5282B31C5C8E3266B552442D07674E96E56DBA3445CBE08BA11498C6565655CD",
+      "length": 89048,
+      "path": "MusicNetEasePlugin.Plugin.pdb"
+    },
+    {
+      "sha256": "52AB55FB828C3F6CF404814BC22F1B7A3B8045B762C56A9E6610799C6BE922E9",
+      "length": 8192,
+      "path": "MyAvaloniaManagement.Icons.dll"
+    },
+    {
+      "sha256": "97B99D057395F9200CB4555A2C73744A67EBFC405130BCDD7CCCAD436B37D0FD",
+      "length": 298,
+      "path": "plugin.manifest.json"
+    },
+    {
+      "sha256": "5CACB8E071EF6B355615E8CAE1D02D94B9D191EC33DB12A05D82099CDDB16E9A",
+      "length": 204288,
+      "path": "QRCoder.dll"
+    },
+    {
+      "sha256": "7CCC461B061D8E45ACF41219809C8773028274037906180C77495571A305734B",
+      "length": 40208,
+      "path": "System.Security.Cryptography.ProtectedData.dll"
+    },
+    {
+      "sha256": "2CAB65847EC2386946992054968F7B841F1E33DBCFB6E9D93CAA6C01513679E0",
+      "length": 2333,
+      "path": "THIRD-PARTY-NOTICES.md"
+    }
+  ],
+  "sourceRevision": "2a8f5ea01938c23d1c9beacd9a8870af5a77c56b",
+  "releaseGateExecuted": false,
+  "fileCount": 12,
+  "configurationFilesUnchanged": 3
+}

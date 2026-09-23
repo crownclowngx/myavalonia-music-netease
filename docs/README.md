@@ -45,9 +45,9 @@
 
 完整入口见[归档索引](archive/README.md)。原 V1 登录计划已经归档，后续能力由当前路线图承接；尚未覆盖的验证项继续在维护矩阵跟踪。
 
-最近一次开发部署见[M1 公共 LibVLC 配置与部署记录](archive/records/netease-v2/shared-libvlc-deployment-20260923.md)：已部署到指定 Controls，配置 Common 路径并确认 Host 实际加载该库；标准清理完成，批量删除受自动审批限制的剩余文件单独列明。此前微信与 App 版记录保留在归档中。
+最近一次开发部署见[V3 Common LibVLC 部署记录](archive/records/netease-v3/common-deployment-20260923.md)：无原生库的 V3 产物已替换指定 Controls，保留公共库及用户配置；本轮未启动 Host。此前[M1 公共库配置](archive/records/netease-v2/shared-libvlc-deployment-20260923.md)、微信与 App 版记录保留在归档中。
 
-最新界面实施见[V3 实现与验证记录](archive/records/netease-v3/ui-implementation-20260923.md)，包含自动门禁、截图审阅、动效观察及明确未执行的实机项目；本轮没有部署。此前播放能力见[V2 / M1 记录](archive/records/netease-v2/m1-implementation-20260923.md)。
+最新界面实施见[V3 实现与验证记录](archive/records/netease-v3/ui-implementation-20260923.md)，包含自动门禁、截图审阅、动效观察及明确未执行的实机项目；后续部署见上述独立记录。此前播放能力见[V2 / M1 记录](archive/records/netease-v2/m1-implementation-20260923.md)。
 
 ## 文档目录与维护约定
 

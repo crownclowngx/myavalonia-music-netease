@@ -32,3 +32,4 @@ V1 最后一次部署见第 4 项，后续部署见下面的 V2 记录。各记�
 | 日期 | V3 实施记录 | 证明范围 |
 | --- | --- | --- |
 | 2026-09-23 | [紧凑桌面界面、主题与轻量动效](records/netease-v3/ui-implementation-20260923.md) | 本地自动门禁、真实 View 截图、同款基础主题组合与有限动效回收；真实 Host/Dock、缩放和硬件帧时间待验收，无部署 |
+| 2026-09-23 | [V3 复用 Common LibVLC 开发部署](records/netease-v3/common-deployment-20260923.md) | 无原生库构建、指定 Controls 整体替换、12 文件摘要一致，公共库与用户配置不变；未启动 Host |
