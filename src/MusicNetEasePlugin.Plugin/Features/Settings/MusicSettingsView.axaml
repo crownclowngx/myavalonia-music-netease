@@ -18,6 +18,8 @@
      <Button Classes="netease-button" Content="更多" AutomationProperties.Name="更多账号操作"><Button.Flyout><MenuFlyout><MenuItem Header="退出账号" Command="{Binding LogoutCommand}" /></MenuFlyout></Button.Flyout></Button>
     </StackPanel>
     <TextBlock Classes="netease-secondary" Text="扫码登录：从「新建」打开网易云音乐。" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding PlaybackStorageMessage}" TextWrapping="Wrap" IsVisible="{Binding PlaybackStorageMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <Button Content="重试本地播放保存/清理" Command="{Binding RetryPlaybackStorageCommand}" HorizontalAlignment="Left" IsVisible="{Binding PlaybackStorageMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
    </StackPanel>
    <StackPanel x:Name="RuntimeSection" Grid.Row="1" Spacing="6">
     <Border Classes="netease-divider" Padding="0,0,0,6"><TextBlock Classes="netease-section" Text="播放运行库" /></Border>

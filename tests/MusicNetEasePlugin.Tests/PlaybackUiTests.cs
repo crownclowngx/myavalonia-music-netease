@@ -22,7 +22,7 @@ public sealed class PlaybackUiTests
     [Fact, Trait("M1", "U01,U02,U03,U07,U08,T08")]
     public async Task 真实音乐视图和设置视图重复重挂保留状态及草稿()
     {
-        using var headless = HeadlessUnitTestSession.StartNew(typeof(PlaybackUiTests));
+        var headless = HeadlessSessions.Get(typeof(PlaybackUiTests));
         await headless.Dispatch(async () =>
         {
             await using var f = new PlaybackFixture(); await using var login = TestLogin.Create(new(), new(), TimeProvider.System, LoginOptions.Default);

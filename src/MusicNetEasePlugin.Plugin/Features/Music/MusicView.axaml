@@ -19,6 +19,7 @@
    <Button Content="我的歌单" Classes="netease-button" Command="{Binding ShowLibraryCommand}" />
    <Button Content="播放队列" Classes="netease-button" Command="{Binding ShowQueueCommand}" />
    <Button Content="歌词" Classes="netease-button" Command="{Binding ShowLyricsCommand}" />
+   <Button Content="最近播放" Classes="netease-button" Command="{Binding ShowHistoryCommand}" />
   </StackPanel>
   <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,*,Auto" IsVisible="{Binding IsSearch}">
   <Grid ColumnDefinitions="*,Auto" Margin="12,10,12,6" ColumnSpacing="8">
@@ -68,6 +69,7 @@
   <Grid Grid.Row="1" IsVisible="{Binding IsLibrary}"><library:PlaylistView DataContext="{Binding Playlists}" /></Grid>
   <Grid Grid.Row="1" IsVisible="{Binding IsQueue}"><vm:QueueView DataContext="{Binding Queue}" /></Grid>
   <Grid Grid.Row="1" IsVisible="{Binding IsLyrics}"><vm:LyricsView DataContext="{Binding Lyrics}" /></Grid>
+  <Grid Grid.Row="1" IsVisible="{Binding IsHistory}"><vm:HistoryView DataContext="{Binding History}" /></Grid>
   <Border x:Name="PlaybackBar" Grid.Row="2" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="0,1,0,0" Padding="12,8">
    <Grid x:Name="PlaybackLayout" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="6" ColumnSpacing="12">
     <Grid ColumnDefinitions="44,*" ColumnSpacing="8">

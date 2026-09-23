@@ -249,7 +249,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
         Update(progress.Generation, s => s with { State = progress.State, PositionMs = Math.Max(0, progress.PositionMs),
             DurationMs = progress.DurationMs > 0 ? s.TrialDurationMs is { } limit ? Math.Min(progress.DurationMs, limit) : progress.DurationMs : s.DurationMs,
             CanSeek = progress.CanSeek,
-            Message = s.State == PlaybackState.Loading ? s.IsTrial ? "正在播放试听片段" : "" : s.Message });
+            Message = progress.StartPositionReset ? "续播位置超出当前媒体长度，已从开头播放。" : s.State == PlaybackState.Loading ? s.IsTrial ? "正在播放试听片段" : "" : s.Message });
     }
     private async Task ReleaseMediaAsync()
     {

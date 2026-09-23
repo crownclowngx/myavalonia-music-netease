@@ -9,9 +9,12 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     private readonly IMusicSessionAccessor _sessions;
     private readonly PlaybackCoordinator _single;
     private readonly QueueNavigator _order;
+    private readonly PlaybackPersistence? _persistence;
+    private long _resumePosition;
     private readonly object _sync = new();
     private readonly CancellationTokenSource _closing = new();
     private CancellationTokenRegistration _revocation;
+    private CancellationToken _accountToken;
     private Guid _attempt;
     private bool _terminalConsumed;
     private bool _closed;
@@ -20,11 +23,12 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     private long _lastSingleRevision = -1;
     private Task _background = Task.CompletedTask;
     private Task? _shutdown;
-    public PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single)
-        : this(sessions, single, new QueueNavigator()) { }
-    internal PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, QueueNavigator order)
+    public PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, PlaybackPersistence? persistence = null)
+        : this(sessions, single, new QueueNavigator(), persistence) { }
+    internal PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, QueueNavigator order, PlaybackPersistence? persistence = null)
     {
         (_sessions, _single, _order) = (sessions, single, order);
+        _persistence = persistence;
         _single.Changed += SingleChanged;
     }
     public PlayerSessionSnapshot Snapshot { get { lock (_sync) return _snapshot; } }
@@ -40,7 +44,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
             BindAccount(session); _order.Replace(entries, startIndex); _failedCandidates.Clear();
             PublishOrder(); work = StartCurrent();
         }
-        Notify(); return work;
+        Notify(explicitReplacement: true); return work;
     }
     public Task EnqueueAsync(IReadOnlyList<QueueEntry> entries, bool playNext, CancellationToken ct)
     {
@@ -54,7 +58,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
             _order.Add(entries, playNext); PublishOrder();
             if (empty) SetPending(PlaybackState.Stopped);
         }
-        Notify(); return Task.CompletedTask;
+        Notify(explicitReplacement: true); return Task.CompletedTask;
     }
     public Task SelectAsync(Guid entryId, CancellationToken ct)
     {
@@ -114,7 +118,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
             _attempt = Guid.Empty; _terminalConsumed = true; _failedCandidates.Clear(); _order.Replace([], 0);
             PublishOrder(); work = StopToPending(PlaybackState.Stopped);
         }
-        Notify(); return work;
+        Notify(explicitReplacement: true); return work;
     }
     public Task StopAsync()
     {
@@ -129,7 +133,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         {
             if (_closed || _order.Current is null) return Task.CompletedTask;
             if (!paused && (_attempt == Guid.Empty || _snapshot.Playback.State is PlaybackState.Stopped or PlaybackState.Ended or PlaybackState.Failed))
-            { _failedCandidates.Clear(); return StartCurrent(); }
+            { _failedCandidates.Clear(); return StartCurrent(_resumePosition); }
             return _single.PauseAsync(paused, ct);
         }
     }
@@ -151,6 +155,28 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
             return _single.SeekAsync(generation, positionMs, ct);
         }
     }
+    /// <summary>
+    /// 账号核验后的静默恢复。检查完整快照 revision，连读取期间的新音量/停止意图也优先；
+    /// 不解析 URL、不打开媒体，保存的起点只在用户点击继续时交给原生适配。
+    /// </summary>
+    public async Task<bool> RestoreAsync(MusicSession session, PlaybackStateData data, long expectedRevision)
+    {
+        Task volume;
+        lock (_sync)
+        {
+            if (_closed || !_sessions.IsCurrent(session) || data.AccountId != session.AccountId || _snapshot.Revision != expectedRevision) return false;
+            BindAccount(session);
+            var entries = data.Entries.Select(entry => entry.ToQueueEntry()).ToArray();
+            Validate(entries); var index = Array.FindIndex(entries, entry => entry.EntryId == data.CurrentEntryId);
+            _order.Replace(entries, Math.Max(0, index)); _order.SetMode(data.Mode); _attempt = Guid.Empty; _terminalConsumed = true; _failedCandidates.Clear();
+            PublishOrder(); SetPending(entries.Length == 0 ? PlaybackState.Stopped : PlaybackState.Paused);
+            _resumePosition = data.PositionMs;
+            _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Playback = _snapshot.Playback with { PositionMs = data.PositionMs,
+                DurationMs = _order.Current?.Track?.DurationMs ?? 0, Volume = data.Volume, Message = entries.Length == 0 ? "" : "已恢复上次队列，点击继续播放。" } };
+            volume = _single.SetVolumeAsync(data.Volume, CancellationToken.None);
+        }
+        await volume.ConfigureAwait(false); Notify(save: false); return true;
+    }
     private MusicSession Capture(CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested(); var session = _sessions.Capture();
@@ -165,6 +191,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         // 旧注册使用非阻塞取消登记，避免在状态锁中等待一个同样需要此锁的撤销回调。
         _revocation.Unregister(); _order.Replace([], 0); _attempt = Guid.Empty;
         _snapshot = _snapshot with { AccountId = session.AccountId, AccountEpoch = session.Epoch };
+        _accountToken = session.Revoked;
         _revocation = session.Revoked.Register(() => Revoke(session.Epoch));
         session.Revoked.ThrowIfCancellationRequested();
     }
@@ -179,14 +206,15 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         }
         Notify();
     }
-    private Task StartCurrent()
+    private Task StartCurrent(long startPosition = 0)
     {
         var current = _order.Current;
         if (current is null) return Task.CompletedTask;
         _attempt = Guid.NewGuid(); _terminalConsumed = false;
+        _resumePosition = startPosition;
         var track = current.Track ?? new MusicTrack(current.TrackId, $"歌曲 {current.TrackId}", "待加载", "", null, 0);
         // PlayAsync 只同步登记代次，执行体首先异步让出，保持本状态锁短暂；旧资源由单曲尾任务先释放。
-        return _single.PlayAsync(_attempt, track, _closing.Token);
+        return _single.PlayAsync(_attempt, track, _closing.Token, startPosition);
     }
     private Task StopToPending(PlaybackState state)
     {
@@ -195,6 +223,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     }
     private void SetPending(PlaybackState state)
     {
+        _resumePosition = 0;
         var current = _order.Current;
         _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Playback = new(_snapshot.Playback.Revision + 1, state,
             current?.Track ?? (current is null ? null : new(current.TrackId, current.Display, "", "", null, 0)), Volume: _snapshot.Playback.Volume) };
@@ -209,11 +238,14 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     {
         lock (_sync)
         {
-            if (_closed || _attempt == Guid.Empty || playback.AttemptId != _attempt || playback.Revision <= _lastSingleRevision) return;
+            // 账号取消回调按逆序执行，单曲 Stop 可能先于队列 Revoke。此时不得把归零事实保存成最后续播位置。
+            if (_closed || _accountToken.IsCancellationRequested || _attempt == Guid.Empty || playback.AttemptId != _attempt || playback.Revision <= _lastSingleRevision) return;
             _lastSingleRevision = playback.Revision;
+            if (playback.State == PlaybackState.Failed && _resumePosition > 0)
+                playback = playback with { PositionMs = _resumePosition, Message = playback.Message + " 已保留续播位置，可重试。" };
             if (playback.Track is { } track && _order.Current?.Track != track) { _order.UpdateTrack(track); PublishOrder(); }
             _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Playback = playback };
-            if (playback.State == PlaybackState.Playing) _failedCandidates.Clear();
+            if (playback.State == PlaybackState.Playing) { _failedCandidates.Clear(); _resumePosition = 0; }
             if (playback.State is PlaybackState.Ended or PlaybackState.Failed && !_terminalConsumed)
             {
                 _terminalConsumed = true;
@@ -244,9 +276,10 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     private void SetFailureSummary() => _snapshot = _snapshot with { Revision = _snapshot.Revision + 1,
         Playback = _snapshot.Playback with { State = PlaybackState.Failed, Message = $"已尝试 {_failedCandidates.Count} 个不可播放项，自动播放已停止，请选择其他歌曲。" } };
     private void Track(Task task) => _background = _background.IsCompleted ? task : Task.WhenAll(_background, task);
-    private void Notify()
+    private void Notify(bool explicitReplacement = false, bool save = true)
     {
         var snapshot = Snapshot;
+        if (save) _persistence?.Observe(snapshot, explicitReplacement);
         if (Changed is not { } handlers) return;
         foreach (EventHandler<PlayerSessionSnapshot> handler in handlers.GetInvocationList())
             try { handler(this, snapshot); } catch (Exception) { /* 页面订阅失败不改变共享播放事实。 */ }
@@ -269,6 +302,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     private async Task ShutdownAsync()
     {
         await Task.Yield(); await _single.StopAsync().ConfigureAwait(false);
+        if (_persistence is not null) await _persistence.FlushAsync().ConfigureAwait(false);
         Task background; lock (_sync) background = _background;
         await background.ConfigureAwait(false); _revocation.Dispose(); _closing.Dispose();
     }

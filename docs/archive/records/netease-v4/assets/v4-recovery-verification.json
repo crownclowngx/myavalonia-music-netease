@@ -1,0 +1,24 @@
+{
+  "hostVerified": false,
+  "machine": "Microsoft Windows 10.0.26200",
+  "runId": "20260923-052430-98588c63",
+  "startedUtc": "2026-09-23T05:24:38.5986931+00:00",
+  "testsPassed": 250,
+  "revision": "b1bc5fe3b650c4c90eb7c6977dd27847b14f4d74",
+  "uiScenarioCoverage": {
+    "methods": 10,
+    "scenarios": 7,
+    "executedCases": 16.0
+  },
+  "audibleOutputVerified": false,
+  "releaseGateExecuted": false,
+  "scenarioCoverage": {
+    "methods": 95,
+    "scenarios": 58,
+    "executedCases": 152.0
+  },
+  "milestone": "V3",
+  "workingTreeDirty": true,
+  "realAccountVerified": false,
+  "completedUtc": "2026-09-23T05:24:54.4400574+00:00"
+}

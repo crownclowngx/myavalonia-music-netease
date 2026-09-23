@@ -32,7 +32,7 @@ public sealed class DesktopUiTests
     [InlineData(true)]
     public async Task 真实Document主题尺寸与播放区域验证(bool dark)
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(DesktopUiTests));
+        var session = HeadlessSessions.Get(typeof(DesktopUiTests));
         // 返回值选中可等待的异步重载，避免 async void 提前结束测试并吞掉断言。
         await session.Dispatch(async () =>
         {
@@ -85,7 +85,7 @@ public sealed class DesktopUiTests
     [InlineData(true)]
     public async Task 真实Tool宽窄布局和主题切换保留草稿(bool dark)
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(DesktopUiTests));
+        var session = HeadlessSessions.Get(typeof(DesktopUiTests));
         // 返回值选中可等待的异步重载，避免 async void 提前结束测试并吞掉断言。
         await session.Dispatch(async () =>
         {
@@ -129,7 +129,7 @@ public sealed class DesktopUiTests
     [InlineData(true)]
     public async Task 登录区深浅主题保留二维码白底与操作(bool dark)
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(DesktopUiTests));
+        var session = HeadlessSessions.Get(typeof(DesktopUiTests));
         // 返回值选中可等待的异步重载，避免 async void 提前结束测试并吞掉断言。
         await session.Dispatch(async () =>
         {
@@ -156,7 +156,7 @@ public sealed class DesktopUiTests
     [Fact]
     public async Task 动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲()
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(DesktopUiTests));
+        var session = HeadlessSessions.Get(typeof(DesktopUiTests));
         // 返回值选中可等待的异步重载，避免 async void 提前结束测试并吞掉断言。
         await session.Dispatch(async () =>
         {
@@ -208,7 +208,7 @@ public sealed class DesktopUiTests
     [Fact]
     public async Task 动效开关成本对照与已脱离视图可回收()
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(DesktopUiTests));
+        var session = HeadlessSessions.Get(typeof(DesktopUiTests));
         // 返回值选中可等待的异步重载，避免 async void 提前结束测试并吞掉断言。
         await session.Dispatch(async () =>
         {
@@ -281,7 +281,7 @@ public sealed class DesktopUiTests
     [Fact]
     public async Task 宿主同款主题组合下菜单绑定和局部资源独立()
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(HostThemeEnvironment));
+        var session = HeadlessSessions.Get(typeof(HostThemeEnvironment));
         // 返回值选中可等待的异步重载，避免 async void 提前结束测试并吞掉断言。
         await session.Dispatch(async () =>
         {

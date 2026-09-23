@@ -30,11 +30,17 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
     private string _session = "";
     private string _candidate = "尚未检查候选运行库。";
     private Task? _initialization;
+    private readonly PlaybackPersistence? _playbackState;
+    private string _playbackStorageMessage = "";
+    private long _storageRevision = -1;
     public MusicSettingsTool(LoginCoordinator login, ILibVlcSettingsStore store, ILibVlcDirectoryProbe probe,
-        IPlaybackRuntimeStatus runtime, ILoginUiDispatcher ui, UiPreferences? preferences = null)
+        IPlaybackRuntimeStatus runtime, ILoginUiDispatcher ui, UiPreferences? preferences = null, PlaybackPersistence? playbackState = null, PlayerAccountCoordinator? playerAccounts = null)
     {
         (_login, _store, _probe, _runtime, _ui) = (login, store, probe, runtime, ui);
         Preferences = preferences;
+        _playbackState = playbackState;
+        RetryPlaybackStorageCommand = new AsyncRelayCommand(() => playbackState?.RetryAsync() ?? Task.CompletedTask);
+        if (playbackState is not null) { playbackState.Changed += StorageChanged; StorageChanged(null, playbackState.Snapshot); }
         CheckCommand = new AsyncRelayCommand(CheckAsync);
         SaveCommand = new AsyncRelayCommand(() => SaveAsync(false));
         ClearCommand = new AsyncRelayCommand(() => SaveAsync(true));
@@ -47,6 +53,10 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
         ApplyLogin(login.Snapshot);
     }
     public string DirectoryPath { get => _directory; set { if (SetProperty(ref _directory, value ?? "")) Interlocked.Increment(ref _editVersion); } }
+    public string PlaybackStorageMessage { get => _playbackStorageMessage; private set => SetProperty(ref _playbackStorageMessage, value); }
+    public IAsyncRelayCommand RetryPlaybackStorageCommand { get; }
+    private void StorageChanged(object? sender, PlaybackStorageSnapshot snapshot) => Post(() =>
+    { if (snapshot.Revision > _storageRevision) { _storageRevision = snapshot.Revision; PlaybackStorageMessage = snapshot.Message; } });
     public UiPreferences? Preferences { get; }
     public bool NeedsLoginSaveRetry => _login.Snapshot is { Account: not null, Remembered: false };
     internal long DraftVersion => Volatile.Read(ref _editVersion);
@@ -156,12 +166,13 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
         _disposed = true;
         _login.Changed -= LoginChanged;
         _runtime.Changed -= RuntimeChanged;
+        if (_playbackState is not null) _playbackState.Changed -= StorageChanged;
         _closing.Cancel();
         _login.Cancel(_owner);
         // 后台命令只向 UI 投递，不等待 UI；容器释放可安全等到取消与原子保存收口后销毁 CTS。
         Task.WhenAll(new[] { _initialization, CheckCommand.ExecutionTask, SaveCommand.ExecutionTask,
             ClearCommand.ExecutionTask, ReloadCommand.ExecutionTask, LogoutCommand.ExecutionTask,
-            RestoreCommand.ExecutionTask, RetrySaveLoginCommand.ExecutionTask }.OfType<Task>()).GetAwaiter().GetResult();
+            RestoreCommand.ExecutionTask, RetrySaveLoginCommand.ExecutionTask, RetryPlaybackStorageCommand.ExecutionTask }.OfType<Task>()).GetAwaiter().GetResult();
         _closing.Dispose();
     }
 }

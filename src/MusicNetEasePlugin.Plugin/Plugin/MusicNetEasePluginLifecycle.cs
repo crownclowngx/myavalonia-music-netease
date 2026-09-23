@@ -6,7 +6,8 @@ using MusicNetEasePlugin.Application.Lyrics;
 namespace MusicNetEasePlugin.Plugin;
 
 /// <summary>Host 停止先收口播放与媒体，再撤销登录请求；初始化不等待网络或创建原生引擎。</summary>
-internal sealed class MusicNetEasePluginLifecycle(LoginCoordinator login, PlaybackCoordinator playback, PlaybackQueueCoordinator queue, LyricsCoordinator lyrics) : IPluginLifecycle
+internal sealed class MusicNetEasePluginLifecycle(LoginCoordinator login, PlaybackCoordinator playback, PlaybackQueueCoordinator queue, LyricsCoordinator lyrics,
+    PlayerAccountCoordinator accounts, PlaybackPersistence persistence) : IPluginLifecycle
 {
     public Task InitializeAsync(CancellationToken cancellationToken)
     {
@@ -16,8 +17,10 @@ internal sealed class MusicNetEasePluginLifecycle(LoginCoordinator login, Playba
 
     public async Task ShutdownAsync(CancellationToken cancellationToken)
     {
+        await accounts.DisposeAsync().ConfigureAwait(false);
         await queue.DisposeAsync().ConfigureAwait(false);
         await lyrics.DisposeAsync().ConfigureAwait(false);
+        await persistence.DisposeAsync().ConfigureAwait(false);
         await playback.DisposeAsync().ConfigureAwait(false);
         await login.DisposeAsync().ConfigureAwait(false);
     }

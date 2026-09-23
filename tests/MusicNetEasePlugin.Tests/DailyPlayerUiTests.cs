@@ -20,7 +20,7 @@ public sealed class DailyPlayerUiTests
     [Fact, Trait("M2", "Y06,U05")]
     public async Task 生产歌词视图手动浏览停止跟随并经二十次重挂可恢复()
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(DailyPlayerUiTests));
+        var session = HeadlessSessions.Get(typeof(DailyPlayerUiTests));
         await session.Dispatch(async () =>
         {
             await using var f = new PlaybackFixture(); var api = new LyricsTests.LyricsFake();
@@ -48,7 +48,7 @@ public sealed class DailyPlayerUiTests
     [Fact, Trait("M2", "B05,U04")]
     public async Task 生产进度滑块键盘合并提交且换曲取消鼠标草稿()
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(DailyPlayerUiTests));
+        var session = HeadlessSessions.Get(typeof(DailyPlayerUiTests));
         await session.Dispatch(async () =>
         {
             await using var f = new PlaybackFixture(); await using var login = TestLogin.Create(new(), new(), TimeProvider.System, MusicNetEasePlugin.Application.Authentication.LoginOptions.Default);
@@ -73,7 +73,7 @@ public sealed class DailyPlayerUiTests
     [Theory, InlineData(false), InlineData(true), Trait("M2", "P06,U01,U03,U04,U05")]
     public async Task 生产歌单视图可导航且大列表保持虚拟化(bool dark)
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(DailyPlayerUiTests));
+        var session = HeadlessSessions.Get(typeof(DailyPlayerUiTests));
         await session.Dispatch(async () =>
         {
             using var sessions = new MusicSessions(); var api = new PlaylistTests.PlaylistFake();

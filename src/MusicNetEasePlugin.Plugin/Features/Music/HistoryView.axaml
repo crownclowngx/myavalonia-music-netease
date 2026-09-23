@@ -1,0 +1,14 @@
+<UserControl x:Class="MusicNetEasePlugin.Features.Music.HistoryView"
+ xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Music" xmlns:model="using:MusicNetEasePlugin.Application.Playback" x:DataType="vm:HistoryWorkspace">
+ <Grid Margin="12,6" RowDefinitions="Auto,*,Auto">
+  <TextBlock Text="{Binding CountText}" />
+  <ListBox x:Name="HistoryList" Grid.Row="1" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="本机最近播放">
+   <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+   <ListBox.ItemTemplate><DataTemplate x:DataType="model:RecentTrack">
+    <StackPanel><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Artists}" TextTrimming="CharacterEllipsis" /></StackPanel>
+   </DataTemplate></ListBox.ItemTemplate>
+  </ListBox>
+  <WrapPanel Grid.Row="2"><Button Content="播放所选" Command="{Binding PlayCommand}" Margin="0,4,6,0" /><Button Content="追加到队列" Command="{Binding AppendCommand}" Margin="0,4,6,0" /></WrapPanel>
+ </Grid>
+</UserControl>

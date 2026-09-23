@@ -42,7 +42,7 @@ public sealed class UiCompositionTests
     [Trait("Scenario", "P09,U01,U02,U04,U05")]
     public async Task 实际页面绑定二维码和账号并可卸载重建()
     {
-        using var session = HeadlessUnitTestSession.StartNew(typeof(UiCompositionTests));
+        var session = HeadlessSessions.Get(typeof(UiCompositionTests));
         await session.Dispatch(async () =>
         {
             var time = new FakeTimeProvider();

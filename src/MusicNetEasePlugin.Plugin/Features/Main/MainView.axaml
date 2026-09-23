@@ -27,12 +27,17 @@
     </StackPanel>
    </Grid>
   </Border>
-  <Border Grid.Row="1" Padding="12,6" Background="{DynamicResource NeteasePanelBrush}" IsVisible="{Binding NeedsSaveRetry}">
+  <StackPanel Grid.Row="1">
+  <Border Padding="12,6" Background="{DynamicResource NeteasePanelBrush}" IsVisible="{Binding Music.History.Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}, FallbackValue=False, TargetNullValue=False}">
+   <Grid ColumnDefinitions="*,Auto"><TextBlock Text="{Binding Music.History.Message}" TextWrapping="Wrap" VerticalAlignment="Center" /><Button Grid.Column="1" Content="重试本地保存/清理" Command="{Binding Music.History.RetryCommand}" /></Grid>
+  </Border>
+  <Border Padding="12,6" Background="{DynamicResource NeteasePanelBrush}" IsVisible="{Binding NeedsSaveRetry}">
    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
     <TextBlock Text="{Binding SessionHint}" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{DynamicResource NeteaseWarningBrush}" />
     <Button Grid.Column="1" Classes="netease-button" Content="重试保存" Command="{Binding RetrySaveCommand}" />
    </Grid>
   </Border>
+  </StackPanel>
   <!-- 未登录只滚动登录主体；已登录的音乐区始终获得有限高度，列表与播放条分别布局。 -->
   <ScrollViewer Grid.Row="2" IsVisible="{Binding !IsSignedIn}" HorizontalScrollBarVisibility="Disabled">
    <Grid x:Name="LoginLayout" ColumnDefinitions="224,*" RowDefinitions="Auto,Auto" Margin="20,24" ColumnSpacing="24" RowSpacing="16" MaxWidth="760" HorizontalAlignment="Stretch">

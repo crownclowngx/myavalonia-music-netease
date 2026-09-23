@@ -1,5 +1,4 @@
 using LibVLCSharp.Shared;
-using System.Globalization;
 using VlcMedia = LibVLCSharp.Shared.Media;
 using MusicNetEasePlugin.Application.Playback;
 
@@ -27,11 +26,11 @@ internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlaye
         var engine = await runtime.GetEngineAsync(ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
         var media = new VlcMedia(engine, path, FromType.FromPath);
-        // 在输入创建前指定起点。恢复只在用户点击继续时进入这里，不采用 Play 后 Pause/seek 的有声竞态。
+        // 先以暂停输入读取真实长度，再决定起点；不能提前设置可能超过新媒体长度的 start-time，导致输入直接结束。
+        // :start-paused 在输入端阻止开头 PCM 输出，区别于播放后再发 Pause 命令的有声竞争。
         if (startPositionMs > 0)
         {
             media.AddOption(":start-paused");
-            media.AddOption(":start-time=" + (startPositionMs / 1000d).ToString("0.000", CultureInfo.InvariantCulture));
         }
         _media = media;
         var player = new MediaPlayer(engine);
@@ -43,12 +42,14 @@ internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlaye
         long lastProgress = 0;
         long position = 0, duration = 0;
         var seekable = 0;
+        var starting = startPositionMs > 0; var startReset = false;
         void Notify(PlaybackState next, string? error = null)
         {
             Interlocked.Exchange(ref state, (int)next);
             if (!ReferenceEquals(_player, player) || _disposed) return;
             // 原生事件可能持有输入锁；这里仅读事件缓存，不能重入 Time/Length/Stop 等原生 API。
-            try { Changed?.Invoke(this, new(generation, next, Math.Max(0, Interlocked.Read(ref position)), Math.Max(0, Interlocked.Read(ref duration)), error, Volatile.Read(ref seekable) != 0)); }
+            var visibleState = Volatile.Read(ref starting) && next is PlaybackState.Playing or PlaybackState.Paused ? PlaybackState.Loading : next;
+            try { Changed?.Invoke(this, new(generation, visibleState, Math.Max(0, Interlocked.Read(ref position)), Math.Max(0, Interlocked.Read(ref duration)), error, Volatile.Read(ref seekable) != 0, startReset)); }
             catch (Exception) { /* 订阅者只接收事实，异常不能穿越原生回调边界。 */ }
         }
         player.Playing += (_, _) => { Notify(PlaybackState.Playing); if (startPositionMs == 0) started.TrySetResult(); };
@@ -85,7 +86,9 @@ internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlaye
         catch (TimeoutException) { throw new MusicException(MusicError.Timeout, "音频启动超时，请检查运行库和设备。"); }
         if (startPositionMs > 0)
         {
-            await SetPositionAsync(player, startPositionMs, ct).ConfigureAwait(false);
+            startReset = player.Length > 0 && startPositionMs >= player.Length;
+            await SetPositionAsync(player, startReset ? 0 : startPositionMs, ct).ConfigureAwait(false);
+            _reportPosition?.Invoke(); Volatile.Write(ref starting, false);
             player.SetPause(false);
         }
     }, ct);

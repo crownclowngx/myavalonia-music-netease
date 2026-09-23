@@ -15,6 +15,32 @@ namespace MusicNetEasePlugin.Tests;
 [Collection("LibVlcNative")]
 public sealed class NativeSeekTests
 {
+    [Theory, InlineData(4000, false), InlineData(12000, true), Trait("M2", "B08,H07")]
+    public async Task 静默恢复首次继续才解码且按真实长度校正起点(long target, bool reset)
+    {
+        using var directory = new TestDirectory(); using var sessions = new MusicSessions(); var catalog = new MusicCatalog();
+        using var runtime = new LibVlcRuntime(new(new MemoryVlcSettings(), new LibVlcDirectoryProbe(), Path.Combine(AppContext.BaseDirectory, "native", "win-x64", "libvlc")));
+        var firstPcm = new TaskCompletionSource<short[]>(TaskCreationOptions.RunContinuationsAsynchronously);
+        await using var audio = new LibVlcAudioOutput(runtime, player =>
+        {
+            player.SetAudioFormat("S16N", 48000, 1);
+            player.SetAudioCallbacks((_, data, count, _) => { if (firstPcm.Task.IsCompleted || count == 0) return; var values = new short[(int)count]; Marshal.Copy(data, values, 0, values.Length); firstPcm.TrySetResult(values); }, null, null, null, null);
+        });
+        var sample = SegmentedWave(); var file = Path.Combine(directory.Path, "restore.wav"); await File.WriteAllBytesAsync(file, sample);
+        var buffer = new MusicBuffer { Download = (_, _) => Task.FromResult(new BufferedMedia(file, _ => { })) };
+        await using var single = new PlaybackCoordinator(sessions, catalog, catalog, buffer, audio); await using var queue = new PlaybackQueueCoordinator(sessions, single);
+        await queue.RestoreAsync(sessions.Capture(), PlaybackPersistenceTests.State(123, 1, target), queue.Snapshot.Revision);
+        Assert.False(runtime.LoadAttempted); Assert.False(firstPcm.Task.IsCompleted); Assert.Equal(0, catalog.Resolves);
+        Assert.Equal(PlaybackState.Paused, queue.Snapshot.Playback.State);
+        await queue.PauseAsync(false, default); var pcm = await firstPcm.Task.WaitAsync(TimeSpan.FromSeconds(5));
+        Assert.True(pcm.Count(value => reset ? value > 1000 : value < -1000) > pcm.Length / 2);
+        Assert.Equal(reset, queue.Snapshot.Playback.Message.Contains("超出", StringComparison.Ordinal));
+        await queue.StopAsync(); using (File.Open(file, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
+        var artifacts = Environment.GetEnvironmentVariable("NETEASE_TEST_ARTIFACTS");
+        if (!string.IsNullOrEmpty(artifacts)) await File.WriteAllTextAsync(Path.Combine(artifacts, $"m2-native-restore-{target}.json"), JsonSerializer.Serialize(new
+        { schemaVersion = 1, target, reset, runtime.ActiveVersion, sampleSha256 = Convert.ToHexString(SHA256.HashData(sample)), initializedWithoutEngine = true,
+            firstOutputMatchesStart = true, decodedFrames = pcm.Length, fileReleased = true, actualDeviceOutput = false, realHost = false }));
+    }
     [Fact, Trait("M2", "Q05,C02,A03")]
     public async Task 原生三曲自然结束连续交接且最后释放所有文件()
     {
