@@ -37,3 +37,4 @@ V1 最后一次部署见第 4 项，后续部署见下面的 V2 记录。各记�
 | 日期 | V4 实施记录 | 证明范围 |
 | --- | --- | --- |
 | 2026-09-23 | [M2 日常播放器分阶段实施](records/netease-v4/m2-implementation-20260923.md) | V4.0–V4.5 功能、完整 V4 自动门禁、三曲/定位/静默恢复 PCM、双色截图与阶段提交；真实声卡、Host/Dock 和重启验收单列 |
+| 2026-09-23 | [V4 复用 Common LibVLC 部署与清理](records/netease-v4/common-deployment-20260923.md) | M2 无原生库构建、指定 Controls 的 12 文件部署与摘要验证；标准 clean 清理约 1.91 GiB，剩余约 130.96 MiB 附手工规则；未启动 Host |

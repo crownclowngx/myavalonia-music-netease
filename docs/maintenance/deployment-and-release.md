@@ -2,7 +2,7 @@
 
 > 用途：开发部署与正式发布的可复用操作参考。当前目标为 Windows x64；本文不表示已完成正式发布或 Host 验收。
 
-最近一次开发部署见[V3 Common LibVLC 部署记录](../archive/records/netease-v3/common-deployment-20260923.md)：V3 无原生库产物已替换指定 Controls，公共库和用户配置保持不变，尚未启动 Host 验收。此前[M1 公共库配置记录](../archive/records/netease-v2/shared-libvlc-deployment-20260923.md)、[微信部署](../archive/records/netease-v1/wechat-login-implementation-20260922.md)和[App 部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
+最近一次开发部署见[V4 Common LibVLC 部署与清理记录](../archive/records/netease-v4/common-deployment-20260923.md)：M2 无原生库产物已替换指定 Controls，公共库和用户配置保持不变；附当前与历史中间产物清理结果及剩余目录，尚未启动 Host 验收。此前[V3 部署](../archive/records/netease-v3/common-deployment-20260923.md)、[M1 公共库配置记录](../archive/records/netease-v2/shared-libvlc-deployment-20260923.md)、[微信部署](../archive/records/netease-v1/wechat-login-implementation-20260922.md)和[App 部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
 
 部署分为开发期临时联调和正式 ZIP 发布。两者都必须使用 Build 包筛选出的干净插件目录，不能直接复制
 普通 `bin/Debug` 或 `bin/Release`，因为普通输出可能包含 Host 应当统一提供的共享程序集。

@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "deployedUtc": "2026-09-23T06:07:20.6324352Z",
+  "revision": "f2654b248e920874227dc1129abe06856de18d46",
+  "configuration": "Debug",
+  "includeLibVlcRuntime": false,
+  "target": "D:\\data\\avalonia\\Controls\\MusicNetEasePlugin",
+  "pluginVersion": "1.0.0",
+  "files": [
+    {
+      "path": "BouncyCastle.Cryptography.dll",
+      "bytes": 4924576,
+      "sha256": "E5EEAF6D263C493619982FD3638E6135077311D08C961E1FE128F9107D29EBC6"
+    },
+    {
+      "path": "Flurl.dll",
+      "bytes": 39936,
+      "sha256": "7FF7965161F6ACC809F7154CD3BA1F56E0290974D4FCFC5944BD4C9030996383"
+    },
+    {
+      "path": "Flurl.Http.dll",
+      "bytes": 113152,
+      "sha256": "CB204C6865563BC7F023F4655977CF5263536A75069B0E7E1D72A900A66F1EB5"
+    },
+    {
+      "path": "LibVLCSharp.dll",
+      "bytes": 229888,
+      "sha256": "EA886CA99677A28C2B15D11F8DDD52EF5F22D7E17600F1A31C0F6DD91DC9E4FE"
+    },
+    {
+      "path": "MusicNetEasePlugin.Plugin.deps.json",
+      "bytes": 16843,
+      "sha256": "3F828A0007BB1C6D18AE668B2918DFAC988888E1D2566E70BE03FABC65257D00"
+    },
+    {
+      "path": "MusicNetEasePlugin.Plugin.dll",
+      "bytes": 648192,
+      "sha256": "FE03242C6DF6D8EC40B433023AD1476F86459D96C83ACB1C7D2DFF36AF76FBBE"
+    },
+    {
+      "path": "MusicNetEasePlugin.Plugin.pdb",
+      "bytes": 155932,
+      "sha256": "3E9A8374ED210A1E06CA49DA9E26DE94340C607C838C3107B3B7CA40F8D020AA"
+    },
+    {
+      "path": "MyAvaloniaManagement.Icons.dll",
+      "bytes": 8192,
+      "sha256": "52AB55FB828C3F6CF404814BC22F1B7A3B8045B762C56A9E6610799C6BE922E9"
+    },
+    {
+      "path": "plugin.manifest.json",
+      "bytes": 298,
+      "sha256": "97B99D057395F9200CB4555A2C73744A67EBFC405130BCDD7CCCAD436B37D0FD"
+    },
+    {
+      "path": "QRCoder.dll",
+      "bytes": 204288,
+      "sha256": "5CACB8E071EF6B355615E8CAE1D02D94B9D191EC33DB12A05D82099CDDB16E9A"
+    },
+    {
+      "path": "System.Security.Cryptography.ProtectedData.dll",
+      "bytes": 40208,
+      "sha256": "7CCC461B061D8E45ACF41219809C8773028274037906180C77495571A305734B"
+    },
+    {
+      "path": "THIRD-PARTY-NOTICES.md",
+      "bytes": 2333,
+      "sha256": "2CAB65847EC2386946992054968F7B841F1E33DBCFB6E9D93CAA6C01513679E0"
+    }
+  ],
+  "commonDirectory": "D:\\data\\avalonia\\Common\\libvlc",
+  "commonFilesUnchanged": 425,
+  "userDataFilesUnchanged": 3,
+  "otherPluginDirectoriesUnchanged": 12,
+  "hostStarted": false,
+  "hostVerified": false,
+  "windowsCiExecuted": false,
+  "releaseGateExecuted": false,
+  "verifiedAfterCleanupUtc": "2026-09-23T06:09:34.5210336Z"
+}
