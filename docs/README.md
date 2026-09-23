@@ -14,11 +14,12 @@
 | 歌单、队列与歌词如何工作 | [日常播放器当前实现](reference/netease-daily-player.md) | 四模式、定位、歌词、历史、静默恢复与页面寿命 |
 | 界面如何工作 | [Document / Tool 当前界面契约](reference/netease-desktop-ui.md) | 紧凑布局、深浅主题、动效、偏好存储与资源所有权 |
 | V5 交互与 UI 依据什么优化 | [V5 轻量交互与 UI 优化方案](roadmap/netease-v5-lightweight-interaction-and-ui-plan.md) | 官方与开源客户端对照、逐页交互、视觉规范、资源预算和实施验收计划；D 验收及交互差项未收口 |
+| 歌词抽屉和其他交互如何选择 | [V6 交互体验候选评估](roadmap/netease-v6-interaction-candidates-evaluation.md) | 18 项候选、已有能力与差项、用户评估栏、工程约束及后续专用文档安排；尚未生成实施修改方案 |
 | 登录与请求如何工作 | [HTTP 与会话契约](reference/netease-http-session.md) | 微信/App 登录、Flurl、端点、会话、取消和生命周期 |
 | 后续有哪些候选能力 | [能力路线图](roadmap/netease-capability-roadmap.md) | 已完成 M0–M2，待讨论的 M3–M5 范围与依赖 |
 | 上游还有哪些能力 | [api-enhanced 能力清单](reference/netease-api-enhanced-capabilities.md) | 固定提交的模块索引与移植边界；不代表全部已支持 |
 
-V 编号表示实施文档序号，M 编号表示能力里程碑，均不是插件包版本。当前以已验收的 Windows x64 日常播放器为基线。
+V 编号表示方案/实施文档序号，M 编号表示能力里程碑，均不是插件包版本。V6 目前只是候选评估，编号递增不表示 V5 已完成。当前以已验收的 Windows x64 日常播放器为基线。
 
 ## 开发参考
 

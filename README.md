@@ -10,6 +10,7 @@ Avalonia 网易云音乐插件，使用 C# + Flurl 直连。当前支持微信/A
 - [验证与维护](docs/maintenance/netease-v5-ui-interaction-verification-plan.md)：默认 V5 本地检查，包含 M1/V3 回归。
 - [已完成方案与历史记录](docs/archive/README.md)：V1–V4 设计、实施、验证及部署证据。
 - [V5 轻量交互与 UI 优化方案](docs/roadmap/netease-v5-lightweight-interaction-and-ui-plan.md)：GitHub / 官方与开源客户端对照、布局与交互、资源预算、SOLID 约束及专用验证计划；主体已接入，D 验收未收口，E 为可选增强。
+- [V6 歌词抽屉与交互体验候选评估](docs/roadmap/netease-v6-interaction-candidates-evaluation.md)：18 项候选的效果、优先级、成本、依赖与评估栏；含 SOLID、中文注释、本地测试门禁和专用文档要求，待用户选择后再生成修改方案。
 - [能力路线图](docs/roadmap/netease-capability-roadmap.md)：M0–M2 已完成，M3–M5 保留为后续候选，下一步另行讨论。
 
 在仓库根目录执行本地开发检查并启动 Standalone：
