@@ -1,0 +1,216 @@
+{
+  "completedUtc": "2026-09-23T10:11:46.3129879+00:00",
+  "method": "dotnet clean solution and isolated output",
+  "recursiveDeleteRejected": true,
+  "rejectionReason": "blocked by policy",
+  "oldBackupsRemoved": false,
+  "paths": [
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Plugin\\bin",
+      "filesBefore": 1,
+      "bytesBefore": 298,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Plugin\\obj",
+      "filesBefore": 24,
+      "bytesBefore": 1631560,
+      "filesAfter": 13,
+      "bytesAfter": 236189
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Standalone\\bin",
+      "filesBefore": 0,
+      "bytesBefore": 0,
+      "filesAfter": 0,
+      "bytesAfter": 0
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\src\\MusicNetEasePlugin.Standalone\\obj",
+      "filesBefore": 11,
+      "bytesBefore": 384857,
+      "filesAfter": 11,
+      "bytesAfter": 384857
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\bin",
+      "filesBefore": 0,
+      "bytesBefore": 0,
+      "filesAfter": 0,
+      "bytesAfter": 0
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\obj",
+      "filesBefore": 10,
+      "bytesBefore": 289267,
+      "filesAfter": 10,
+      "bytesAfter": 289267
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tools\\MusicNetEasePlugin.LoginProbe\\bin",
+      "filesBefore": 0,
+      "bytesBefore": 0,
+      "filesAfter": 0,
+      "bytesAfter": 0
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tools\\MusicNetEasePlugin.LoginProbe\\obj",
+      "filesBefore": 10,
+      "bytesBefore": 300803,
+      "filesAfter": 10,
+      "bytesAfter": 300803
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\development-deployment-20260923-160902\\bin",
+      "filesBefore": 1,
+      "bytesBefore": 298,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\development-deployment-20260923-160902\\Controls",
+      "filesBefore": 12,
+      "bytesBefore": 6383814,
+      "filesAfter": 12,
+      "bytesAfter": 6383814
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\development-deployment-20260923-160902\\previous-plugin",
+      "filesBefore": 12,
+      "bytesBefore": 6383838,
+      "filesAfter": 12,
+      "bytesAfter": 6383838
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\m1-common-deployment-20260923\\bin",
+      "filesBefore": 1,
+      "bytesBefore": 298,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\m1-common-deployment-20260923\\Controls",
+      "filesBefore": 12,
+      "bytesBefore": 5971510,
+      "filesAfter": 12,
+      "bytesAfter": 5971510
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\m1-development-20260923\\builtin\\Controls",
+      "filesBefore": 437,
+      "bytesBefore": 111745711,
+      "filesAfter": 437,
+      "bytesAfter": 111745711
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\m1-development-20260923\\external-only\\bin",
+      "filesBefore": 1,
+      "bytesBefore": 298,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\m1-development-20260923\\external-only\\Controls",
+      "filesBefore": 12,
+      "bytesBefore": 5971510,
+      "filesAfter": 12,
+      "bytesAfter": 5971510
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v3-common-deployment-20260923-104516\\bin",
+      "filesBefore": 1,
+      "bytesBefore": 298,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v3-common-deployment-20260923-104516\\Controls",
+      "filesBefore": 12,
+      "bytesBefore": 6035354,
+      "filesAfter": 12,
+      "bytesAfter": 6035354
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v3-common-deployment-20260923-104516\\previous-plugin",
+      "filesBefore": 12,
+      "bytesBefore": 5971510,
+      "filesAfter": 12,
+      "bytesAfter": 5971510
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v4-common-deployment-20260923-140214\\bin",
+      "filesBefore": 1,
+      "bytesBefore": 298,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v4-common-deployment-20260923-140214\\Controls",
+      "filesBefore": 12,
+      "bytesBefore": 6383838,
+      "filesAfter": 12,
+      "bytesAfter": 6383838
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v4-common-deployment-20260923-140214\\previous-plugin",
+      "filesBefore": 12,
+      "bytesBefore": 6035354,
+      "filesAfter": 12,
+      "bytesAfter": 6035354
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-deployment-20260923\\bin",
+      "filesBefore": 1,
+      "bytesBefore": 298,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-deployment-20260923\\Controls",
+      "filesBefore": 12,
+      "bytesBefore": 6528114,
+      "filesAfter": 12,
+      "bytesAfter": 6528114
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-deployment-20260923\\previous-plugin",
+      "filesBefore": 12,
+      "bytesBefore": 6383814,
+      "filesAfter": 12,
+      "bytesAfter": 6383814
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-startup-fix-20260923\\deployment\\bin",
+      "filesBefore": 1,
+      "bytesBefore": 298,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-startup-fix-20260923\\deployment\\Controls",
+      "filesBefore": 12,
+      "bytesBefore": 6528110,
+      "filesAfter": 12,
+      "bytesAfter": 6528110
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-redeploy-20260923\\bin",
+      "filesBefore": 417,
+      "bytesBefore": 85973884,
+      "filesAfter": 1,
+      "bytesAfter": 298
+    },
+    {
+      "path": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\artifacts\\v5-redeploy-20260923\\Controls",
+      "filesBefore": 12,
+      "bytesBefore": 6528110,
+      "filesAfter": 12,
+      "bytesAfter": 6528110
+    }
+  ],
+  "removedFiles": 427.0,
+  "removedBytes": 87368957.0,
+  "remainingFiles": 634.0,
+  "remainingBytes": 188064385.0
+}

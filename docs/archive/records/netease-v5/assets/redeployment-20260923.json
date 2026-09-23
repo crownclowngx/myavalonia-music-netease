@@ -1,0 +1,85 @@
+{
+  "completedUtc": "2026-09-23T18:09:34.6212537+08:00",
+  "revision": "cca46ba6f29cba5fd958371be2d21c282f1707cf",
+  "sourceSha256": "B85FDBAF6046A402E947AA8259F9BDCB439CF2CD47E480025AD36FE6C21FF1A2",
+  "target": "D:\\data\\avalonia\\Controls\\MusicNetEasePlugin",
+  "configuration": "Debug",
+  "includeLibVlcRuntime": false,
+  "fileCount": 12,
+  "files": [
+    {
+      "name": "BouncyCastle.Cryptography.dll",
+      "bytes": 4924576,
+      "sha256": "E5EEAF6D263C493619982FD3638E6135077311D08C961E1FE128F9107D29EBC6"
+    },
+    {
+      "name": "Flurl.dll",
+      "bytes": 39936,
+      "sha256": "7FF7965161F6ACC809F7154CD3BA1F56E0290974D4FCFC5944BD4C9030996383"
+    },
+    {
+      "name": "Flurl.Http.dll",
+      "bytes": 113152,
+      "sha256": "CB204C6865563BC7F023F4655977CF5263536A75069B0E7E1D72A900A66F1EB5"
+    },
+    {
+      "name": "LibVLCSharp.dll",
+      "bytes": 229888,
+      "sha256": "EA886CA99677A28C2B15D11F8DDD52EF5F22D7E17600F1A31C0F6DD91DC9E4FE"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.deps.json",
+      "bytes": 16843,
+      "sha256": "3F828A0007BB1C6D18AE668B2918DFAC988888E1D2566E70BE03FABC65257D00"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.dll",
+      "bytes": 763392,
+      "sha256": "667C74FAE28B88FDD2ABC58D1683338EC8ACD738839CDFA711B1C2871BD1AAF5"
+    },
+    {
+      "name": "MusicNetEasePlugin.Plugin.pdb",
+      "bytes": 185004,
+      "sha256": "C9A41FD63A7979BB5082B226DBFC0BA76B60BADE5046231F6B338E69B5142349"
+    },
+    {
+      "name": "MyAvaloniaManagement.Icons.dll",
+      "bytes": 8192,
+      "sha256": "52AB55FB828C3F6CF404814BC22F1B7A3B8045B762C56A9E6610799C6BE922E9"
+    },
+    {
+      "name": "plugin.manifest.json",
+      "bytes": 298,
+      "sha256": "97B99D057395F9200CB4555A2C73744A67EBFC405130BCDD7CCCAD436B37D0FD"
+    },
+    {
+      "name": "QRCoder.dll",
+      "bytes": 204288,
+      "sha256": "5CACB8E071EF6B355615E8CAE1D02D94B9D191EC33DB12A05D82099CDDB16E9A"
+    },
+    {
+      "name": "System.Security.Cryptography.ProtectedData.dll",
+      "bytes": 40208,
+      "sha256": "7CCC461B061D8E45ACF41219809C8773028274037906180C77495571A305734B"
+    },
+    {
+      "name": "THIRD-PARTY-NOTICES.md",
+      "bytes": 2333,
+      "sha256": "2CAB65847EC2386946992054968F7B841F1E33DBCFB6E9D93CAA6C01513679E0"
+    }
+  ],
+  "stagingMatchesTarget": true,
+  "backupCreated": false,
+  "reusedGateRun": "20260923-095639-88e63d4d",
+  "reusedTestsPassed": 309,
+  "releaseGateExecuted": false,
+  "startupCheck": {
+    "exitCode": 0,
+    "diagnosticCount": 0,
+    "output": "Startup firstFrameMs=890 readyMs=2302",
+    "hostExeSha256": "B8F8653192E6B8CF979F1FC4C5F6285F99B9190B7F9E487210DF31B001774879",
+    "isolatedHostData": true,
+    "fullUiAcceptance": false
+  },
+  "postCleanupFilesVerified": true
+}
