@@ -11,6 +11,7 @@
 | 下一步开发什么 | [能力路线图](roadmap/netease-capability-roadmap.md) | M1–M5 能力范围、先后依赖、验收标准与首轮任务拆分 |
 | 如何播放与配置运行库 | [搜索播放快速开始](quick-start/netease-playback.md)、[当前播放契约](reference/netease-music-playback.md) | 搜索、单曲控制、共享路径、开发产物与探针 |
 | 如何实现 M1 | [V2：搜索与单曲播放方案](roadmap/netease-v2-m1-playback-plan.md) | SOLID 分工、S0–S5 进度与剩余验收 |
+| 如何优化当前 Document 和 Tool | [V3：紧凑桌面界面改造方案](roadmap/netease-v3-desktop-ui-and-theme-plan.md) | 待实施；现代紧凑布局、浅色背景定位、双色资源、轻量动效及性能验收 |
 | 多个插件如何使用 LibVLC | [V2：运行库、Tool 与 Dock 专项设计](roadmap/netease-v2-libvlc-tool-and-dock-design.md) | 内置优先/指定目录、设置生效、VideoSecurityPlayer 踩坑对照；共享目录已解码，真实共存待验收 |
 | 当前具体实现了什么 | [HTTP 与会话契约](reference/netease-http-session.md) | 微信/App 登录、已接入端点、Flurl、会话、取消和生命周期 |
 | 上游还有哪些能力 | [api-enhanced 能力清单](reference/netease-api-enhanced-capabilities.md) | 固定提交的模块索引与移植边界；不代表插件已支持 |
