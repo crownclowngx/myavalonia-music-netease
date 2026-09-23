@@ -51,15 +51,17 @@ internal sealed class MusicAudio : IAudioOutput
     public Func<CancellationToken, Task>? Opening { get; set; }
     public Func<CancellationToken, Task>? Pausing { get; set; }
     public Func<Task>? Stopping { get; set; }
-    public async Task OpenAsync(string path, long generation, CancellationToken ct)
+    public async Task OpenAsync(string path, long generation, CancellationToken ct, long startPositionMs = 0)
     {
         if (Opening is not null) await Opening(ct);
         ct.ThrowIfCancellationRequested();
         if (Current is not null) throw new InvalidOperationException("出现第二个同时持有的音源");
         Current = path; Opened.Enqueue((path, generation));
-        if (AutoStart) Emit(generation, PlaybackState.Playing);
+        if (AutoStart) Emit(generation, PlaybackState.Playing, startPositionMs);
     }
-    public async Task PauseAsync(bool paused, CancellationToken ct) { if (Pausing is not null) await Pausing(ct); ct.ThrowIfCancellationRequested(); }
+    public async Task PauseAsync(bool paused, CancellationToken ct, long? generation = null) { if (Pausing is not null) await Pausing(ct); ct.ThrowIfCancellationRequested(); }
+    public Task SeekAsync(long generation, long positionMs, CancellationToken ct)
+    { ct.ThrowIfCancellationRequested(); Emit(generation, PlaybackState.Playing, positionMs); return Task.CompletedTask; }
     public async Task StopAsync() { if (Stopping is not null) await Stopping(); Current = null; Stops++; }
     public Task SetVolumeAsync(int volume, CancellationToken ct) { ct.ThrowIfCancellationRequested(); Volume = volume; return Task.CompletedTask; }
     public void Emit(long generation, PlaybackState state, long position = 0) => Changed?.Invoke(this, new(generation, state, position, 120000, state == PlaybackState.Failed ? "设备失败" : null));

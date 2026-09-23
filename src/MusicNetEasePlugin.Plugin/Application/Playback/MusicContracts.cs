@@ -44,7 +44,7 @@ public sealed class BufferedMedia(string path, Action<string> cleanup) : IDispos
 public interface IMediaBuffer { Task<BufferedMedia> DownloadAsync(PlaybackResource resource, CancellationToken ct); }
 
 public enum PlaybackState { Idle, Loading, Playing, Paused, Stopped, Ended, Failed }
-public sealed record AudioProgress(long Generation, PlaybackState State, long PositionMs, long DurationMs, string? Error = null);
+public sealed record AudioProgress(long Generation, PlaybackState State, long PositionMs, long DurationMs, string? Error = null, bool CanSeek = false);
 /// <summary>
 /// 本地音频边界，调用者按顺序 await 控制命令，事件可从任意线程到达且必须携带原播放代次。
 /// StopAsync 返回后不再持有本次媒体文件；Dispose 仅负责本适配持有的播放器，不销毁外部共享库。
@@ -52,8 +52,11 @@ public sealed record AudioProgress(long Generation, PlaybackState State, long Po
 public interface IAudioOutput : IAsyncDisposable
 {
     event EventHandler<AudioProgress>? Changed;
-    Task OpenAsync(string path, long generation, CancellationToken ct);
-    Task PauseAsync(bool paused, CancellationToken ct);
+    /// <summary>从指定本地媒体时间启动；起点在创建输入时设置，禁止先播放开头再跳转。恢复界面本身不得调用此方法。</summary>
+    Task OpenAsync(string path, long generation, CancellationToken ct, long startPositionMs = 0);
+    Task PauseAsync(bool paused, CancellationToken ct, long? generation = null);
+    /// <summary>只控制指定代次的当前媒体；在原生控制门内重新检查代次，保留暂停状态，位置以事实回报为准。</summary>
+    Task SeekAsync(long generation, long positionMs, CancellationToken ct);
     Task StopAsync();
     Task SetVolumeAsync(int volume, CancellationToken ct);
 }

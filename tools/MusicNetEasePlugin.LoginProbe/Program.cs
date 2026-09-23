@@ -5,6 +5,8 @@ using MusicNetEasePlugin.Infrastructure.Http;
 
 if (args.Length > 0)
 {
+    if (args.Length == 5 && args[0] == "--daily-player" && args[1] == "--session-directory" && args[3] == "--output")
+        return await DailyPlayerProbe.RunAsync(args[2], args[4]);
     if (args.Length is 7 or 9 && args[0] == "--music" && args[1] == "--session-directory" && args[3] == "--keyword" && args[5] == "--output" && (args.Length == 7 || args[7] == "--runtime-directory"))
         return await MusicProbe.RunAsync(args[2], args[4], args[6], args.Length == 9 ? args[8] : null);
     if (args.Length == 3 && args[0] == "--wechat" && args[1] == "--output")
