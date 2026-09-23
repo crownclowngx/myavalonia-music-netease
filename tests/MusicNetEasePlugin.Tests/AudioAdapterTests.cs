@@ -8,7 +8,13 @@ using Xunit;
 
 namespace MusicNetEasePlugin.Tests;
 
+// 测试共享进程级原生模块；不同夹具不能并行初始化/销毁独立引擎。
+// 业务容器仍复用唯一引擎，跨插件共存需要真实 Host 单独验证，不能从此串行夹具推断。
+[CollectionDefinition("LibVlcNative", DisableParallelization = true)]
+public sealed class LibVlcNativeCollection;
+
 /// <summary>测试运行库固定为构建产物，真实生产适配解码到 PCM；不访问账号、网络或系统输出设备。</summary>
+[Collection("LibVlcNative")]
 public sealed class AudioAdapterTests
 {
     [Fact, Trait("M1", "E01,E02,E03,E07")]

@@ -10,6 +10,21 @@ namespace MusicNetEasePlugin.Tests;
 
 public sealed class MediaBufferTests
 {
+    [Theory, InlineData(false), InlineData(true), Trait("M2", "B01")]
+    public async Task 下载进度区分已知总长与未知长度且最后字节准确(bool known)
+    {
+        using var directory = new TestDirectory(); var reports = new List<BufferProgress>();
+        using var clients = Clients((_, _) =>
+        {
+            var content = new StreamContent(new ChunkStream(Audio(400)));
+            if (known) content.Headers.ContentLength = 400;
+            return Task.FromResult(new HttpResponseMessage(HttpStatusCode.OK) { Content = content });
+        });
+        using var buffer = new FlurlMediaBuffer(clients, directory.Path, MediaLimits.Default);
+        using var media = await buffer.DownloadAsync(Resource(), default, reports.Add);
+        Assert.Equal(0, reports[0].BytesRead); Assert.Equal(400, reports[^1].BytesRead);
+        Assert.All(reports, p => Assert.Equal(known ? 400L : (long?)null, p.TotalBytes));
+    }
     private static PlaybackResource Resource(string url = "https://m1.music.126.net/file") => new(1, new Uri(url), "mp3", "standard", false, null);
     private static byte[] Audio(int size = 64) { var bytes = new byte[size]; "ID3"u8.CopyTo(bytes); return bytes; }
     private static NeteaseFlurlClients Clients(Func<HttpRequestMessage, CancellationToken, Task<HttpResponseMessage>> handler) =>
@@ -123,7 +138,7 @@ public sealed class MediaBufferTests
         Assert.True(File.Exists(a.Path)); Assert.True(File.Exists(b.Path)); Assert.True(File.Exists(Path.Combine(unrelated, "keep")));
     }
 
-    [Theory, InlineData(403, MusicError.Network), InlineData(410, MusicError.AddressExpired)]
+    [Theory, InlineData(403, MusicError.Restricted), InlineData(410, MusicError.AddressExpired)]
     [Trait("M1", "B07")]
     public async Task 普通拒绝不同于明确过期(int code, MusicError expected)
     {

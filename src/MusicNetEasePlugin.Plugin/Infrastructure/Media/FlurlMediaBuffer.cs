@@ -19,7 +19,7 @@ internal sealed class FlurlMediaBuffer(NeteaseFlurlClients clients, string root,
     private string? _directory;
     private FileStream? _owner;
     private bool _disposed;
-    public async Task<BufferedMedia> DownloadAsync(PlaybackResource resource, CancellationToken ct)
+    public async Task<BufferedMedia> DownloadAsync(PlaybackResource resource, CancellationToken ct, Action<BufferProgress>? progress = null)
     {
         ct.ThrowIfCancellationRequested();
         var address = ValidateAddress(resource.Address ?? throw new MusicException(MusicError.Restricted, "当前歌曲暂不可播放。"));
@@ -37,11 +37,13 @@ internal sealed class FlurlMediaBuffer(NeteaseFlurlClients clients, string root,
                 if (response.StatusCode is >= 300 and < 400)
                 {
                     if (redirects >= 3 || !Uri.TryCreate(address, response.Headers.FirstOrDefault("Location"), out var next))
-                        throw new MusicException(MusicError.Network, "媒体重定向次数过多或地址无效。");
+                        throw new MusicException(MusicError.Protocol, "媒体重定向次数过多或地址无效。");
                     address = ValidateAddress(next);
                     continue;
                 }
                 if (response.StatusCode == 410) throw new MusicException(MusicError.AddressExpired, "播放地址已过期。");
+                if (response.StatusCode == 429) throw new MusicException(MusicError.RateLimited, "媒体访问频繁，请稍后重试。");
+                if (response.StatusCode is >= 400 and < 500) throw new MusicException(MusicError.Restricted, "媒体访问被拒绝，请主动重试或选择其他歌曲。");
                 if (response.StatusCode != 200) throw new MusicException(MusicError.Network, "媒体服务器暂未提供可播放内容，请重试。");
                 if (response.ResponseMessage.Content.Headers.ContentLength > limits.MaximumBytes)
                     throw new MusicException(MusicError.Storage, "音频超过本阶段 64 MiB 缓冲上限。");
@@ -52,11 +54,16 @@ internal sealed class FlurlMediaBuffer(NeteaseFlurlClients clients, string root,
                     var prefix = new byte[16];
                     var prefixLength = 0;
                     long length = 0;
+                    var totalBytes = response.ResponseMessage.Content.Headers.ContentLength;
+                    progress?.Invoke(new(0, totalBytes));
+                    long lastReport = Environment.TickCount64;
                     while (true)
                     {
                         using var idle = CancellationTokenSource.CreateLinkedTokenSource(total.Token);
                         idle.CancelAfter(limits.IdleTimeout);
-                        var read = await input.ReadAsync(block, idle.Token).ConfigureAwait(false);
+                        int read;
+                        try { read = await input.ReadAsync(block, idle.Token).ConfigureAwait(false); }
+                        catch (IOException) { throw new MusicException(MusicError.Network, "音频传输中断，请重试。"); }
                         if (read == 0) break;
                         length += read;
                         if (length > limits.MaximumBytes) throw new MusicException(MusicError.Storage, "音频超过允许的缓冲大小。");
@@ -64,12 +71,15 @@ internal sealed class FlurlMediaBuffer(NeteaseFlurlClients clients, string root,
                         block.AsSpan(0, take).CopyTo(prefix.AsSpan(prefixLength));
                         prefixLength += take;
                         await output.WriteAsync(block.AsMemory(0, read), total.Token).ConfigureAwait(false);
+                        if (Environment.TickCount64 - lastReport >= 200)
+                        { progress?.Invoke(new(length, totalBytes)); lastReport = Environment.TickCount64; }
                     }
                     if (response.ResponseMessage.Content.Headers.ContentLength is { } promised && length != promised)
                         throw new MusicException(MusicError.Network, "音频内容被截断，请重试。");
                     if (!LooksLikeAudio(prefix.AsSpan(0, prefixLength)))
                         throw new MusicException(MusicError.Decode, "返回内容不是受支持的音频文件。");
                     await output.FlushAsync(total.Token).ConfigureAwait(false);
+                    progress?.Invoke(new(length, totalBytes));
                 }
                 total.Token.ThrowIfCancellationRequested();
                 var complete = Path.ChangeExtension(file, ".media");

@@ -143,6 +143,14 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         }
         Notify();
     }
+    public Task SeekAsync(Guid entryId, long generation, long positionMs, CancellationToken ct)
+    {
+        lock (_sync)
+        {
+            if (_closed || _order.CurrentId != entryId || _snapshot.Playback.Generation != generation) return Task.CompletedTask;
+            return _single.SeekAsync(generation, positionMs, ct);
+        }
+    }
     private MusicSession Capture(CancellationToken ct)
     {
         ct.ThrowIfCancellationRequested(); var session = _sessions.Capture();

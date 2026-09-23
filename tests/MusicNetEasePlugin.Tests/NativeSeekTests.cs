@@ -12,6 +12,7 @@ namespace MusicNetEasePlugin.Tests;
 /// 使用前后两段不同符号的自生成 PCM 验证真实适配，恢复起点不仅检查 Time 属性，
 /// 还检查第一段实际输出内容，防止先播放开头再定位仍被误判成功。不使用声卡和网易账号。
 /// </summary>
+[Collection("LibVlcNative")]
 public sealed class NativeSeekTests
 {
     [Fact, Trait("M2", "Q05,C02,A03")]
@@ -62,6 +63,8 @@ public sealed class NativeSeekTests
         await audio.OpenAsync(path, 41, default, 4000).WaitAsync(TimeSpan.FromSeconds(20));
         var first = await firstSamples.Task.WaitAsync(TimeSpan.FromSeconds(5));
         Assert.True(first.Count(v => v < -1000) > first.Length / 2, $"恢复后第一段 PCM 应来自后半段：min={first.Min()}, max={first.Max()}, mean={first.Average(v => (double)v)}, count={first.Length}。");
+        await audio.SeekAsync(41, 2000, default);
+        Assert.InRange(progress.Last().PositionMs, 1900, 2100);
         await audio.PauseAsync(true, default, 41);
         await audio.SeekAsync(41, 1000, default);
         var backward = progress.Last();
@@ -74,6 +77,9 @@ public sealed class NativeSeekTests
         Assert.InRange(forward.PositionMs, 4450, 4550);
         await audio.SeekAsync(40, 0, default);
         Assert.Equal(forward, progress.Last());
+        await audio.SeekAsync(41, 7990, default);
+        Assert.InRange(progress.Last().PositionMs, 7890, 8000);
+        Assert.Equal(PlaybackState.Paused, progress.Last().State);
         await audio.StopAsync();
         using (File.Open(path, FileMode.Open, FileAccess.ReadWrite, FileShare.None)) { }
         var artifacts = Environment.GetEnvironmentVariable("NETEASE_TEST_ARTIFACTS");

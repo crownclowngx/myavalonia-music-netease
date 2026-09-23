@@ -8,8 +8,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
 {
     private readonly IMusicSessionAccessor _sessions;
     private readonly IMusicCatalogApi _catalog;
-    private readonly IPlaybackResourceResolver _resources;
-    private readonly IMediaBuffer _buffer;
+    private readonly MediaLoader _loader;
     private readonly IAudioOutput _audio;
     private readonly object _sync = new();
     private long _generation;
@@ -24,17 +23,20 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
     private bool _disposed;
     private Task? _shutdown;
     private readonly SemaphoreSlim _volumeChanges = new(1);
+    private CancellationTokenSource? _seek;
+    private long _seekVersion;
     private PlaybackSnapshot _snapshot = new(0, PlaybackState.Idle);
     public PlaybackCoordinator(IMusicSessionAccessor sessions, IMusicCatalogApi catalog, IPlaybackResourceResolver resources,
-        IMediaBuffer buffer, IAudioOutput audio)
+        IMediaBuffer buffer, IAudioOutput audio, TimeProvider? time = null)
     {
-        (_sessions, _catalog, _resources, _buffer, _audio) = (sessions, catalog, resources, buffer, audio);
+        (_sessions, _catalog, _audio) = (sessions, catalog, audio);
+        _loader = new(resources, buffer, time ?? TimeProvider.System);
         audio.Changed += OnAudioChanged;
     }
     public PlaybackSnapshot Snapshot { get { lock (_sync) return _snapshot; } }
     public event EventHandler<PlaybackSnapshot>? Changed;
 
-    public Task PlayAsync(Guid owner, MusicTrack track, CancellationToken ct)
+    public Task PlayAsync(Guid owner, MusicTrack track, CancellationToken ct, long startPositionMs = 0)
     {
         MusicSession session;
         try { session = _sessions.Capture(); }
@@ -86,11 +88,11 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
             if (retained) _accountRevocation = accountRegistration;
         }
         if (!retained) accountRegistration.Dispose();
-        _ = LoadAsync(previous, previousCancellation, operation, session, track, generation, completion);
+        _ = LoadAsync(previous, previousCancellation, operation, session, track, generation, completion, startPositionMs);
         return completion.Task;
     }
     private async Task LoadAsync(Task previous, CancellationTokenSource? previousCancellation, CancellationTokenSource operation,
-        MusicSession session, MusicTrack track, long generation, TaskCompletionSource completion)
+        MusicSession session, MusicTrack track, long generation, TaskCompletionSource completion, long startPositionMs)
     {
         // 把执行让到登记意图之后，队列可在短锁内完成播放交接，不让网络和原生操作进入外层状态锁。
         await Task.Yield();
@@ -102,21 +104,19 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
             operation.Token.ThrowIfCancellationRequested();
             var detail = await _catalog.DetailAsync(track.Id, session, operation.Token).ConfigureAwait(false);
             operation.Token.ThrowIfCancellationRequested();
-            for (var attempt = 0; ; attempt++)
-            {
-                var resource = await _resources.ResolveAsync(track.Id, session, operation.Token).ConfigureAwait(false);
-                operation.Token.ThrowIfCancellationRequested();
-                if (resource.Address is null) throw new MusicException(MusicError.Unavailable, "当前账号暂不能播放这首歌曲。");
-                try { _media = await _buffer.DownloadAsync(resource, operation.Token).ConfigureAwait(false); }
-                catch (MusicException ex) when (ex.Kind == MusicError.AddressExpired && attempt == 0) { continue; }
-                operation.Token.ThrowIfCancellationRequested();
-                if (!_sessions.IsCurrent(session)) throw new OperationCanceledException(operation.Token);
-                Update(generation, s => s with { Track = detail, IsTrial = resource.IsTrial, DurationMs = resource.TrialDurationMs ?? detail.DurationMs });
-                await ApplyCurrentVolumeAsync(operation.Token).ConfigureAwait(false);
-                await _audio.OpenAsync(_media.Path, generation, operation.Token).ConfigureAwait(false);
-                operation.Token.ThrowIfCancellationRequested();
-                break;
-            }
+            var loaded = await _loader.LoadAsync(track.Id, session, operation.Token,
+                p => Update(generation, s => s with { Buffer = p }), message => Update(generation, s => s with { Message = message, Buffer = null })).ConfigureAwait(false);
+            _media = loaded.Media; var resource = loaded.Resource;
+            operation.Token.ThrowIfCancellationRequested();
+            if (!_sessions.IsCurrent(session)) throw new OperationCanceledException(operation.Token);
+            var duration = resource.TrialDurationMs ?? detail.DurationMs;
+            var start = Math.Max(0, startPositionMs);
+            if (duration > 0 && start >= duration) start = 0;
+            Update(generation, s => s with { Track = detail, IsTrial = resource.IsTrial, DurationMs = duration, TrialDurationMs = resource.TrialDurationMs });
+            await ApplyCurrentVolumeAsync(operation.Token).ConfigureAwait(false);
+            await _audio.OpenAsync(_media.Path, generation, operation.Token, start).ConfigureAwait(false);
+            operation.Token.ThrowIfCancellationRequested();
+            if (start != startPositionMs) Update(generation, s => s with { Message = "续播位置超出当前可播范围，已从开头播放。" });
         }
         catch (OperationCanceledException) { await ReleaseMediaSafelyAsync().ConfigureAwait(false); }
         catch (Exception ex)
@@ -149,7 +149,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
             previous = _tail;
             _tail = completion.Task;
             snapshot = _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, State = state,
-                PositionMs = state == PlaybackState.Ended ? _snapshot.DurationMs : 0, CanSeek = false,
+                PositionMs = state == PlaybackState.Ended ? _snapshot.DurationMs : 0, CanSeek = false, IsSeeking = false, Buffer = null,
                 Error = state == PlaybackState.Failed ? MusicError.Device : null,
                 Track = clearTrack ? null : _snapshot.Track, DurationMs = clearTrack ? 0 : _snapshot.DurationMs,
                 IsTrial = clearTrack ? false : _snapshot.IsTrial, Message = message };
@@ -195,6 +195,28 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
         catch (OperationCanceledException) { }
         catch (MusicException ex) { await StopCoreAsync(null, generation, PlaybackState.Failed, ex.Message, false).ConfigureAwait(false); }
     }
+    /// <summary>只修改已确认的当前媒体；用户目标不写入事实位置。后来的定位取消旧等待，换曲也通过操作令牌撤销。</summary>
+    public async Task SeekAsync(long generation, long positionMs, CancellationToken ct)
+    {
+        CancellationTokenSource seek; long version; long target; CancellationTokenSource? old;
+        lock (_sync)
+        {
+            if (_disposed || generation != _generation || !_snapshot.CanSeek || _snapshot.DurationMs <= 0 || _snapshot.State is not (PlaybackState.Playing or PlaybackState.Paused)) return;
+            old = _seek; seek = CancellationTokenSource.CreateLinkedTokenSource(ct, _operation?.Token ?? new(true)); _seek = seek;
+            version = ++_seekVersion; target = Math.Clamp(positionMs, 0, Math.Max(0, _snapshot.DurationMs - 1));
+        }
+        try { old?.Cancel(); } catch (ObjectDisposedException) { }
+        Update(generation, s => s with { IsSeeking = true, SeekRevision = s.SeekRevision + 1, Message = s.IsTrial ? "正在播放试听片段" : "" });
+        try { await _audio.SeekAsync(generation, target, seek.Token).ConfigureAwait(false); }
+        catch (OperationCanceledException) { }
+        catch (MusicException ex) { Update(generation, s => s with { Message = ex.Message }); }
+        finally
+        {
+            lock (_sync) if (ReferenceEquals(_seek, seek)) _seek = null;
+            if (version == Interlocked.Read(ref _seekVersion)) Update(generation, s => s with { IsSeeking = false });
+            seek.Dispose();
+        }
+    }
     public async Task SetVolumeAsync(int volume, CancellationToken ct)
     {
         if (volume is < 0 or > 100) throw new ArgumentOutOfRangeException(nameof(volume));
@@ -224,10 +246,10 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
             _ = Task.Run(() => StopCoreAsync(null, progress.Generation, progress.State, progress.Error ?? "", false));
             return;
         }
-        Update(progress.Generation, s => s with { State = progress.State, PositionMs = progress.PositionMs,
-            DurationMs = progress.DurationMs > 0 ? progress.DurationMs : s.DurationMs,
+        Update(progress.Generation, s => s with { State = progress.State, PositionMs = Math.Max(0, progress.PositionMs),
+            DurationMs = progress.DurationMs > 0 ? s.TrialDurationMs is { } limit ? Math.Min(progress.DurationMs, limit) : progress.DurationMs : s.DurationMs,
             CanSeek = progress.CanSeek,
-            Message = s.IsTrial ? "正在播放试听片段" : "" });
+            Message = s.State == PlaybackState.Loading ? s.IsTrial ? "正在播放试听片段" : "" : s.Message });
     }
     private async Task ReleaseMediaAsync()
     {

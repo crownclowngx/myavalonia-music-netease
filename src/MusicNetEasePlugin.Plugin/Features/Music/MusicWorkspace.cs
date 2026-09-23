@@ -52,6 +52,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         Preferences = preferences;
         Playlists = playlists;
         Queue = new(playback, ui);
+        Timeline = new(playback, ui);
         ShowSearchCommand = new RelayCommand(() => Pane = 0);
         ShowQueueCommand = new RelayCommand(() => Pane = 2);
         ShowLibraryCommand = new AsyncRelayCommand(async () =>
@@ -78,6 +79,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     public UiPreferences? Preferences { get; }
     public PlaylistBrowser? Playlists { get; }
     public QueueWorkspace Queue { get; }
+    public TimelineWorkspace Timeline { get; }
     private int _pane;
     private int Pane { get => _pane; set { if (SetProperty(ref _pane, value)) { OnPropertyChanged(nameof(IsSearch)); OnPropertyChanged(nameof(IsLibrary)); OnPropertyChanged(nameof(IsQueue)); } } }
     public bool IsSearch => Pane == 0;
@@ -252,6 +254,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         _closing.Cancel();
         Playlists?.Dispose();
         Queue.Dispose();
+        Timeline.Dispose();
         _login.Changed -= LoginChanged;
         _playback.Changed -= PlaybackChanged;
         // V4 队列由插件容器拥有。页面只撤销自己的搜索、图片与订阅，不再停止已接纳的歌曲。

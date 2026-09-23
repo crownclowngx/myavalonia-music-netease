@@ -31,4 +31,5 @@ public interface IPlayerSession
     Task StopAsync();
     Task PauseAsync(bool paused, CancellationToken ct);
     Task SetVolumeAsync(int volume, CancellationToken ct);
+    Task SeekAsync(Guid entryId, long generation, long positionMs, CancellationToken ct);
 }

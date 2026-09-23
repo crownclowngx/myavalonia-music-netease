@@ -22,6 +22,12 @@ public partial class MusicView : UserControl
     {
         Motion = new(this);
         InitializeComponent();
+        // Tunnel 先于 Slider 内部处理，保证第一次跳动前已登记草稿身份；按键自动重复仅在 KeyUp 提交。
+        PlaybackProgress.AddHandler(PointerPressedEvent, (_, _) => _model?.Timeline.Begin(), Avalonia.Interactivity.RoutingStrategies.Tunnel);
+        PlaybackProgress.AddHandler(PointerReleasedEvent, async (_, _) => { if (_model is { } model) await model.Timeline.CommitAsync(); }, Avalonia.Interactivity.RoutingStrategies.Tunnel);
+        PlaybackProgress.PointerCaptureLost += (_, _) => _model?.Timeline.Cancel();
+        PlaybackProgress.AddHandler(KeyDownEvent, (_, e) => { if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown) _model?.Timeline.Begin(); if (e.Key == Key.Escape) _model?.Timeline.Cancel(); }, Avalonia.Interactivity.RoutingStrategies.Tunnel);
+        PlaybackProgress.AddHandler(KeyUpEvent, async (_, e) => { if (e.Key is Key.Left or Key.Right or Key.Up or Key.Down or Key.Home or Key.End or Key.PageUp or Key.PageDown && _model is { } model) await model.Timeline.CommitAsync(); }, Avalonia.Interactivity.RoutingStrategies.Tunnel);
         DataContextChanged += (_, _) => { if (VisualRoot is not null) Bind(); };
         SizeChanged += (_, _) => ApplyWidth();
     }
@@ -38,7 +44,7 @@ public partial class MusicView : UserControl
         if (_model is not null) _model.PropertyChanged += ModelChanged;
         SetCover(_model?.CoverBytes);
     }
-    private void Unbind() { if (_model is not null) _model.PropertyChanged -= ModelChanged; _model = null; Motion.Bind(null); }
+    private void Unbind() { if (_model is not null) { _model.PropertyChanged -= ModelChanged; _model.Timeline.Cancel(); } _model = null; Motion.Bind(null); }
     private void ModelChanged(object? sender, PropertyChangedEventArgs args)
     {
         if (args.PropertyName == nameof(MusicWorkspace.CoverBytes)) SetCover(_model?.CoverBytes);

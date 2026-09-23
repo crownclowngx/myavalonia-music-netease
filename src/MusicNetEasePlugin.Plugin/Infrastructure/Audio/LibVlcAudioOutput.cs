@@ -22,11 +22,11 @@ internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlaye
 
     public Task OpenAsync(string path, long generation, CancellationToken ct, long startPositionMs = 0) => RunAsync(async () =>
     {
+        if (startPositionMs < 0) throw new ArgumentOutOfRangeException(nameof(startPositionMs));
         StopCore();
         var engine = await runtime.GetEngineAsync(ct).ConfigureAwait(false);
         ct.ThrowIfCancellationRequested();
         var media = new VlcMedia(engine, path, FromType.FromPath);
-        if (startPositionMs < 0) throw new ArgumentOutOfRangeException(nameof(startPositionMs));
         // 在输入创建前指定起点。恢复只在用户点击继续时进入这里，不采用 Play 后 Pause/seek 的有声竞态。
         if (startPositionMs > 0)
         {
@@ -38,6 +38,7 @@ internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlaye
         _player = player;
         _generation = generation;
         var state = (int)PlaybackState.Loading;
+        _reportedState = () => (PlaybackState)Volatile.Read(ref state);
         var started = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         long lastProgress = 0;
         long position = 0, duration = 0;
@@ -88,17 +89,25 @@ internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlaye
             player.SetPause(false);
         }
     }, ct);
-    public Task PauseAsync(bool paused, CancellationToken ct, long? generation = null) => RunAsync(() =>
+    private Func<PlaybackState>? _reportedState;
+    public Task PauseAsync(bool paused, CancellationToken ct, long? generation = null) => RunAsync(async () =>
     {
-        if (generation.HasValue && generation.Value != _generation) return Task.CompletedTask;
+        if (_player is null || generation.HasValue && generation.Value != _generation) return;
         _player?.SetPause(paused); // 使用显式 SetPause，重复暂停不会像 toggle 一样反向播放。
-        return Task.CompletedTask;
+        // SetPause 是异步命令。等待事件缓存确认后才交给下一次 seek，不能把 setter 返回误当成已暂停。
+        var expected = paused ? PlaybackState.Paused : PlaybackState.Playing;
+        var deadline = Environment.TickCount64 + 2000;
+        while (_reportedState?.Invoke() != expected)
+        {
+            if (Environment.TickCount64 >= deadline) throw new MusicException(MusicError.Timeout, "播放状态切换未完成，请重试。");
+            await Task.Delay(20, ct).ConfigureAwait(false);
+        }
     }, ct);
     public Task SeekAsync(long generation, long positionMs, CancellationToken ct) => RunAsync(async () =>
     {
         if (_player is null || generation != _generation) return;
-        await SetPositionAsync(_player, positionMs, ct).ConfigureAwait(false);
-        _reportPosition?.Invoke();
+        try { await SetPositionAsync(_player, positionMs, ct).ConfigureAwait(false); }
+        finally { _reportPosition?.Invoke(); } // 定位超时也报告真实位置，界面不能保留未经确认的用户目标。
     }, ct);
     private static async Task SetPositionAsync(MediaPlayer player, long target, CancellationToken ct)
     {
@@ -140,6 +149,7 @@ internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlaye
         var player = _player;
         _player = null;
         _reportPosition = null;
+        _reportedState = null;
         var media = _media;
         _media = null;
         try

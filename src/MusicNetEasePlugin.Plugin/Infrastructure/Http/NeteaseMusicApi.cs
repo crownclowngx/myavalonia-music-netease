@@ -54,7 +54,7 @@ internal sealed class NeteaseMusicApi(NeteaseTransport transport, XeapiTransport
         if (!string.IsNullOrEmpty(address) && !Uri.TryCreate(address, UriKind.Absolute, out _))
             throw new MusicException(MusicError.Protocol, "播放地址格式无效。");
         return new PlaybackResource(id, string.IsNullOrEmpty(address) ? null : new Uri(address),
-            Text(item, "type") ?? "", Text(item, "level") ?? "standard", trial, trialMs);
+            Text(item, "type") ?? "", Text(item, "level") ?? "standard", trial, trialMs, trial ? Number(info, "start") * 1000 : null);
     });
     private async Task CommitAsync(NeteaseResponse reply, MusicSession session, CancellationToken ct)
     {

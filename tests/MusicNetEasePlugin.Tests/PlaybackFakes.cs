@@ -38,7 +38,7 @@ internal sealed class MusicBuffer : IMediaBuffer
 {
     public ConcurrentQueue<string> Deleted { get; } = new();
     public Func<PlaybackResource, CancellationToken, Task<BufferedMedia>>? Download { get; set; }
-    public Task<BufferedMedia> DownloadAsync(PlaybackResource resource, CancellationToken ct) => Download?.Invoke(resource, ct)
+    public Task<BufferedMedia> DownloadAsync(PlaybackResource resource, CancellationToken ct, Action<BufferProgress>? progress = null) => Download?.Invoke(resource, ct)
         ?? Task.FromResult(new BufferedMedia(resource.Id + ".media", Deleted.Enqueue));
 }
 internal sealed class MusicAudio : IAudioOutput
@@ -49,6 +49,12 @@ internal sealed class MusicAudio : IAudioOutput
     public int Volume { get; private set; }
     public int Stops { get; private set; }
     public bool AutoStart { get; set; } = true;
+    public bool CanSeek { get; set; } = true;
+    public long DurationMs { get; set; } = 120000;
+    private long _generation;
+    private PlaybackState _state;
+    public ConcurrentQueue<long> SeekPositions { get; } = new();
+    public Func<CancellationToken, Task>? Seeking { get; set; }
     public Func<CancellationToken, Task>? Opening { get; set; }
     public Func<CancellationToken, Task>? Pausing { get; set; }
     public Func<Task>? Stopping { get; set; }
@@ -57,15 +63,17 @@ internal sealed class MusicAudio : IAudioOutput
         if (Opening is not null) await Opening(ct);
         ct.ThrowIfCancellationRequested();
         if (Current is not null) throw new InvalidOperationException("出现第二个同时持有的音源");
-        Current = path; Opened.Enqueue((path, generation));
+        Current = path; _generation = generation; Opened.Enqueue((path, generation));
         if (AutoStart) Emit(generation, PlaybackState.Playing, startPositionMs);
     }
-    public async Task PauseAsync(bool paused, CancellationToken ct, long? generation = null) { if (Pausing is not null) await Pausing(ct); ct.ThrowIfCancellationRequested(); }
-    public Task SeekAsync(long generation, long positionMs, CancellationToken ct)
-    { ct.ThrowIfCancellationRequested(); Emit(generation, PlaybackState.Playing, positionMs); return Task.CompletedTask; }
+    public async Task PauseAsync(bool paused, CancellationToken ct, long? generation = null)
+    { if (Pausing is not null) await Pausing(ct); ct.ThrowIfCancellationRequested(); if (generation is null || generation == _generation) _state = paused ? PlaybackState.Paused : PlaybackState.Playing; }
+    public async Task SeekAsync(long generation, long positionMs, CancellationToken ct)
+    { if (Seeking is not null) await Seeking(ct); ct.ThrowIfCancellationRequested(); if (generation != _generation) return; SeekPositions.Enqueue(positionMs); Emit(generation, _state, positionMs); }
     public async Task StopAsync() { if (Stopping is not null) await Stopping(); Current = null; Stops++; }
     public Task SetVolumeAsync(int volume, CancellationToken ct) { ct.ThrowIfCancellationRequested(); Volume = volume; return Task.CompletedTask; }
-    public void Emit(long generation, PlaybackState state, long position = 0) => Changed?.Invoke(this, new(generation, state, position, 120000, state == PlaybackState.Failed ? "设备失败" : null));
+    public void Emit(long generation, PlaybackState state, long position = 0)
+    { if (generation == _generation) _state = state; Changed?.Invoke(this, new(generation, state, position, DurationMs, state == PlaybackState.Failed ? "设备失败" : null, CanSeek)); }
     public ValueTask DisposeAsync() { Current = null; Changed = null; return ValueTask.CompletedTask; }
 }
 internal sealed class PlaybackFixture : IAsyncDisposable

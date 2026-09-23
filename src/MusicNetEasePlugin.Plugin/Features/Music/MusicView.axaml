@@ -88,7 +88,9 @@
      <Button Content="下一首" Classes="netease-button" Command="{Binding Queue.NextCommand}" />
     </StackPanel>
     <Grid x:Name="TimelineLayout" Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto,180" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="4">
-     <ProgressBar x:Name="PlaybackProgress" Value="{Binding Progress}" Minimum="0" Maximum="100" Height="3" VerticalAlignment="Center" AutomationProperties.Name="只读播放进度" />
+     <Slider x:Name="PlaybackProgress" Value="{Binding Timeline.Position, Mode=TwoWay}" Minimum="0" Maximum="{Binding Timeline.Maximum}" IsEnabled="{Binding Timeline.CanSeek}" SmallChange="5000" LargeChange="15000" Height="32" MinHeight="32" VerticalAlignment="Center" AutomationProperties.Name="播放进度定位" ToolTip.Tip="{Binding Timeline.DraftText}">
+      <Slider.Resources><GridLength x:Key="SliderPreContentMargin">6</GridLength><GridLength x:Key="SliderPostContentMargin">6</GridLength></Slider.Resources>
+     </Slider>
      <TextBlock Grid.Column="1" Classes="netease-secondary" Text="{Binding PositionText}" VerticalAlignment="Center" />
      <Grid x:Name="VolumeControls" Grid.Column="2" ColumnDefinitions="Auto,*,30" ColumnSpacing="6">
       <TextBlock Classes="netease-secondary" Text="音量" VerticalAlignment="Center" />
@@ -100,7 +102,11 @@
       <TextBlock Grid.Column="2" Classes="netease-secondary" Text="{Binding Volume}" VerticalAlignment="Center" HorizontalAlignment="Right" />
      </Grid>
     </Grid>
-    <TextBlock Grid.Row="2" Grid.ColumnSpan="2" Classes="netease-secondary" Text="{Binding PlaybackMessage}" IsVisible="{Binding PlaybackMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding PlaybackMessage}" AutomationProperties.LiveSetting="Polite" />
+    <StackPanel Grid.Row="2" Grid.ColumnSpan="2">
+     <TextBlock Text="{Binding Timeline.BufferText}" IsVisible="{Binding Timeline.BufferText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+     <TextBlock Text="{Binding Timeline.DraftText}" IsVisible="{Binding Timeline.DraftText, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+     <TextBlock Classes="netease-secondary" Text="{Binding PlaybackMessage}" IsVisible="{Binding PlaybackMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding PlaybackMessage}" AutomationProperties.LiveSetting="Polite" />
+    </StackPanel>
    </Grid>
   </Border>
  </Grid>

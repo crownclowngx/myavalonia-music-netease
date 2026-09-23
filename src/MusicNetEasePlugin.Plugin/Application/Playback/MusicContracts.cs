@@ -25,7 +25,7 @@ public interface IMusicCatalogApi
     Task<MusicTrack> DetailAsync(long id, MusicSession session, CancellationToken ct);
 }
 /// <summary>带签名的资源仅在播放链内短期存在，默认字符串不输出 URL。</summary>
-public sealed record PlaybackResource(long Id, Uri? Address, string Format, string Quality, bool IsTrial, long? TrialDurationMs)
+public sealed record PlaybackResource(long Id, Uri? Address, string Format, string Quality, bool IsTrial, long? TrialDurationMs, long? TrialStartMs = null)
 {
     public override string ToString() => "[临时播放资源]";
 }
@@ -41,7 +41,9 @@ public sealed class BufferedMedia(string path, Action<string> cleanup) : IDispos
     public string Path { get; } = path;
     public void Dispose() { if (Interlocked.Exchange(ref _disposed, 1) == 0) cleanup(Path); }
 }
-public interface IMediaBuffer { Task<BufferedMedia> DownloadAsync(PlaybackResource resource, CancellationToken ct); }
+/// <summary>仅描述本次完整文件下载；未知 Content-Length 保持 null，不虚构完成百分比。</summary>
+public sealed record BufferProgress(long BytesRead, long? TotalBytes);
+public interface IMediaBuffer { Task<BufferedMedia> DownloadAsync(PlaybackResource resource, CancellationToken ct, Action<BufferProgress>? progress = null); }
 
 public enum PlaybackState { Idle, Loading, Playing, Paused, Stopped, Ended, Failed }
 public sealed record AudioProgress(long Generation, PlaybackState State, long PositionMs, long DurationMs, string? Error = null, bool CanSeek = false);
@@ -62,4 +64,5 @@ public interface IAudioOutput : IAsyncDisposable
 }
 public sealed record PlaybackSnapshot(long Revision, PlaybackState State, MusicTrack? Track = null,
     long PositionMs = 0, long DurationMs = 0, int Volume = 70, bool IsTrial = false, string Message = "",
-    long Generation = 0, Guid AttemptId = default, MusicError? Error = null, bool CanSeek = false);
+    long Generation = 0, Guid AttemptId = default, MusicError? Error = null, bool CanSeek = false,
+    bool IsSeeking = false, long SeekRevision = 0, BufferProgress? Buffer = null, long? TrialDurationMs = null);
