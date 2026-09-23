@@ -75,10 +75,11 @@ internal sealed class PlaybackFixture : IAsyncDisposable
     public MusicBuffer Buffer { get; } = new();
     public MusicAudio Audio { get; } = new();
     public PlaybackCoordinator Player { get; }
+    public PlaybackQueueCoordinator Queue { get; }
     public Guid Owner { get; } = Guid.NewGuid();
-    public PlaybackFixture() => Player = new(Sessions, Catalog, Catalog, Buffer, Audio);
+    public PlaybackFixture() { Player = new(Sessions, Catalog, Catalog, Buffer, Audio); Queue = new(Sessions, Player); }
     public Task Play(long id = 1) => Player.PlayAsync(Owner, MusicCatalog.Track(id), default);
-    public async ValueTask DisposeAsync() { await Player.DisposeAsync(); await Audio.DisposeAsync(); Sessions.Dispose(); }
+    public async ValueTask DisposeAsync() { await Queue.DisposeAsync(); await Player.DisposeAsync(); await Audio.DisposeAsync(); Sessions.Dispose(); }
 }
 internal sealed class ImmediateUi : ILoginUiDispatcher { public void Post(Action action) => action(); }
 internal sealed class MusicLifetime : IDocumentLifetime, IDisposable

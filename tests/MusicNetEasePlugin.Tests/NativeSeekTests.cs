@@ -14,6 +14,28 @@ namespace MusicNetEasePlugin.Tests;
 /// </summary>
 public sealed class NativeSeekTests
 {
+    [Fact, Trait("M2", "Q05,C02,A03")]
+    public async Task 原生三曲自然结束连续交接且最后释放所有文件()
+    {
+        using var directory = new TestDirectory(); using var sessions = new MusicSessions(); var catalog = new MusicCatalog();
+        using var runtime = new LibVlcRuntime(new(new MemoryVlcSettings(), new LibVlcDirectoryProbe(), Path.Combine(AppContext.BaseDirectory, "native", "win-x64", "libvlc")));
+        long samples = 0;
+        await using var audio = new LibVlcAudioOutput(runtime, player => { player.SetAudioFormat("S16N", 48000, 1); player.SetAudioCallbacks((_, _, count, _) => Interlocked.Add(ref samples, count), null, null, null, null); });
+        var buffer = new MusicBuffer { Download = async (resource, ct) =>
+        {
+            var file = Path.Combine(directory.Path, resource.Id + ".wav"); await File.WriteAllBytesAsync(file, SegmentedWave(1), ct);
+            return new(file, File.Delete);
+        } };
+        await using var single = new PlaybackCoordinator(sessions, catalog, catalog, buffer, audio);
+        await using var queue = new PlaybackQueueCoordinator(sessions, single);
+        var played = new ConcurrentQueue<long>(); var ended = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        queue.Changed += (_, snapshot) => { if (snapshot.Playback.State == PlaybackState.Playing) played.Enqueue(snapshot.Playback.Track!.Id); if (snapshot.Playback.State == PlaybackState.Ended && snapshot.Playback.Track?.Id == 3) ended.TrySetResult(); };
+        await queue.ReplaceAsync(Enumerable.Range(1, 3).Select(id => QueueEntry.FromTrack(MusicCatalog.Track(id))).ToArray(), 0, default);
+        await ended.Task.WaitAsync(TimeSpan.FromSeconds(20)); await queue.DisposeAsync();
+        Assert.Equal(new long[] { 1, 2, 3 }, played.Distinct()); Assert.True(samples > 48000); Assert.Empty(Directory.GetFiles(directory.Path));
+        var artifacts = Environment.GetEnvironmentVariable("NETEASE_TEST_ARTIFACTS");
+        if (!string.IsNullOrEmpty(artifacts)) await File.WriteAllTextAsync(Path.Combine(artifacts, "m2-native-queue.json"), JsonSerializer.Serialize(new { schemaVersion = 1, tracks = 3, decodedFrames = samples, filesReleased = true, actualDeviceOutput = false, realHost = false }));
+    }
     [Fact, Trait("M2", "B02,B03,B08")]
     public async Task 原生定位保留暂停且续播第一帧来自指定区段()
     {
@@ -65,9 +87,9 @@ public sealed class NativeSeekTests
             }));
     }
 
-    private static byte[] SegmentedWave()
+    private static byte[] SegmentedWave(int seconds = 8)
     {
-        const int rate = 48000, count = rate * 8;
+        const int rate = 48000; var count = rate * seconds;
         using var stream = new MemoryStream(); using var writer = new BinaryWriter(stream);
         writer.Write("RIFF"u8); writer.Write(36 + count * 2); writer.Write("WAVEfmt "u8);
         writer.Write(16); writer.Write((short)1); writer.Write((short)1); writer.Write(rate); writer.Write(rate * 2);

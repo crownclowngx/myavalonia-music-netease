@@ -72,7 +72,7 @@
     "MusicNetEasePlugin.Tests.ProtocolTests.最终请求使用稳定设备和正确的逻辑端点": 1,
     "MusicNetEasePlugin.Tests.ProtocolTests.Unicode序列化不误修改字面反斜杠转义": 1,
     "MusicNetEasePlugin.Tests.SearchDocumentTests.迟到封面不能覆盖新歌曲且失败保留占位": 1,
-    "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用播放器但关闭无关文档不取消当前所有者": 1,
+    "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放": 1,
     "MusicNetEasePlugin.Tests.SearchDocumentTests.搜索只投影最新响应并在失败后保留原页允许重试": 1,
     "MusicNetEasePlugin.Tests.SessionStoreTests.保存或清除目标被目录占用时明确失败": 1,
     "MusicNetEasePlugin.Tests.SessionStoreTests.本机当前用户保护可以往返且损坏密文拒绝": 1,
@@ -229,7 +229,7 @@
     ],
     "L09": [
       "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.账号撤销取消加载并清除曲目且关闭无关页面不停止当前歌曲",
-      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用播放器但关闭无关文档不取消当前所有者"
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放"
     ],
     "P01": [
       "MusicNetEasePlugin.Tests.MusicHttpTests.搜索分页参数经真实编码且详情保持长整型身份及缺省资料",
@@ -298,14 +298,14 @@
       "MusicNetEasePlugin.Tests.SearchDocumentTests.迟到封面不能覆盖新歌曲且失败保留占位"
     ],
     "U04": [
-      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用播放器但关闭无关文档不取消当前所有者",
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放",
       "MusicNetEasePlugin.Tests.SearchDocumentTests.搜索只投影最新响应并在失败后保留原页允许重试"
     ],
     "U05": [
-      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用播放器但关闭无关文档不取消当前所有者"
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放"
     ],
     "U06": [
-      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用播放器但关闭无关文档不取消当前所有者"
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放"
     ],
     "U07": [
       "MusicNetEasePlugin.Tests.LibVlcSettingsTests.模型初始化只一次并保留载入时用户草稿及过期检测隔离",

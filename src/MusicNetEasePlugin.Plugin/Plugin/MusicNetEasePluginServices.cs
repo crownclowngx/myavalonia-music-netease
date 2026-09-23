@@ -57,9 +57,11 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<IMediaBuffer>(provider => new FlurlMediaBuffer(provider.GetRequiredService<NeteaseFlurlClients>(), Path.Combine(root, "media-buffer"), MediaLimits.Default));
         services.TryAddSingleton<IAudioOutput, LibVlcAudioOutput>();
         services.TryAddSingleton<PlaybackCoordinator>();
+        services.TryAddSingleton<PlaybackQueueCoordinator>();
+        services.TryAddSingleton<IPlayerSession>(provider => provider.GetRequiredService<PlaybackQueueCoordinator>());
         // Host 在 Document Scope 中提供 Lifetime；工厂避免普通服务容器预检被要求创建一个虚假的 Document。
         services.TryAddScoped(provider => new MusicWorkspace(provider.GetRequiredService<IMusicCatalogApi>(),
-            provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<PlaybackCoordinator>(),
+            provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<IPlayerSession>(),
             provider.GetRequiredService<LoginCoordinator>(), provider.GetRequiredService<ILoginUiDispatcher>(),
             provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>(),
             provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>()));

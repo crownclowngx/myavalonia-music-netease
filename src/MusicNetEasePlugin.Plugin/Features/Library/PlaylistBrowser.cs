@@ -22,6 +22,7 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     private readonly IPlaylistCatalogApi _api;
     private readonly IMusicSessionAccessor _sessions;
     private readonly ILoginUiDispatcher _ui;
+    private readonly IPlayerSession? _player;
     private readonly CancellationTokenSource _closing = new();
     private CancellationTokenSource? _operation;
     private CancellationTokenRegistration _account;
@@ -38,20 +39,25 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     private PlaylistTrackRow? _selectedTrack;
     private PlaylistTracks? _snapshot;
     private int _tabIndex;
-    public PlaylistBrowser(IPlaylistCatalogApi api, IMusicSessionAccessor sessions, ILoginUiDispatcher ui)
+    public PlaylistBrowser(IPlaylistCatalogApi api, IMusicSessionAccessor sessions, ILoginUiDispatcher ui, IPlayerSession? player = null)
     {
         (_api, _sessions, _ui) = (api, sessions, ui);
+        _player = player;
         RefreshCommand = new AsyncRelayCommand(() => LoadPlaylistsAsync(true), () => !_closed, AsyncRelayCommandOptions.AllowConcurrentExecutions);
         MoreCommand = new AsyncRelayCommand(() => LoadPlaylistsAsync(false), () => HasMore && !IsLoading);
         OpenCommand = new AsyncRelayCommand(() => SelectedPlaylist is { } p ? OpenAsync(p.Id) : Task.CompletedTask, () => SelectedPlaylist is not null && !IsLoading);
         NextTracksCommand = new AsyncRelayCommand(() => LoadTracksAsync(_trackOffset + 50), () => Snapshot is { } s && _trackOffset + 50 < s.TrackIds.Count && !IsLoading);
         PreviousTracksCommand = new AsyncRelayCommand(() => LoadTracksAsync(Math.Max(0, _trackOffset - 50)), () => _trackOffset > 0 && !IsLoading);
         RetryTracksCommand = new AsyncRelayCommand(() => LoadTracksAsync(_trackOffset, true), () => Snapshot is not null && !IsLoading);
+        PlayAllCommand = new AsyncRelayCommand(() => QueueAsync(true, false, false), () => CanReplace);
+        PlayFromHereCommand = new AsyncRelayCommand(() => QueueAsync(true, true, false), () => CanReplace && SelectedTrack is not null);
+        AppendCommand = new AsyncRelayCommand(() => QueueAsync(false, true, false), () => CanAdd);
+        PlayNextCommand = new AsyncRelayCommand(() => QueueAsync(false, true, true), () => CanAdd);
     }
     public ObservableCollection<MusicPlaylist> Playlists { get; } = [];
     public ObservableCollection<PlaylistTrackRow> Tracks { get; } = [];
     public MusicPlaylist? SelectedPlaylist { get => _selected; set { SetProperty(ref _selected, value); OpenCommand.NotifyCanExecuteChanged(); } }
-    public PlaylistTrackRow? SelectedTrack { get => _selectedTrack; set => SetProperty(ref _selectedTrack, value); }
+    public PlaylistTrackRow? SelectedTrack { get => _selectedTrack; set { SetProperty(ref _selectedTrack, value); CommandsChanged(); } }
     public PlaylistTracks? Snapshot { get => _snapshot; private set { SetProperty(ref _snapshot, value); OnPropertyChanged(nameof(Title)); } }
     public string Title => Snapshot?.Name ?? "尚未打开歌单";
     public int TabIndex { get => _tabIndex; set => SetProperty(ref _tabIndex, value); }
@@ -66,6 +72,31 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     public IAsyncRelayCommand NextTracksCommand { get; }
     public IAsyncRelayCommand PreviousTracksCommand { get; }
     public IAsyncRelayCommand RetryTracksCommand { get; }
+    public IAsyncRelayCommand PlayAllCommand { get; }
+    public IAsyncRelayCommand PlayFromHereCommand { get; }
+    public IAsyncRelayCommand AppendCommand { get; }
+    public IAsyncRelayCommand PlayNextCommand { get; }
+    private bool CanReplace => _player is not null && !IsLoading && Snapshot is { IsComplete: true, TrackIds.Count: > 0 };
+    private bool CanAdd => _player is not null && !IsLoading && SelectedTrack is not null;
+
+    /// <summary>整单操作取完整 ID 快照；资料缓存仅用于展示，不能把当前 50 行误当成完整歌单。</summary>
+    public async Task QueueAsync(bool replace, bool fromSelected, bool next)
+    {
+        if (_player is null || Snapshot is not { } snapshot || (replace && !CanReplace)) return;
+        try
+        {
+            var session = _sessions.Capture();
+            if (session.Epoch != _accountEpoch) return;
+            var selected = SelectedTrack;
+            if (fromSelected && selected is null) return;
+            QueueEntry Create(long id) { lock (_cache) return new(Guid.NewGuid(), id, "歌单", snapshot.PlaylistId, _cache.GetValueOrDefault(id)); }
+            using var acceptance = CancellationTokenSource.CreateLinkedTokenSource(_closing.Token, session.Revoked);
+            if (replace) await _player.ReplaceAsync(snapshot.TrackIds.Select(Create).ToArray(), fromSelected ? selected!.Index : 0, acceptance.Token).ConfigureAwait(false);
+            else await _player.EnqueueAsync([Create(selected!.TrackId)], next, acceptance.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) { }
+        catch (MusicException ex) { _ui.Post(() => { if (!_closed) Message = ex.Message; }); }
+    }
 
     public Task LoadPlaylistsAsync(bool refresh) => RunAsync(async (session, generation, ct) =>
     {
@@ -163,7 +194,7 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
     { if (!_closed && generation == Interlocked.Read(ref _generation) && _sessions.IsCurrent(session)) action(); });
     private void ClearTracks() { Snapshot = null; Tracks.Clear(); SelectedTrack = null; lock (_cache) _cache.Clear(); _trackOffset = 0; OnPropertyChanged(nameof(PageText)); CommandsChanged(); }
     private void CommandsChanged()
-    { MoreCommand.NotifyCanExecuteChanged(); OpenCommand.NotifyCanExecuteChanged(); NextTracksCommand.NotifyCanExecuteChanged(); PreviousTracksCommand.NotifyCanExecuteChanged(); RetryTracksCommand.NotifyCanExecuteChanged(); }
+    { MoreCommand.NotifyCanExecuteChanged(); OpenCommand.NotifyCanExecuteChanged(); NextTracksCommand.NotifyCanExecuteChanged(); PreviousTracksCommand.NotifyCanExecuteChanged(); RetryTracksCommand.NotifyCanExecuteChanged(); PlayAllCommand.NotifyCanExecuteChanged(); PlayFromHereCommand.NotifyCanExecuteChanged(); AppendCommand.NotifyCanExecuteChanged(); PlayNextCommand.NotifyCanExecuteChanged(); }
     public void Dispose()
     {
         if (_closed) return;

@@ -1,0 +1,24 @@
+<UserControl x:Class="MusicNetEasePlugin.Features.Music.QueueView"
+ xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:QueueWorkspace">
+ <Grid RowDefinitions="Auto,*,Auto,Auto" Margin="12,6">
+  <Grid ColumnDefinitions="*,Auto">
+   <TextBlock Text="{Binding CountText}" VerticalAlignment="Center" />
+   <ComboBox Grid.Column="1" ItemsSource="{Binding Modes}" SelectedIndex="{Binding ModeIndex, Mode=TwoWay}" AutomationProperties.Name="播放模式" MinWidth="130" />
+  </Grid>
+  <ListBox Grid.Row="1" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected, Mode=TwoWay}" AutomationProperties.Name="当前播放队列" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+   <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+   <ListBox.ItemTemplate><DataTemplate x:DataType="vm:QueueRow"><Grid ColumnDefinitions="*,Auto">
+    <TextBlock Text="{Binding Display}" TextTrimming="CharacterEllipsis" /><TextBlock Grid.Column="1" Text="{Binding Source}" Margin="8,0,0,0" FontSize="12" />
+   </Grid></DataTemplate></ListBox.ItemTemplate>
+  </ListBox>
+  <WrapPanel Grid.Row="2" Orientation="Horizontal">
+   <Button Content="播放所选" Command="{Binding PlayCommand}" Margin="0,4,6,0" />
+   <Button Content="移除" Command="{Binding RemoveCommand}" Margin="0,4,6,0" />
+   <Button Content="上移" Command="{Binding UpCommand}" Margin="0,4,6,0" />
+   <Button Content="下移" Command="{Binding DownCommand}" Margin="0,4,6,0" />
+   <Button Content="清空队列" Command="{Binding ClearCommand}" Margin="0,4,0,0" />
+  </WrapPanel>
+  <TextBlock Grid.Row="3" Text="{Binding Message}" TextTrimming="CharacterEllipsis" />
+ </Grid>
+</UserControl>

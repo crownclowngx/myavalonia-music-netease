@@ -10,6 +10,20 @@ namespace MusicNetEasePlugin.Tests;
 
 public sealed class PlaylistTests
 {
+    [Fact, Trait("M2", "P05,Q01,Q02,C06")]
+    public async Task 从选中位置播放接纳整单且刷新不会改写已接纳队列()
+    {
+        await using var f = new PlaybackFixture(); var api = new PlaylistFake();
+        api.Detail = (id, _) => Task.FromResult(new PlaylistTracks(id, "完整歌单", Enumerable.Range(1, 120).Select(i => (long)i).ToArray(), true, ""));
+        using var browser = new PlaylistBrowser(api, f.Sessions, new ImmediateUi(), f.Queue);
+        await browser.OpenAsync(7); await browser.LoadTracksAsync(50); browser.SelectedTrack = browser.Tracks[8];
+        await browser.PlayFromHereCommand.ExecuteAsync(null);
+        Assert.Equal(120, f.Queue.Snapshot.Entries.Count); Assert.Equal(59, f.Queue.Snapshot.Playback.Track!.Id);
+        Assert.Equal(120, f.Queue.Snapshot.Entries.Select(e => e.EntryId).Distinct().Count());
+        var accepted = f.Queue.Snapshot.Entries.Select(e => e.EntryId).ToArray();
+        await browser.LoadPlaylistsAsync(true); Assert.Equal(accepted, f.Queue.Snapshot.Entries.Select(e => e.EntryId));
+        f.Sessions.Revoke(); Assert.False(browser.PlayAllCommand.CanExecute(null)); Assert.Empty(f.Queue.Snapshot.Entries);
+    }
     [Fact, Trait("M2", "P01,P02,P04,P05,P07")]
     public async Task 真实歌单适配保留重复顺序并按身份补资料()
     {

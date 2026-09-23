@@ -17,8 +17,9 @@
   <StackPanel Orientation="Horizontal" Spacing="6" Margin="12,4,12,0">
    <Button Content="搜索" Classes="netease-button" Command="{Binding ShowSearchCommand}" />
    <Button Content="我的歌单" Classes="netease-button" Command="{Binding ShowLibraryCommand}" />
+   <Button Content="播放队列" Classes="netease-button" Command="{Binding ShowQueueCommand}" />
   </StackPanel>
-  <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,*,Auto" IsVisible="{Binding !IsLibrary}">
+  <Grid Grid.Row="1" RowDefinitions="Auto,Auto,Auto,*,Auto" IsVisible="{Binding IsSearch}">
   <Grid ColumnDefinitions="*,Auto" Margin="12,10,12,6" ColumnSpacing="8">
    <TextBox x:Name="SearchInput" Classes="netease-input" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索歌名或歌手" KeyDown="SearchKeyDown" AutomationProperties.Name="搜索歌名或歌手" />
    <Button x:Name="SearchButton" Grid.Column="1" Classes="netease-button primary" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="搜索" Command="{Binding SearchCommand}" />
@@ -51,15 +52,20 @@
    </DataTemplate></ListBox.ItemTemplate>
   </ListBox>
   <Grid Grid.Row="4" ColumnDefinitions="*,Auto" Margin="12,6" ColumnSpacing="6">
-   <Button x:Name="PlaySelectedButton" Classes="netease-button primary" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="播放所选" Command="{Binding PlayCommand}" HorizontalAlignment="Left" />
+   <WrapPanel>
+    <Button x:Name="PlaySelectedButton" Classes="netease-button primary" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="播放所选" Command="{Binding PlayCommand}" HorizontalAlignment="Left" />
+    <Button Content="下一首播" Classes="netease-button" Command="{Binding PlayNextCommand}" />
+    <Button Content="追加" Classes="netease-button" Command="{Binding AppendCommand}" />
+   </WrapPanel>
    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6">
-    <Button Classes="netease-button" Content="上一页" Command="{Binding PreviousCommand}" />
+    <Button Classes="netease-button" Content="上一页" Command="{Binding PreviousSearchPageCommand}" />
     <TextBlock Classes="netease-secondary" Text="{Binding PageText}" VerticalAlignment="Center" />
-    <Button Classes="netease-button" Content="下一页" Command="{Binding NextCommand}" />
+    <Button Classes="netease-button" Content="下一页" Command="{Binding NextSearchPageCommand}" />
    </StackPanel>
   </Grid>
   </Grid>
   <Grid Grid.Row="1" IsVisible="{Binding IsLibrary}"><library:PlaylistView DataContext="{Binding Playlists}" /></Grid>
+  <Grid Grid.Row="1" IsVisible="{Binding IsQueue}"><vm:QueueView DataContext="{Binding Queue}" /></Grid>
   <Border x:Name="PlaybackBar" Grid.Row="2" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="0,1,0,0" Padding="12,8">
    <Grid x:Name="PlaybackLayout" ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="6" ColumnSpacing="12">
     <Grid ColumnDefinitions="44,*" ColumnSpacing="8">
@@ -75,9 +81,11 @@
      </StackPanel>
     </Grid>
     <StackPanel x:Name="TransportControls" Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center">
+     <Button Content="上一首" Classes="netease-button" Command="{Binding Queue.PreviousCommand}" />
      <Button x:Name="PauseButton" Classes="netease-button" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="暂停" Command="{Binding PauseCommand}" IsVisible="{Binding !IsPaused}" />
      <Button x:Name="ResumeButton" Classes="netease-button" Classes.netease-motion="{Binding #MusicRoot.Motion.IsEnabled}" Content="继续" Command="{Binding ResumeCommand}" IsVisible="{Binding IsPaused}" />
      <Button x:Name="StopButton" Classes="netease-button" Content="停止" Command="{Binding StopCommand}" />
+     <Button Content="下一首" Classes="netease-button" Command="{Binding Queue.NextCommand}" />
     </StackPanel>
     <Grid x:Name="TimelineLayout" Grid.Row="1" Grid.ColumnSpan="2" ColumnDefinitions="*,Auto,180" RowDefinitions="Auto,Auto" ColumnSpacing="10" RowSpacing="4">
      <ProgressBar x:Name="PlaybackProgress" Value="{Binding Progress}" Minimum="0" Maximum="100" Height="3" VerticalAlignment="Center" AutomationProperties.Name="只读播放进度" />

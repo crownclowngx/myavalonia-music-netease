@@ -109,8 +109,15 @@ public sealed class MainDocumentTests
         var wechat = document.StartLoginCommand.ExecuteAsync(null);
         Assert.Equal(LoginMethod.WeChat, login.Snapshot.Method);
         Assert.True(document.StartNeteaseLoginCommand.CanExecute(null));
+        // 旧入口取消完成不代表新入口已经生成图片；等待实际投影，避免把两条异步链误当成串行。
+        var ready = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        document.PropertyChanged += (_, args) =>
+        {
+            if (args.PropertyName == nameof(MainDocument.QrImageBytes) && login.Snapshot.Method == LoginMethod.NeteaseApp && document.QrImageBytes is not null) ready.TrySetResult();
+        };
         var app = document.StartNeteaseLoginCommand.ExecuteAsync(null);
         await wechat.WaitAsync(TimeSpan.FromSeconds(3));
+        await ready.Task.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.Equal(LoginMethod.NeteaseApp, login.Snapshot.Method);
         Assert.Contains("网易云音乐 App", document.QrInstruction);
         Assert.Equal(Infrastructure.Protocol.LoginQrCode.Render("key-2"), document.QrImageBytes);

@@ -61,4 +61,5 @@ public interface IAudioOutput : IAsyncDisposable
     Task SetVolumeAsync(int volume, CancellationToken ct);
 }
 public sealed record PlaybackSnapshot(long Revision, PlaybackState State, MusicTrack? Track = null,
-    long PositionMs = 0, long DurationMs = 0, int Volume = 70, bool IsTrial = false, string Message = "");
+    long PositionMs = 0, long DurationMs = 0, int Volume = 70, bool IsTrial = false, string Message = "",
+    long Generation = 0, Guid AttemptId = default, MusicError? Error = null, bool CanSeek = false);

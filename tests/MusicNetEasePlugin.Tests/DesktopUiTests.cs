@@ -350,7 +350,7 @@ public sealed class DesktopUiTests
             Preferences = new(new MemoryUiPreferences(), dispatcher);
             Playback.Catalog.Search = (_, offset, _) => Task.FromResult(new MusicSearchPage(
                 Enumerable.Range(1, 30).Select(i => new MusicTrack(i, $"夜空中的旋律 {i:00}", "桌面音乐测试歌手", "留给清晨的专辑", null, 223000 + i * 1000)).ToArray(), offset, false));
-            Music = new(Playback.Catalog, Playback.Sessions, Playback.Player, Login, dispatcher, Lifetime, preferences: Preferences);
+            Music = new(Playback.Catalog, Playback.Sessions, Playback.Queue, Login, dispatcher, Lifetime, preferences: Preferences);
             Document = new(Login, dispatcher, new NoImages(), Lifetime, Music, Preferences);
             Settings = new(Login, VlcSettings, new DirectoryProbe(path => new(path, [])), Runtime, dispatcher, Preferences);
         }

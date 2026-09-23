@@ -27,7 +27,7 @@ public sealed class PlaybackUiTests
         {
             await using var f = new PlaybackFixture(); await using var login = TestLogin.Create(new(), new(), TimeProvider.System, LoginOptions.Default);
             using var lifetime = new MusicLifetime(); var ui = new LoginUiDispatcher();
-            using var document = new MusicWorkspace(f.Catalog, f.Sessions, f.Player, login, ui, lifetime);
+            using var document = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, ui, lifetime);
             var settings = new MemoryVlcSettings(); var runtime = new RuntimeStatus();
             using var tool = new MusicSettingsTool(login, settings, new DirectoryProbe(p => new(p, [])), runtime, ui);
             var music = new MusicView { DataContext = document }; var settingsView = new MusicSettingsView { DataContext = tool };

@@ -63,10 +63,13 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
             _accountEpoch = session.Epoch;
             _accountWatchVersion = generation;
             _owner = owner;
-            snapshot = _snapshot = new(_snapshot.Revision + 1, PlaybackState.Loading, track, Volume: _snapshot.Volume, Message: "正在加载音频…");
+            snapshot = _snapshot = new(_snapshot.Revision + 1, PlaybackState.Loading, track, Volume: _snapshot.Volume,
+                Message: "正在加载音频…", Generation: generation, AttemptId: owner);
         }
-        previousRegistration.Dispose();
-        previousAccountRegistration.Dispose();
+        // 这里可能位于队列接纳意图的短锁中，不能等待正在回调并发布队列状态的取消注册。
+        // 旧回调即使已经开始，也会被 generation/account 校验拒绝；解除登记即可。
+        previousRegistration.Unregister();
+        previousAccountRegistration.Unregister();
         previousCancellation?.Cancel();
         Notify(snapshot);
         // 注册发生在新代次登记之后；预取消也会安排停止，但必须仍启动本次收口任务以完成尾任务。
@@ -89,6 +92,8 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
     private async Task LoadAsync(Task previous, CancellationTokenSource? previousCancellation, CancellationTokenSource operation,
         MusicSession session, MusicTrack track, long generation, TaskCompletionSource completion)
     {
+        // 把执行让到登记意图之后，队列可在短锁内完成播放交接，不让网络和原生操作进入外层状态锁。
+        await Task.Yield();
         try
         {
             await previous.ConfigureAwait(false);
@@ -101,7 +106,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
             {
                 var resource = await _resources.ResolveAsync(track.Id, session, operation.Token).ConfigureAwait(false);
                 operation.Token.ThrowIfCancellationRequested();
-                if (resource.Address is null) throw new MusicException(MusicError.Restricted, "当前账号暂不能播放这首歌曲。");
+                if (resource.Address is null) throw new MusicException(MusicError.Unavailable, "当前账号暂不能播放这首歌曲。");
                 try { _media = await _buffer.DownloadAsync(resource, operation.Token).ConfigureAwait(false); }
                 catch (MusicException ex) when (ex.Kind == MusicError.AddressExpired && attempt == 0) { continue; }
                 operation.Token.ThrowIfCancellationRequested();
@@ -117,7 +122,8 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
         catch (Exception ex)
         {
             await ReleaseMediaSafelyAsync().ConfigureAwait(false);
-            Update(generation, s => s with { State = PlaybackState.Failed, PositionMs = 0, Message = ex is MusicException ? ex.Message : "播放失败，请重试。" });
+            Update(generation, s => s with { State = PlaybackState.Failed, PositionMs = 0, Error = ex is MusicException music ? music.Kind : MusicError.Device,
+                Message = ex is MusicException ? ex.Message : "播放失败，请重试。" });
         }
         finally { completion.TrySetResult(); }
     }
@@ -142,7 +148,9 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
             _revocation = default;
             previous = _tail;
             _tail = completion.Task;
-            snapshot = _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, State = state, PositionMs = 0,
+            snapshot = _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, State = state,
+                PositionMs = state == PlaybackState.Ended ? _snapshot.DurationMs : 0, CanSeek = false,
+                Error = state == PlaybackState.Failed ? MusicError.Device : null,
                 Track = clearTrack ? null : _snapshot.Track, DurationMs = clearTrack ? 0 : _snapshot.DurationMs,
                 IsTrial = clearTrack ? false : _snapshot.IsTrial, Message = message };
         }
@@ -181,7 +189,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
         using var linked = CancellationTokenSource.CreateLinkedTokenSource(ct, operation);
         try
         {
-            await _audio.PauseAsync(paused, linked.Token).ConfigureAwait(false);
+            await _audio.PauseAsync(paused, linked.Token, generation).ConfigureAwait(false);
             Update(generation, s => s with { State = paused ? PlaybackState.Paused : PlaybackState.Playing });
         }
         catch (OperationCanceledException) { }
@@ -218,6 +226,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
         }
         Update(progress.Generation, s => s with { State = progress.State, PositionMs = progress.PositionMs,
             DurationMs = progress.DurationMs > 0 ? progress.DurationMs : s.DurationMs,
+            CanSeek = progress.CanSeek,
             Message = s.IsTrial ? "正在播放试听片段" : "" });
     }
     private async Task ReleaseMediaAsync()

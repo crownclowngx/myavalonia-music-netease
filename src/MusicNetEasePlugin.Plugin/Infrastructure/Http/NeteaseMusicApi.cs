@@ -35,7 +35,10 @@ internal sealed class NeteaseMusicApi(NeteaseTransport transport, XeapiTransport
             new() { ["c"] = "[{\"id\":" + id.ToString(CultureInfo.InvariantCulture) + "}]" },
             NeteaseProtocol.Weapi, session.Context, token).ConfigureAwait(false);
         await CommitAsync(reply, session, token).ConfigureAwait(false);
-        var song = reply.Body.GetProperty("songs").EnumerateArray().Select(ParseTrack).FirstOrDefault(t => t.Id == id);
+        var songs = reply.Body.GetProperty("songs");
+        if (songs.ValueKind == JsonValueKind.Array && songs.GetArrayLength() == 0)
+            throw new MusicException(MusicError.Unavailable, "当前歌曲资料不可用。");
+        var song = songs.EnumerateArray().Select(ParseTrack).FirstOrDefault(t => t.Id == id);
         return song ?? throw new MusicException(MusicError.Protocol, "返回的歌曲详情与所选歌曲不一致。");
     });
     public Task<PlaybackResource> ResolveAsync(long id, MusicSession session, CancellationToken ct) => ExecuteAsync(session, ct, async token =>

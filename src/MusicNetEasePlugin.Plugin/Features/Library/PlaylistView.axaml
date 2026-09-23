@@ -20,7 +20,14 @@
    </TabItem>
    <TabItem Header="曲目">
     <Grid RowDefinitions="Auto,*,Auto">
-     <TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+     <StackPanel><TextBlock Text="{Binding Title}" TextTrimming="CharacterEllipsis" />
+      <WrapPanel>
+       <Button Content="播放全部" Command="{Binding PlayAllCommand}" Margin="0,4,6,0" />
+       <Button Content="从这里播放" Command="{Binding PlayFromHereCommand}" Margin="0,4,6,0" />
+       <Button Content="下一首播" Command="{Binding PlayNextCommand}" Margin="0,4,6,0" />
+       <Button Content="追加所选" Command="{Binding AppendCommand}" Margin="0,4,0,0" />
+      </WrapPanel>
+     </StackPanel>
      <ListBox x:Name="PlaylistTrackList" Grid.Row="1" ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" AutomationProperties.Name="歌单曲目" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
       <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
       <ListBox.ItemTemplate><DataTemplate x:DataType="vm:PlaylistTrackRow">

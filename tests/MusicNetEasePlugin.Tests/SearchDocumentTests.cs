@@ -11,7 +11,7 @@ public sealed class SearchDocumentTests
     public async Task 搜索只投影最新响应并在失败后保留原页允许重试()
     {
         await using var f = new PlaybackFixture(); await using var login = TestLogin.Create(new(), new(), TimeProvider.System, LoginOptions.Default);
-        using var lifetime = new MusicLifetime(); using var document = new MusicWorkspace(f.Catalog, f.Sessions, f.Player, login, new ImmediateUi(), lifetime);
+        using var lifetime = new MusicLifetime(); using var document = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifetime);
         var old = new TaskCompletionSource<MusicSearchPage>(TaskCreationOptions.RunContinuationsAsynchronously);
         var requests = new List<(string Keyword, int Offset)>();
         f.Catalog.Search = (keyword, offset, _) =>
@@ -28,23 +28,26 @@ public sealed class SearchDocumentTests
         await document.SearchAsync(0, "error");
         Assert.Equal(2, Assert.Single(document.Tracks).Id); Assert.Contains("失败", document.SearchMessage); Assert.False(document.IsLoading);
         document.Keyword = "尚未提交的新草稿";
-        await document.NextCommand.ExecuteAsync(null);
+        await document.NextSearchPageCommand.ExecuteAsync(null);
         Assert.Equal(("new", 30), requests[^1]); Assert.Empty(document.Tracks); Assert.False(document.HasMore); Assert.Equal("第 2 页", document.PageText);
-        await document.PreviousCommand.ExecuteAsync(null); Assert.Equal(("new", 0), requests[^1]);
+        await document.PreviousSearchPageCommand.ExecuteAsync(null); Assert.Equal(("new", 0), requests[^1]);
     }
 
     [Fact, Trait("M1", "L09,U04,U05,U06")]
-    public async Task 多文档共用播放器但关闭无关文档不取消当前所有者()
+    public async Task 多文档共用队列且关闭任意页面不会取消播放()
     {
         await using var f = new PlaybackFixture(); await using var login = TestLogin.Create(new(), new(), TimeProvider.System, LoginOptions.Default);
         using var lifeA = new MusicLifetime(); using var lifeB = new MusicLifetime();
-        using var a = new MusicWorkspace(f.Catalog, f.Sessions, f.Player, login, new ImmediateUi(), lifeA);
-        using var b = new MusicWorkspace(f.Catalog, f.Sessions, f.Player, login, new ImmediateUi(), lifeB);
+        using var a = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeA);
+        using var b = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeB);
         a.SelectedTrack = MusicCatalog.Track(1); await a.PlayCommand.ExecuteAsync(null);
         Assert.Equal(a.CurrentTrack, b.CurrentTrack);
         lifeB.Close(); b.Dispose(); Assert.Equal(PlaybackState.Playing, f.Player.Snapshot.State);
-        lifeA.Close(); a.Dispose(); Assert.Equal(PlaybackState.Stopped, f.Player.Snapshot.State);
-        Assert.Null(f.Audio.Current);
+        lifeA.Close(); a.Dispose(); Assert.Equal(PlaybackState.Playing, f.Player.Snapshot.State);
+        using var lifeC = new MusicLifetime();
+        using var c = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeC);
+        Assert.Contains("歌曲1", c.CurrentTrack); Assert.Single(f.Audio.Opened);
+        await f.Queue.StopAsync(); Assert.Null(f.Audio.Current);
         f.Audio.Emit(Assert.Single(f.Audio.Opened).Generation, PlaybackState.Playing);
         Assert.Equal(PlaybackState.Stopped, f.Player.Snapshot.State);
     }
@@ -54,15 +57,15 @@ public sealed class SearchDocumentTests
     {
         await using var f = new PlaybackFixture(); await using var login = TestLogin.Create(new(), new(), TimeProvider.System, LoginOptions.Default);
         using var lifetime = new MusicLifetime(); var images = new CoverImages();
-        using var document = new MusicWorkspace(f.Catalog, f.Sessions, f.Player, login, new ImmediateUi(), lifetime, images);
+        using var document = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifetime, images);
         f.Catalog.Detail = (id, _) => Task.FromResult(MusicCatalog.Track(id) with { Cover = id.ToString() });
-        await f.Play(1); await images.Entered.Task.WaitAsync(TimeSpan.FromSeconds(3));
-        await f.Play(2);
+        await f.Queue.PlaySingleAsync(MusicCatalog.Track(1), default); await images.Entered.Task.WaitAsync(TimeSpan.FromSeconds(3));
+        await f.Queue.PlaySingleAsync(MusicCatalog.Track(2), default);
         var applied = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
         document.PropertyChanged += (_, args) => { if (args.PropertyName == nameof(document.CoverBytes) && document.CoverBytes is [2]) applied.TrySetResult(); };
         images.Old.SetResult([1]); await applied.Task.WaitAsync(TimeSpan.FromSeconds(3));
         Assert.Equal(new byte[] { 2 }, document.CoverBytes);
-        await f.Play(3); Assert.Null(document.CoverBytes); Assert.Equal(PlaybackState.Playing, f.Player.Snapshot.State);
+        await f.Queue.PlaySingleAsync(MusicCatalog.Track(3), default); Assert.Null(document.CoverBytes); Assert.Equal(PlaybackState.Playing, f.Player.Snapshot.State);
     }
     private sealed class CoverImages : IAccountImageSource
     {
