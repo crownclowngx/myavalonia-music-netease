@@ -25,12 +25,15 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     private int _closed;
     private int _disposed;
     private LoginSnapshot _snapshot = new(-1, LoginStage.SignedOut, "");
+    public Music.MusicWorkspace? Music { get; }
     private byte[]? _qrImageBytes;
     private byte[]? _avatarImageBytes;
     private DocumentPresentationState _presentation = new("网易云音乐");
 
-    public MainDocument(LoginCoordinator login, ILoginUiDispatcher dispatcher, IAccountImageSource images, IDocumentLifetime lifetime)
+    public MainDocument(LoginCoordinator login, ILoginUiDispatcher dispatcher, IAccountImageSource images, IDocumentLifetime lifetime,
+        Music.MusicWorkspace? music = null)
     {
+        Music = music;
         (_login, _dispatcher, _images) = (login, dispatcher, images);
         StartLoginCommand = new AsyncRelayCommand(() => _login.StartAsync(_owner, _closing.Token),
             CanStart,

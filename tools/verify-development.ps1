@@ -1,11 +1,11 @@
 #requires -Version 7.0
 [CmdletBinding()]
-param()
+param([ValidateSet('Login', 'M1')][string]$Milestone = 'M1')
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'DevelopmentChecks.ps1')
 $root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
 $runId = [datetime]::UtcNow.ToString('yyyyMMdd-HHmmss') + '-' + [guid]::NewGuid().ToString('N').Substring(0, 8)
-$results = Join-Path $root "TestResults/NetEaseLogin/$runId"
+$results = Join-Path $root "TestResults/NetEase$Milestone/$runId"
 [void][IO.Directory]::CreateDirectory($results)
 $previousArtifacts = $env:NETEASE_TEST_ARTIFACTS
 try {
@@ -16,6 +16,11 @@ try {
     $env:NETEASE_TEST_ARTIFACTS = $results
     Invoke-CheckedProcess 'dotnet' @('test', 'tests/MusicNetEasePlugin.Tests/MusicNetEasePlugin.Tests.csproj', '-c', 'Debug', '--no-build', '--no-restore', '--logger', 'trx;LogFileName=netease-login-development.trx', '--results-directory', $results) $root 180
     $passed = Assert-DevelopmentTrx (Join-Path $results 'netease-login-development.trx') $started $results
+    $coverage = $null
+    if ($Milestone -eq 'M1') {
+        $coverage = Assert-M1TestMap (Join-Path $results 'netease-login-development.trx') (Join-Path $PSScriptRoot 'm1-test-map.json')
+        Assert-M1Artifacts $results
+    }
     Assert-MarkdownLinks $root
     Invoke-CheckedProcess 'git' @('diff', '--check') $root
     $revision = (& git -C $root rev-parse HEAD).Trim()
@@ -25,7 +30,8 @@ try {
     @{ runId = $runId; revision = $revision; workingTreeDirty = $dirty; testsPassed = $passed;
         startedUtc = $started.ToString('o'); completedUtc = [datetimeoffset]::UtcNow.ToString('o');
         machine = [Runtime.InteropServices.RuntimeInformation]::OSDescription;
-        realAccountVerified = $false; hostVerified = $false; releaseGateExecuted = $false } |
+        milestone = $Milestone; scenarioCoverage = $coverage;
+        realAccountVerified = $false; audibleOutputVerified = $false; hostVerified = $false; releaseGateExecuted = $false } |
         ConvertTo-Json | Set-Content (Join-Path $results 'verification.json') -Encoding utf8
     Write-Host "本地开发门禁通过：$passed 项测试；证据目录 $results"
 }

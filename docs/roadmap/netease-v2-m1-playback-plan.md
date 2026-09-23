@@ -1,13 +1,13 @@
 # 网易云音乐 V2：M1 搜索与单曲播放实施方案
 
-> 状态：方案已编写，业务代码、播放探针及 M1 开发门禁扩展尚未实施。
+> 状态：核心功能、真实账号解码探针与 M1 本地开发门禁已实现；真实扬声器、Standalone 操作和 Host/Dock/双插件共存验收仍待完成。当前契约见[实现说明](../reference/netease-music-playback.md)，本轮证据见[实施记录](../archive/records/netease-v2/m1-implementation-20260923.md)。
 > 创建日期：2026-09-22；更新日期：2026-09-23。源码基线：`c469f919e931e60d30797cbd357d245e84e7cf01`；初版文档提交：`f14eece`。本次按用户要求补充内置优先/指定 LibVLC 目录、账号与设置 Tool，以及 VideoSecurityPlayer 的 Dock 经验。
 > 编号：承接已归档的 [V1 登录方案](../archive/plans/netease-v1-flurl-login-plan.md)，使用 **V2**；对应能力路线图的 **M1**，不改变插件包版本或 SDK 版本。
 > 配套：[运行库、Tool 与 Dock 专项设计](netease-v2-libvlc-tool-and-dock-design.md) · [V2 / M1 专用开发验证矩阵](../maintenance/netease-v2-m1-playback-verification.md) · [能力路线图](netease-capability-roadmap.md) · [当前登录契约](../reference/netease-http-session.md)。
 
 ## 1. 目标与首要规定
 
-**目标：用户在已登录的插件里搜索歌曲，从结果中选中一首，实际播放，并能暂停、继续、停止、调节音量和查看进度。** 登录沿用现有成果。本方案将 M1 拆成可以实现和验证的步骤；本文中的新增类型、脚本参数和文档路径均是计划，不表示已经存在。
+**目标：用户在已登录的插件里搜索歌曲，从结果中选中一首，实际播放，并能暂停、继续、停止、调节音量和查看进度。** 登录沿用现有成果。本方案保留设计与阶段验收标准，实际落地差异和进度见第 11 节；自动解码不代替真实扬声器与 Host 验收。
 
 以下要求贯穿整个 V2 实施过程：
 
@@ -201,7 +201,7 @@ SOLID 的审查要求：
 
 增加“网易云音乐 · 账号与播放设置”Tool，拟定稳定 ID 为 `myavalonia.plugin.music.netease.tool.account-settings`，默认右侧，关闭行为采用 SDK 的 `ToolCloseBehavior.Hide`。通过 `AddTool<MusicSettingsTool, MusicSettingsView>` 注册，Host 持有单例模型，不能重复手工登记根模型生命周期。
 
-Tool 展示昵称/账号标识、登录和保存状态，提供打开既有登录 Document 的入口及明确的退出账号操作；微信/App 二维码流程继续复用原有实现。设置区包含 LibVLC 目录输入/选择、检测、保存、清空配置，以及当前来源、可用性、重启待生效提示。账号未登录或库缺失时仍能打开 Tool。
+Tool 展示昵称/账号标识、登录和保存状态，提供恢复、重试保存与明确的退出操作；微信/App 二维码继续复用原有 Document。实施核对 SDK 3.4.1 没有运行时打开指定 Document 的公开端口，因此 Tool 提示从“新建”打开网易云音乐，不引用 Host 内部服务。设置区包含 LibVLC 目录输入/选择、检测、保存、清空配置，以及候选/实际来源和重启待生效提示。账号未登录或库缺失时仍能打开 Tool。
 
 路径设置保存在插件数据目录的独立配置文件，只保存目录和 schema 版本；退出账号不删除它，修改它不触碰受保护会话。草稿、检测结果、已保存值、当前生效值分开，保存失败不冒充生效。Tool 隐藏或浮动重挂仅影响 View，模型和已保存设置保持；不取消 Document 的登录尝试或播放。
 
@@ -246,7 +246,7 @@ S0 可以先使用已知歌曲 ID，S2 搜索开发可在接口边界明确后�
 
 专用用例、拟建测试文件、自动/人工边界及门禁自测见[V2 / M1 验证矩阵](../maintenance/netease-v2-m1-playback-verification.md)。继续使用现有 Tests 项目，新增测试与所有登录回归在同轮运行。
 
-计划扩展已有 `tools/verify-development.ps1`，增加 `-Milestone M1`：复用同一 restore/build/test/报告校验实现，增加 M1 场景映射检查和独立结果目录。当前脚本没有这个参数，以下命令在 S5 实现后才可使用：
+已扩展 `tools/verify-development.ps1`，支持并默认使用 `-Milestone M1`：复用同一 restore/build/test/报告校验实现，增加 M1 场景映射检查和独立结果目录。命令可直接执行：
 
 ```powershell
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone M1
@@ -276,13 +276,15 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone M1
 ## 11. 进度与当前验证状态
 
 - [x] 编写 V2 / M1 实施方案与专用开发验证矩阵，并接入现有文档导航。
-- [x] 将首选方向调整为 LibVLCSharp + LibVLC，补充跨平台目标、插件内承载和原生依赖验收；尚未安装依赖或实现适配。
-- [x] 按用户要求放宽为内置优先、可指定共享目录，补充账号设置 Tool 和视频插件 Dock 踩坑对照；均为设计，尚未实施。
-- [ ] S0：协议、引擎、媒体输入和 Host 依赖最小验证。
-- [ ] S1：会话与传输扩展。
-- [ ] S2：搜索、分页与详情。
-- [ ] S3：单曲播放、试听及资源清理。
-- [ ] S4：生产界面、Standalone 和 Host 集成。
-- [ ] S5：M1 本地门禁、真实验收与文档收口。
+- [x] 锁定 LibVLCSharp 3.10.0 / 原生包 3.0.23.1 / BouncyCastle 2.6.2，Windows x64 适配落地；其他平台仍待适配。
+- [x] 内置优先、指定共享目录、账号设置 Tool、Dock 资源所有权落地；普通 View 重挂不停止。
+- [ ] S0：协议向量、真实账号 MP3、内置/视频共享目录解码及干净开发产物已验证；真实 Host 及双插件两种加载顺序待完成。
+- [x] S1：会话与传输扩展，账号撤销和凭据提交复用原协调器。
+- [x] S2：搜索、分页、详情与封面占位，迟到结果隔离。
+- [x] S3：单曲控制、试听、下载边界及媒体清理，自动失败/竞态验证。
+- [ ] S4：生产界面与 Standalone 接线、Headless 重挂已完成；真实 Standalone 听感和 Host/Dock 待验收。
+- [ ] S5：M1 本地门禁、完整回归、当前契约及专用记录已完成；R 类人工核心验收仍待完成，M1 不标记全部验收通过。
 
-本次工作是文档编写与静态源码核对，并查阅了正文链接的上游源码和候选音频库官方资料。未执行音乐接口实测、音频引擎验证、业务单测、Host 联调、部署或发布；不能据此认为 M1 已实现。
+实现差异：容器复用一个 LibVLC，每首歌重建 MediaPlayer/Media 并带独立事件代次；原生回调使用事件缓存，禁止重入状态 getter。Windows 为本插件私有 LibVLCSharp 绑定所选原生句柄，不设置全局搜索路径。Tool 直接打开 Document 的设想按公开 SDK 边界调整为“新建”引导。详见[当前播放契约](../reference/netease-music-playback.md)。
+
+当前已执行自动测试、真实音乐接口和内置/指定库解码，并生成两种干净开发暂存产物；尚未替换正在运行的 Host，也未执行真实听感、Dock/双插件共存或发布验收。阶段状态以[本轮记录](../archive/records/netease-v2/m1-implementation-20260923.md)为准。

@@ -1,10 +1,11 @@
 using MusicNetEasePlugin.Application.Authentication;
 using MyAvaloniaManagement.PluginSdk;
+using MusicNetEasePlugin.Application.Playback;
 
 namespace MusicNetEasePlugin.Plugin;
 
-/// <summary>Host 停止前先收口登录任务；初始化不等待网络，避免账号故障阻塞插件加载。</summary>
-internal sealed class MusicNetEasePluginLifecycle(LoginCoordinator login) : IPluginLifecycle
+/// <summary>Host 停止先收口播放与媒体，再撤销登录请求；初始化不等待网络或创建原生引擎。</summary>
+internal sealed class MusicNetEasePluginLifecycle(LoginCoordinator login, PlaybackCoordinator playback) : IPluginLifecycle
 {
     public Task InitializeAsync(CancellationToken cancellationToken)
     {
@@ -12,6 +13,9 @@ internal sealed class MusicNetEasePluginLifecycle(LoginCoordinator login) : IPlu
         return Task.CompletedTask;
     }
 
-    public Task ShutdownAsync(CancellationToken cancellationToken) =>
-        login.DisposeAsync().AsTask().WaitAsync(cancellationToken);
+    public async Task ShutdownAsync(CancellationToken cancellationToken)
+    {
+        await playback.DisposeAsync().ConfigureAwait(false);
+        await login.DisposeAsync().ConfigureAwait(false);
+    }
 }

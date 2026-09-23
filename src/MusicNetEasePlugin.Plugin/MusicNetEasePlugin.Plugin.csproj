@@ -10,9 +10,18 @@
     <ManagedPluginSdkMinInclusive>3.4.1</ManagedPluginSdkMinInclusive>
     <ManagedPluginSdkMaxExclusive>4.0.0</ManagedPluginSdkMaxExclusive>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <!-- 原生库可选携带；用户配置的共享目录只在运行时读取，不写进插件清单。 -->
+    <IncludeLibVlcRuntime Condition="'$(IncludeLibVlcRuntime)' == ''">true</IncludeLibVlcRuntime>
+    <VlcWindowsX64Enabled>$(IncludeLibVlcRuntime)</VlcWindowsX64Enabled>
+    <VlcWindowsX86Enabled>false</VlcWindowsX86Enabled>
+    <VlcWindowsX64TargetDir>native\win-x64\libvlc</VlcWindowsX64TargetDir>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="LibVLCSharp" />
+    <PackageReference Include="BouncyCastle.Cryptography" />
+    <PackageReference Include="VideoLAN.LibVLC.Windows" PrivateAssets="all" />
+    <ManagedPluginPrivatePackage Include="LibVLCSharp;BouncyCastle.Cryptography" />
     <PackageReference Include="Flurl.Http" />
     <PackageReference Include="QRCoder" />
     <PackageReference Include="System.Security.Cryptography.ProtectedData" />
@@ -31,4 +40,7 @@
     <!-- 普通输出复制不会自动进入干净插件目录；显式声明部署资产，确保上游许可随插件交付。 -->
     <ManagedPluginAsset Include="../../THIRD-PARTY-NOTICES.md" TargetPath="THIRD-PARTY-NOTICES.md" />
   </ItemGroup>
+  <PropertyGroup Condition="'$(IncludeLibVlcRuntime)' == 'true'">
+    <ManagedPluginAssetDirectoryRelativePath>native\win-x64\libvlc</ManagedPluginAssetDirectoryRelativePath>
+  </PropertyGroup>
 </Project>

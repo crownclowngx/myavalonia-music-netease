@@ -1,0 +1,33 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ x:Class="MusicNetEasePlugin.Features.Settings.MusicSettingsView"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Settings" x:DataType="vm:MusicSettingsTool">
+ <ScrollViewer>
+  <StackPanel Margin="16" Spacing="12">
+   <TextBlock Text="账号与播放设置" FontSize="20" FontWeight="SemiBold" />
+   <TextBlock Text="{Binding AccountText}" TextWrapping="Wrap" />
+   <TextBlock Text="{Binding SessionText}" TextWrapping="Wrap" />
+   <TextBlock Text="扫码登录：从「新建」打开网易云音乐页面。" TextWrapping="Wrap" />
+   <WrapPanel>
+    <Button Content="恢复登录" Command="{Binding RestoreCommand}" Margin="0,0,8,8" />
+    <Button Content="重试保存" Command="{Binding RetrySaveLoginCommand}" Margin="0,0,8,8" />
+    <Button Content="退出账号" Command="{Binding LogoutCommand}" Margin="0,0,8,8" />
+   </WrapPanel>
+   <Separator />
+   <TextBlock Text="LibVLC 运行库目录" FontWeight="SemiBold" />
+   <TextBlock Text="有效内置库优先；也可配置多个插件共用的目录。" TextWrapping="Wrap" />
+   <TextBox Text="{Binding DirectoryPath, Mode=TwoWay}" PlaceholderText="包含 libvlc 和 plugins 的完整目录" />
+   <WrapPanel>
+    <Button Content="选择目录" Click="ChooseDirectory" Margin="0,0,8,8" />
+    <Button Content="检测" Command="{Binding CheckCommand}" Margin="0,0,8,8" />
+    <Button Content="保存" Command="{Binding SaveCommand}" Margin="0,0,8,8" />
+    <Button Content="清空配置" Command="{Binding ClearCommand}" Margin="0,0,8,8" />
+    <Button Content="刷新状态" Command="{Binding ReloadCommand}" Margin="0,0,8,8" />
+   </WrapPanel>
+   <TextBlock Text="已保存的配置目录：" />
+   <SelectableTextBlock Text="{Binding SavedDirectory}" TextWrapping="Wrap" />
+   <SelectableTextBlock Text="{Binding CandidateRuntime}" TextWrapping="Wrap" />
+   <SelectableTextBlock Text="{Binding ActiveRuntime}" TextWrapping="Wrap" />
+   <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
+  </StackPanel>
+ </ScrollViewer>
+</UserControl>

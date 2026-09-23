@@ -1,7 +1,7 @@
 # 网易云音乐 V2 / M1：搜索与单曲播放专用开发验证
 
 > 主方案：[V2：M1 搜索与单曲播放实施方案](../roadmap/netease-v2-m1-playback-plan.md)。创建日期：2026-09-22；更新日期：2026-09-23。
-> 状态：验证设计，以下新增场景、测试文件和 M1 门禁扩展均待实施、未执行。已有登录验证继续由[登录维护矩阵](netease-login-verification.md)维护，不在此重复登记历史测试数。
+> 状态：新增自动套件与 M1 门禁已实现；真实账号 MP3、内置/指定视频目录已解码，真实设备听感与 Host/Dock 验收待完成。以下矩阵保留完整验收目标，实际方法映射及边界见第 10、13 节。已有登录回归继续由[登录维护矩阵](netease-login-verification.md)维护，实际结果只登记于[当次记录](../archive/records/netease-v2/m1-implementation-20260923.md)。
 > 范围：本地单元测试、协议/媒体契约测试、离线解码、Headless、Standalone 和真实 Host 开发联调；不使用 AIFLOW、Windows CI 或发布门禁。
 > 路径与 Dock 规则：[运行库、Tool 与 Dock 专项设计](../roadmap/netease-v2-libvlc-tool-and-dock-design.md)。本轮增加 T 类配置验证，补充真实 Dock 和共享运行库验收。
 
@@ -115,7 +115,7 @@ E06/E07 的路径和生命周期契约使用受控夹具验证；原生库不可
 | T04 | 草稿 A 检测未结束即改为 B，选择器迟到或重复点击 | 只发布当前草稿/请求的结果；检测不保存或出声；过期检查不能为新草稿授予有效状态 |
 | T05 | 保存成功、写入/替换失败、畸形配置、清空和下次启动失效 | 原子保存及恢复策略明确；失败保留旧值，畸形配置报问题；清空不删外部目录，失效路径保留以便修复 |
 | T06 | 初始化前修改；加载开始/成功/失败后再修改 | 初始化前使用最新有效候选；此后保存为下次启动值，当前加载不热切换；媒体失败不误报为运行库配置失败 |
-| T07 | Tool 账号摘要、打开登录页、退出与修改路径 | 读取同一 LoginSnapshot，登录页复用原实现；退出撤销音乐但保留路径，修改路径不清除会话 |
+| T07 | Tool 账号摘要、登录入口引导、退出与修改路径 | 读取同一 LoginSnapshot，提示从“新建”打开原登录页；退出撤销音乐但保留路径，修改路径不清除会话。SDK 3.4.1 无运行时 Document 打开端口 |
 | T08 | 无音乐 Document 时打开 Tool，隐藏/重开及多次创建 View | 同一个 Tool 模型与设置源；不因显示 Tool 初始化 LibVLC、自动登录或播放；隐藏保留草稿，不释放共享服务 |
 | T09 | 用户指定共享目录，自身清理/关闭/配置清空 | 仅只读使用库文件，不删除/改写共享目录；不拥有其他插件的引擎、音量或账号；真共存由 R10 验证 |
 
@@ -140,30 +140,32 @@ T 类自动测试隔离配置目录与运行库夹具。文件内容、失败保
 
 D 类需要真实代码审查结论；不写搜索某个类名、中文注释数量或代码文本的测试来代替设计审查。
 
-## 10. 拟建测试文件与场景映射
+## 10. 实际测试文件与场景映射
 
-| 拟建 / 扩展位置 | 主要场景 |
+| 实际位置 | 主要场景 |
 | --- | --- |
-| `MusicProtocolTests.cs`、`MusicHttpTests.cs` | P01–P06 |
-| `MusicSessionTests.cs`，扩展既有登录协调器/存储测试 | A01–A06 |
-| `MusicCatalogTests.cs`、`SearchDocumentTests.cs` | C01–C06 |
-| `MediaBufferTests.cs` | B01–B07 |
-| `PlaybackCoordinatorTests.cs` | L01–L09，设备替身失败 |
-| `AudioAdapterTests.cs`、`LibVlcRuntimeTests.cs` | E01–E07 的自动部分 |
-| `LibVlcSettingsTests.cs`、`MusicSettingsToolTests.cs` | T01–T09 |
-| `PlaybackUiTests.cs`，扩展既有 `UiCompositionTests.cs` | U01–U08 |
+| [MusicProtocolTests](../../tests/MusicNetEasePlugin.Tests/MusicProtocolTests.cs)、[MusicHttpTests](../../tests/MusicNetEasePlugin.Tests/MusicHttpTests.cs) | P01–P06 |
+| [MusicSessionTests](../../tests/MusicNetEasePlugin.Tests/MusicSessionTests.cs)，既有登录协调器/存储回归 | A01–A06 |
+| MusicHttpTests、[SearchDocumentTests](../../tests/MusicNetEasePlugin.Tests/SearchDocumentTests.cs) | C01–C06 |
+| [MediaBufferTests](../../tests/MusicNetEasePlugin.Tests/MediaBufferTests.cs) | B01–B07 |
+| [PlaybackCoordinatorTests](../../tests/MusicNetEasePlugin.Tests/PlaybackCoordinatorTests.cs) | L01–L09，设备替身失败 |
+| [AudioAdapterTests](../../tests/MusicNetEasePlugin.Tests/AudioAdapterTests.cs)、LibVlcSettingsTests | E01–E07 的自动部分 |
+| [LibVlcSettingsTests](../../tests/MusicNetEasePlugin.Tests/LibVlcSettingsTests.cs) | T01–T09 |
+| [PlaybackUiTests](../../tests/MusicNetEasePlugin.Tests/PlaybackUiTests.cs)，既有 UiCompositionTests | U01–U08 的页面/组合部分 |
 | `tools/test-development-gate.ps1` 及公共检查函数 | G01–G08 |
 | 带日期的人工记录 | D01–D04 与 R01–R13，按平台分别登记 |
 
-上述测试文件均计划放入现有测试项目；名称是建议。实施后补上实际文件链接、测试全名、参数化用例及证据路径，再将状态从“待实施”改为实际状态。每个关键场景至少对应能验证该行为的断言，不能创建空测试占位。
+方法全名和参数化最低用例数登记在[实际测试映射](../../tools/m1-test-map.json)，包含全部既有登录方法；M1 门禁核对 TRX 中实际方法 ID、通过结果及参数化条数。场景编号覆盖对应自动可验证的部分，不等于矩阵每个系统条件都在真实机器复现。
 
-最终 M1 门禁需核对场景映射与本次测试发现/执行结果。一个测试可以覆盖多个场景；场景清单不等于用例数。新增 M1 类别或 Trait 有利于检索，但标签本身不是覆盖证明。
+自动边界：系统选择器由受控返回替换，真实 View 仍执行防重入、挂载/重绑/草稿过期保护；设备故障使用音频替身；目录写入失败用真实文件占用/无效目录，未实际填满磁盘或变更系统 ACL；原生故障验证空/坏媒体与静态缺库/架构。真实设备拔除、系统文件夹对话框操作、双插件同时运行和完整 Host 退出仍需 R 类验证。
+
+M1 门禁已核对场景映射与本次测试发现/执行结果。一个测试可以覆盖多个场景；场景清单不等于用例数。Trait 用于检索，映射必须对应真实行为断言，不能只靠标签通过。
 
 ## 11. G：本地开发门禁及其自测
 
-计划扩展现有 [verify-development.ps1](../../tools/verify-development.ps1)、[DevelopmentChecks.ps1](../../tools/DevelopmentChecks.ps1) 和[门禁自测](../../tools/test-development-gate.ps1)，新增 `-Milestone M1` 选择与 M1 映射校验；不另建一套重复的 restore/build/test 实现。
+已扩展 [verify-development.ps1](../../tools/verify-development.ps1)、[DevelopmentChecks.ps1](../../tools/DevelopmentChecks.ps1) 和[门禁自测](../../tools/test-development-gate.ps1)，支持并默认选择 `-Milestone M1`，增加 M1 映射和解码/图像证据校验；复用同一套 restore/build/test 实现。
 
-当前脚本尚不支持该参数。实施后，无参数入口仍可使用；M1 验收模式须满足以下要求：
+无参数入口仍可使用；`-Milestone Login` 仍执行全量套件，只省略 M1 附加映射/产物判定。M1 开发模式按以下要求执行，人工验收不由脚本伪造：
 
 | 编号 | 检查 / 注入失败 | 必须表现 |
 | --- | --- | --- |
@@ -208,7 +210,7 @@ R01–R07、R09–R13 是 Windows x64 M1 的核心开发验收。R08 按真实�
 
 | 平台 | 第一阶段：引擎探针 | 第二阶段：完整插件 | 当前证据 |
 | --- | --- | --- | --- |
-| Windows x64 | 内置/指定目录、离线解码、实际出声、与视频插件共用库及独立库 | 登录/会话、搜索、Tool、Dock、路径生效和 Host 生命周期 | 均未执行；M1 首个验收目标 |
+| Windows x64 | 内置/指定目录、离线解码、实际出声、与视频插件共用库及独立库 | 登录/会话、搜索、Tool、Dock、路径生效和 Host 生命周期 | 内置及视频目录 MP3 解码已执行；实际出声、真实 Host/Dock 和双插件共存待验收 |
 | Linux x64 | 记录发行版/ABI，验证内置/指定目录的依赖解析与设备输出 | 对应受保护存储、RID 构建、Tool/Host 集成后执行完整链路 | 均未执行；必须证明加载的是选定目录 |
 | macOS arm64 / x64 | 两种架构分别记录资产来源、模块加载及设备输出 | 对应受保护存储、RID 构建、Host 集成后执行完整链路 | 均未执行；一种架构通过不代表另一种通过 |
 
@@ -226,6 +228,6 @@ Host 验证使用开发产物与[现有开发部署方式](deployment-and-releas
 - 真实账号、音频输出、Standalone、Host、开发部署、正式发布分别写“已执行及结果”或“未执行”。
 - 当前支持格式、加载方式、资源限额与可复现限制；同时记录操作系统/架构、LibVLCSharp/原生库版本、资产来源及实际加载路径，没有验证的数据不写成结论。
 
-记录放入拟建的 `docs/archive/records/netease-v2/`，可复用矩阵保留在本页。主方案 S5 完成时，将当前协议和使用步骤分别写入 reference 与 quick-start。
+记录放入 `docs/archive/records/netease-v2/`，可复用矩阵保留在本页。当前已有[播放契约](../reference/netease-music-playback.md)和[使用步骤](../quick-start/netease-playback.md)。
 
-**当前只有方案和验证设计；P/A/C/B/L/E/T/U/D/G/R 新增场景未执行，M1 未实现。** 本轮仅执行文档链接、锚点、格式与范围一致性检查，不构建、不运行单元测试、不登录真实账号或部署。
+**当前核心实现与自动验证已完成，M1 整体人工验收尚未完成。** R01 搜索/详情与 R09 两种来源的解码部分已有证据；R02/R03 的探针只证明 PCM 和程序控制，不能代替听感。真实 Standalone、Host、多插件共存、设备与 Dock R 类验收保持待执行，见[本轮实施记录](../archive/records/netease-v2/m1-implementation-20260923.md)。

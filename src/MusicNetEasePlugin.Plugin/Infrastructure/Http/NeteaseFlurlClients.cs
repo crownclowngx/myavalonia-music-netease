@@ -13,11 +13,14 @@ internal sealed class NeteaseFlurlClients : IDisposable
         _cache = cache;
         Web = cache.GetOrAdd("netease-web", "https://music.163.com");
         Eapi = cache.GetOrAdd("netease-eapi", "https://interfacepc.music.163.com");
+        Xeapi = cache.GetOrAdd("netease-xeapi", "https://interface3.music.163.com");
+        Keys = cache.GetOrAdd("netease-keys", "https://interface.music.163.com");
+        Media = cache.GetOrAdd("netease-media");
         Images = cache.GetOrAdd("netease-images");
         Social = cache.GetOrAdd("netease-social", "https://music.163.com");
         WeChat = cache.GetOrAdd("netease-wechat", "https://open.weixin.qq.com");
         WeChatPoll = cache.GetOrAdd("netease-wechat-poll");
-        foreach (var client in new[] { Web, Eapi, Images, Social, WeChat, WeChatPoll })
+        foreach (var client in new[] { Web, Eapi, Xeapi, Keys, Media, Images, Social, WeChat, WeChatPoll })
         {
             client.Settings.Timeout = TimeSpan.FromSeconds(15);
             client.Settings.Redirects.Enabled = false;
@@ -26,6 +29,9 @@ internal sealed class NeteaseFlurlClients : IDisposable
 
     public IFlurlClient Web { get; }
     public IFlurlClient Eapi { get; }
+    public IFlurlClient Xeapi { get; }
+    public IFlurlClient Keys { get; }
+    public IFlurlClient Media { get; }
     public IFlurlClient Images { get; }
     public IFlurlClient Social { get; }
     public IFlurlClient WeChat { get; }

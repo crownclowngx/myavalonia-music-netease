@@ -1,0 +1,52 @@
+<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Music" xmlns:models="using:MusicNetEasePlugin.Application.Playback"
+ x:Class="MusicNetEasePlugin.Features.Music.MusicView" x:DataType="vm:MusicWorkspace">
+ <StackPanel Spacing="12">
+  <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+   <TextBox Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索歌名或歌手" KeyDown="SearchKeyDown" />
+   <Button Grid.Column="1" Content="搜索" Command="{Binding SearchCommand}" />
+  </Grid>
+  <ProgressBar IsVisible="{Binding IsLoading}" IsIndeterminate="True" Height="3" />
+  <TextBlock Text="{Binding SearchMessage}" TextWrapping="Wrap" />
+  <ListBox ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" Height="260" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+   <ListBox.ItemTemplate>
+    <DataTemplate x:DataType="models:MusicTrack">
+     <StackPanel Spacing="3" Margin="4">
+      <TextBlock Text="{Binding Name}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+      <TextBlock Text="{Binding Artists}" FontSize="12" TextTrimming="CharacterEllipsis" />
+      <TextBlock Text="{Binding Album}" FontSize="11" Opacity="0.65" TextTrimming="CharacterEllipsis" />
+     </StackPanel>
+    </DataTemplate>
+   </ListBox.ItemTemplate>
+  </ListBox>
+  <WrapPanel>
+   <Button Content="上一页" Command="{Binding PreviousCommand}" Margin="0,0,8,0" />
+   <TextBlock Text="{Binding PageText}" VerticalAlignment="Center" Margin="0,0,8,0" />
+   <Button Content="下一页" Command="{Binding NextCommand}" />
+  </WrapPanel>
+  <Separator />
+  <Border Width="80" Height="80" HorizontalAlignment="Left" CornerRadius="6" Background="#18777777">
+   <Grid><TextBlock Text="♪" FontSize="32" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    <Image x:Name="CoverImage" Stretch="UniformToFill" />
+   </Grid>
+  </Border>
+  <TextBlock Text="{Binding CurrentTrack}" TextWrapping="Wrap" FontWeight="SemiBold" />
+  <TextBlock Text="{Binding Album}" TextWrapping="Wrap" />
+  <TextBlock IsVisible="{Binding IsTrial}" Text="试听片段" Foreground="#B54708" />
+  <TextBlock Text="{Binding StateText}" />
+  <ProgressBar Value="{Binding Progress}" Minimum="0" Maximum="100" Height="5" />
+  <TextBlock Text="{Binding PositionText}" />
+  <WrapPanel>
+   <Button Content="播放所选" Command="{Binding PlayCommand}" Margin="0,0,8,8" />
+   <Button Content="暂停" Command="{Binding PauseCommand}" Margin="0,0,8,8" />
+   <Button Content="继续" Command="{Binding ResumeCommand}" Margin="0,0,8,8" />
+   <Button Content="停止" Command="{Binding StopCommand}" Margin="0,0,8,8" />
+  </WrapPanel>
+  <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+   <TextBlock Text="音量" VerticalAlignment="Center" />
+   <Slider Grid.Column="1" Value="{Binding Volume, Mode=TwoWay}" Minimum="0" Maximum="100" />
+   <TextBlock Grid.Column="2" Text="{Binding Volume}" VerticalAlignment="Center" />
+  </Grid>
+  <TextBlock Text="{Binding PlaybackMessage}" TextWrapping="Wrap" />
+ </StackPanel>
+</UserControl>

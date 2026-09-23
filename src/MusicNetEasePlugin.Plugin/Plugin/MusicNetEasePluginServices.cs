@@ -5,6 +5,10 @@ using MusicNetEasePlugin.Application.Authentication;
 using MusicNetEasePlugin.Infrastructure.Http;
 using MusicNetEasePlugin.Infrastructure.Persistence;
 using MusicNetEasePlugin.Infrastructure.Ui;
+using MusicNetEasePlugin.Application.Playback;
+using MusicNetEasePlugin.Infrastructure.Audio;
+using MusicNetEasePlugin.Infrastructure.Media;
+using MusicNetEasePlugin.Features.Music;
 
 namespace MusicNetEasePlugin.Plugin;
 
@@ -30,6 +34,26 @@ public static class MusicNetEasePluginServices
             new ProtectedLoginSessionStore(Path.GetFullPath(root), provider.GetRequiredService<ISessionProtector>()));
         services.TryAddSingleton<LoginCoordinator>();
         services.TryAddSingleton<ILoginUiDispatcher, LoginUiDispatcher>();
+        services.TryAddSingleton<ILibVlcSettingsStore>(_ => new LibVlcSettingsStore(Path.GetFullPath(root)));
+        services.TryAddSingleton<ILibVlcDirectoryProbe, LibVlcDirectoryProbe>();
+        services.TryAddSingleton(provider => new LibVlcRuntimeResolver(
+            provider.GetRequiredService<ILibVlcSettingsStore>(), provider.GetRequiredService<ILibVlcDirectoryProbe>(),
+            Path.Combine(Path.GetDirectoryName(typeof(MusicNetEasePluginServices).Assembly.Location)!, "native", "win-x64", "libvlc")));
+        services.TryAddSingleton<LibVlcRuntime>();
+        services.TryAddSingleton<IPlaybackRuntimeStatus>(provider => provider.GetRequiredService<LibVlcRuntime>());
+        services.TryAddSingleton<IMusicSessionAccessor, LoginMusicSession>();
+        services.TryAddSingleton<XeapiTransport>();
+        services.TryAddSingleton<NeteaseMusicApi>();
+        services.TryAddSingleton<IMusicCatalogApi>(provider => provider.GetRequiredService<NeteaseMusicApi>());
+        services.TryAddSingleton<IPlaybackResourceResolver>(provider => provider.GetRequiredService<NeteaseMusicApi>());
+        services.TryAddSingleton<IMediaBuffer>(provider => new FlurlMediaBuffer(provider.GetRequiredService<NeteaseFlurlClients>(), Path.Combine(root, "media-buffer"), MediaLimits.Default));
+        services.TryAddSingleton<IAudioOutput, LibVlcAudioOutput>();
+        services.TryAddSingleton<PlaybackCoordinator>();
+        // Host 在 Document Scope 中提供 Lifetime；工厂避免普通服务容器预检被要求创建一个虚假的 Document。
+        services.TryAddScoped(provider => new MusicWorkspace(provider.GetRequiredService<IMusicCatalogApi>(),
+            provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<PlaybackCoordinator>(),
+            provider.GetRequiredService<LoginCoordinator>(), provider.GetRequiredService<ILoginUiDispatcher>(),
+            provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>()));
         return services;
     }
 }

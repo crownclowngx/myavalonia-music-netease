@@ -1,13 +1,15 @@
 # MusicNetEasePlugin
 
 Avalonia 网易云音乐插件，使用 C# + Flurl 直连。当前提供微信扫码登录、网易云 App 备用入口、
-账号核验及受保护会话管理。用户已确认登录可用，下一阶段推进搜索与播放。
+账号核验及受保护会话管理，并已实现歌曲搜索、单曲播放与账号/LibVLC 设置 Tool。
+真实账号 MP3 已解码验证；扬声器听感及真实 Host/Dock 验收仍待完成。
 
 正式交付项目为 Plugin，Standalone 复用同一套服务和界面；当前目标为 Windows x64。
 
 - [文档总导航](docs/README.md)
 - [能力路线图](docs/roadmap/netease-capability-roadmap.md)：搜索播放 → 歌单、队列与歌词 → 音乐库管理 → 推荐发现
-- [V2：M1 搜索与单曲播放方案](docs/roadmap/netease-v2-m1-playback-plan.md)与[专用开发验证矩阵](docs/maintenance/netease-v2-m1-playback-verification.md)：LibVLCSharp + LibVLC、账号设置 Tool 与跨平台音频；待实施
+- [搜索播放快速开始](docs/quick-start/netease-playback.md)与[当前播放契约](docs/reference/netease-music-playback.md)：内置优先、可配置共享 LibVLC、单曲控制和边界
+- [V2：M1 搜索与单曲播放方案](docs/roadmap/netease-v2-m1-playback-plan.md)与[专用开发验证矩阵](docs/maintenance/netease-v2-m1-playback-verification.md)：实现进度及剩余人工验收
 - [V2：LibVLC 路径、Tool 与 Dock 专项设计](docs/roadmap/netease-v2-libvlc-tool-and-dock-design.md)：内置优先、可指定共享目录，参考 VideoSecurityPlayer 的 Dock 与资源经验
 - [扫码登录快速开始](docs/quick-start/netease-login.md)：登录、恢复、退出与排错
 - [HTTP 与会话契约](docs/reference/netease-http-session.md)：当前实现与接口边界
@@ -15,7 +17,7 @@ Avalonia 网易云音乐插件，使用 C# + Flurl 直连。当前提供微信�
 在仓库根目录执行本地开发检查并启动 Standalone：
 
 ```powershell
-pwsh -NoProfile -File tools/verify-development.ps1
+pwsh -NoProfile -File tools/verify-development.ps1 -Milestone M1
 dotnet run --project src/MusicNetEasePlugin.Standalone -c Debug --no-build
 ```
 

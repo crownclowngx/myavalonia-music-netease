@@ -2,9 +2,10 @@ using MyAvaloniaManagement.PluginSdk;
 
 namespace MusicNetEasePlugin.Constants;
 
-/// <summary>沿用初始化时的插件和 Document 持久身份，不因页面从模板变成登录页而改名。</summary>
+/// <summary>集中维护持久身份；显示名、页面能力和目录变化不能改变已经保存的 Dock 身份。</summary>
 public static class PluginIds
 {
     public static readonly PluginId Plugin = new("myavalonia.plugin.music.netease");
     public static readonly DocumentTypeId MainDocument = new("myavalonia.plugin.music.netease.document.main");
+    public static readonly ToolTypeId AccountSettings = new("myavalonia.plugin.music.netease.tool.account-settings");
 }

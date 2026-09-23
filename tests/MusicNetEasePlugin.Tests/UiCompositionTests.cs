@@ -16,6 +16,7 @@ using Xunit;
 namespace MusicNetEasePlugin.Tests;
 
 /// <summary>直接在专用 UI 线程渲染生产 View；测试不另造一个与真实绑定脱离的窗口。</summary>
+[Collection("AvaloniaHeadless")]
 public sealed class UiCompositionTests
 {
     public sealed class TestApp : Avalonia.Application

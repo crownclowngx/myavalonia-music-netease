@@ -1,3 +1,5 @@
+using MusicNetEasePlugin.Application.Playback;
+
 namespace MusicNetEasePlugin.Application.Authentication;
 
 /// <summary>
@@ -18,6 +20,9 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
     private long _generation;
     private bool _stopping;
     private bool _restored;
+    private long _accountEpoch;
+    private long _credentialVersion;
+    private CancellationTokenSource _accountLifetime = new();
     private AuthContext _context = AuthContext.Create();
     private LoginSnapshot _snapshot = new(0, LoginStage.SignedOut, "登录后即可连接你的网易云音乐账号。");
 
@@ -41,6 +46,42 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
 
     public LoginSnapshot Snapshot { get { lock (_sync) return _snapshot; } }
     public event EventHandler<LoginSnapshot>? Changed;
+
+    internal MusicSession CaptureMusicSession()
+    {
+        lock (_sync)
+        {
+            if (_stopping || _snapshot.Account is null || !_context.HasAccount(_time.GetUtcNow()))
+                throw new MusicException(MusicError.SignedOut, "请先登录网易云音乐。");
+            return new(_accountEpoch, _credentialVersion, _context, _accountLifetime.Token);
+        }
+    }
+    internal bool IsMusicSessionCurrent(MusicSession request)
+    {
+        lock (_sync) return !_stopping && _snapshot.Account is not null && request.Epoch == _accountEpoch && !request.Revoked.IsCancellationRequested;
+    }
+    internal Task CommitMusicContextAsync(MusicSession request, AuthContext context, CancellationToken ct)
+    {
+        // 没有 Cookie 变化时无需写盘；但调用方仍须检查账号撤销，不能把无变化当作旧响应可提交。
+        if (context == request.Context) return Task.CompletedTask;
+        AccountCheck? account = null;
+        return Begin(Guid.Empty, LoginStage.SignedIn, "已登录。", op => CommitAsync(op, account!, false), ct,
+            canBegin: () => _current is null && _snapshot.Account is not null &&
+                _accountEpoch == request.Epoch && _credentialVersion == request.CredentialVersion,
+            prepare: () => account = new(_snapshot.Account!, context));
+    }
+    internal Task InvalidateMusicSessionAsync(MusicSession request)
+    {
+        // 失效仅作用于发起请求的代次。旧账号的迟到 301 不能把新登录账号退出。
+        return Begin(Guid.Empty, LoginStage.SignedOut, "登录已失效，请重新扫码。",
+            async op =>
+            {
+                await _store.ClearAsync(CancellationToken.None).ConfigureAwait(false);
+                Update(op, LoginStage.SignedOut, "登录已失效，请重新扫码。", cleanupCompleted: true);
+            }, CancellationToken.None,
+            clearAccount: true, canBegin: () => _accountEpoch == request.Epoch && _snapshot.Account is not null,
+            prepare: () => _context = _context with { Cookies = _context.Cookies.Clear() });
+    }
 
     /// <summary>首次页面激活时尝试恢复；多个页面不会重复发起启动账号检查。手动重试可传 force。</summary>
     public Task RestoreAsync(Guid owner, CancellationToken ct, bool force = false)
@@ -203,10 +244,18 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
         Operation? old;
         Task previous;
         LoginSnapshot snapshot;
+        CancellationTokenSource? revoked = null;
         lock (_sync)
         {
             // 前置判断、读取当前会话与登记新操作必须原子完成，避免另一页面在两把锁之间提交账号。
             if (_stopping || canBegin?.Invoke() == false) return _tail;
+            if (clearAccount)
+            {
+                revoked = _accountLifetime;
+                _accountLifetime = new();
+                _accountEpoch++;
+                _credentialVersion++;
+            }
             prepare?.Invoke();
             old = _current;
             previous = _tail;
@@ -224,6 +273,8 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
             snapshot = _snapshot;
         }
         TryCancel(old);
+        // 取消回调可能进入音乐服务，必须在状态锁外执行。
+        if (revoked is not null) { revoked.Cancel(); revoked.Dispose(); }
         Notify(snapshot);
         _ = ExecuteAsync(operation, previous, work, clearAccount);
         return operation.Completion.Task;
@@ -249,14 +300,20 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
         {
             if (ex.Kind == AuthError.SessionExpired)
             {
+                CancellationTokenSource? expired = null;
                 lock (_sync)
                 {
                     if (ActiveLocked(op))
                     {
                         _context = _context with { Cookies = _context.Cookies.Clear() };
                         _snapshot = _snapshot with { Account = null, Remembered = false };
+                        expired = _accountLifetime;
+                        _accountLifetime = new();
+                        _accountEpoch++;
+                        _credentialVersion++;
                     }
                 }
+                if (expired is not null) { expired.Cancel(); expired.Dispose(); }
             }
             Update(op, LoginStage.Failed, ex.Message);
         }
@@ -295,6 +352,8 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
             // 只在同一个临界区内决定发布或补偿，避免“检查有效”与“发布”之间被取消。
             if (ActiveLocked(op))
             {
+                if (_snapshot.Account is null) _accountEpoch++;
+                _credentialVersion++;
                 _context = account.Context;
                 _snapshot = new(_snapshot.Revision + 1, LoginStage.SignedIn, message,
                     account.Account, Remembered: remembered, Method: _snapshot.Method);
@@ -371,6 +430,7 @@ public sealed class LoginCoordinator : IAsyncDisposable, IDisposable
             current = _current;
         }
         TryCancel(current);
+        _accountLifetime.Cancel();
         await tail.ConfigureAwait(false);
         _shutdown.Dispose();
     }

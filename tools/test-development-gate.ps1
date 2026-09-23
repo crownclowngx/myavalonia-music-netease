@@ -47,6 +47,48 @@ try {
     Expect-Rejection { Assert-MarkdownLinks $directory }; $checks++
     '[错误](missing.md)' | Set-Content (Join-Path $directory 'README.md')
     Expect-Rejection { Assert-MarkdownLinks $directory }; $checks++
+    # 用完整场景表和真正 TRX 节点验证映射，不把“含 M1 标签”当作已执行。
+    $m1Trx = "<TestRun><TestDefinitions><UnitTest id='fixture'><TestMethod className='Fixture' name='Pass'/></UnitTest></TestDefinitions><Results><UnitTestResult testId='fixture' outcome='Passed'/></Results></TestRun>"
+    $m1MapPath = Join-Path $directory 'm1.json'
+    $m1Map = @{ schemaVersion=1; methods=@{ 'Fixture.Pass'=1 }; scenarios=@{} }
+    foreach ($group in @(@('P',6),@('A',6),@('C',6),@('B',7),@('L',9),@('E',7),@('T',9),@('U',8))) {
+        foreach ($number in 1..$group[1]) { $m1Map.scenarios[('{0}{1:00}' -f $group[0],$number)] = @('Fixture.Pass') }
+    }
+    function Save-M1Map { $m1Map | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $m1MapPath }
+    $m1Trx | Set-Content -LiteralPath $path; Save-M1Map
+    if ((Assert-M1TestMap $path $m1MapPath).scenarios -ne 58) { throw '正确 M1 映射被拒绝。' }; $checks++
+    foreach ($missing in @('P01', 'T09', 'U07', 'U08')) {
+        $m1Map.scenarios.Remove($missing); Save-M1Map
+        Expect-Rejection { Assert-M1TestMap $path $m1MapPath }; $checks++
+        $m1Map.scenarios[$missing] = @('Fixture.Pass')
+    }
+    $m1Map.methods['Fixture.Pass']=2; Save-M1Map
+    Expect-Rejection { Assert-M1TestMap $path $m1MapPath }; $checks++
+    $m1Map.methods['Fixture.Pass']=1; $m1Map.scenarios['P01']=@('Fixture.Renamed'); Save-M1Map
+    Expect-Rejection { Assert-M1TestMap $path $m1MapPath }; $checks++
+    $m1Map.scenarios['P01']=@(); Save-M1Map
+    Expect-Rejection { Assert-M1TestMap $path $m1MapPath }; $checks++
+    $m1Map.scenarios['P01']=@('Fixture.Pass'); Save-M1Map
+    $m1Trx.Replace("outcome='Passed'", "outcome='NotExecuted'") | Set-Content -LiteralPath $path
+    Expect-Rejection { Assert-M1TestMap $path $m1MapPath }; $checks++
+    $m1Trx.Replace("testId='fixture'", "testId='unmatched'") | Set-Content -LiteralPath $path
+    Expect-Rejection { Assert-M1TestMap $path $m1MapPath }; $checks++
+    $m1Map.methods.Clear(); Save-M1Map; $m1Trx | Set-Content -LiteralPath $path
+    Expect-Rejection { Assert-M1TestMap $path $m1MapPath }; $checks++
+    $nativePath = Join-Path $directory 'libvlc-offline.json'
+    $native = @{ actualDeviceOutput=$false; ActiveVersion='fixture'; ActiveDirectory='fixture'; sample=@{sha256=('a'*64)};
+        measurements=@(1..12 | ForEach-Object { @{decodedFrames=19200} }) }
+    $native | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $nativePath
+    $png = [byte[]]::new(1024); [Convert]::FromHexString('89504E470D0A1A0A').CopyTo($png,0)
+    foreach ($name in @('m1-music-and-settings.png','m1-compact.png')) { [IO.File]::WriteAllBytes((Join-Path $directory $name),$png) }
+    Assert-M1Artifacts $directory; $checks++
+    $native.actualDeviceOutput=$true; $native | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $nativePath
+    Expect-Rejection { Assert-M1Artifacts $directory }; $checks++
+    $native.actualDeviceOutput=$false; $native.measurements[0].decodedFrames=0; $native | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $nativePath
+    Expect-Rejection { Assert-M1Artifacts $directory }; $checks++
+    $native.measurements[0].decodedFrames=19200; $native | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $nativePath
+    [IO.File]::WriteAllBytes((Join-Path $directory 'm1-compact.png'),[byte[]]::new(0))
+    Expect-Rejection { Assert-M1Artifacts $directory }; $checks++
     Write-Host "门禁自测通过：$checks 项判定。"
 }
 finally {

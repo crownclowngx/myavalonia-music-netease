@@ -8,7 +8,10 @@ using MusicNetEasePlugin.Infrastructure.Protocol;
 
 namespace MusicNetEasePlugin.Infrastructure.Http;
 
-internal sealed record NeteaseResponse(JsonElement Body, AuthContext Context);
+internal sealed record NeteaseResponse(JsonElement Body, AuthContext Context, string? SessionId = null, string? SessionKey = null)
+{
+    public override string ToString() => "[网易响应]";
+}
 
 /// <summary>
 /// 唯一业务 HTTP 执行入口：固定端点、请求级凭据、完整取消、有限响应及安全错误。
@@ -24,6 +27,13 @@ internal sealed class NeteaseTransport(NeteaseFlurlClients clients, TimeProvider
         cancellationToken.ThrowIfCancellationRequested();
         var encoded = NeteaseRequestEncoder.Encode(path, data, protocol, context, time.GetUtcNow());
         var client = protocol == NeteaseProtocol.Weapi ? clients.Web : clients.Eapi;
+        return await SendEncodedAsync(client, encoded, protocol, context, cancellationToken).ConfigureAwait(false);
+    }
+
+    /// <summary>复用相同预算、错误和 Cookie 规则；xeapi 编码器仅提供协议数据，不重新实现 HTTP 生命周期。</summary>
+    internal async Task<NeteaseResponse> SendEncodedAsync(IFlurlClient client, EncodedRequest encoded,
+        NeteaseProtocol protocol, AuthContext context, CancellationToken cancellationToken)
+    {
         using var timeout = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
         timeout.CancelAfter(TimeSpan.FromSeconds(15));
         try
@@ -43,7 +53,7 @@ internal sealed class NeteaseTransport(NeteaseFlurlClients clients, TimeProvider
             var json = Decode(bytes, protocol);
             var merged = NeteaseCookies.Merge(context, new Uri(client.BaseUrl + encoded.Route),
                 response.Headers.GetAll("Set-Cookie"), time.GetUtcNow());
-            return new(json, merged);
+            return new(json, merged, response.Headers.FirstOrDefault("x-encr-ssid"), response.Headers.FirstOrDefault("x-encr-sskey"));
         }
         catch (OperationCanceledException) when (cancellationToken.IsCancellationRequested)
         {

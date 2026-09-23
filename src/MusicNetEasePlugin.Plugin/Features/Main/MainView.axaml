@@ -3,6 +3,7 @@
     xmlns="https://github.com/avaloniaui"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:vm="using:MusicNetEasePlugin.Features.Main"
+    xmlns:music="using:MusicNetEasePlugin.Features.Music"
     x:DataType="vm:MainDocument">
   <ScrollViewer Background="#F5F6F8">
     <StackPanel Margin="32" Spacing="22" MaxWidth="820" HorizontalAlignment="Center">
@@ -55,6 +56,9 @@
           </Border>
           <Button Content="退出 / 清除本地登录信息" Command="{Binding LogoutCommand}" HorizontalAlignment="Right" />
         </StackPanel>
+      </Border>
+      <Border IsVisible="{Binding IsSignedIn}" Background="White" CornerRadius="16" Padding="24">
+        <music:MusicView DataContext="{Binding Music}" />
       </Border>
       <TextBlock Text="登录信息仅保存在当前用户的数据目录。关闭页面不会退出已连接的账号。"
                  Foreground="#98A2B3" TextWrapping="Wrap" FontSize="12" />

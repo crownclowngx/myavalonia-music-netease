@@ -1,7 +1,7 @@
 # 项目、Host 与 Standalone 窗口职责
 
-> 用途：本插件的项目结构与宿主接入参考。当前只注册登录主页面，账号与登录协调器在插件容器中共享。
-> 后续设计：[V2 / M1](../roadmap/netease-v2-m1-playback-plan.md)拟增加账号设置 Tool 与共享音频服务；其[目录配置及 Dock 约定](../roadmap/netease-v2-libvlc-tool-and-dock-design.md)仍待实施，不属于当前注册事实。
+> 用途：本插件的项目结构与宿主接入参考。当前注册音乐主 Document 与右侧账号设置 Tool（Hide）；账号和播放协调器在插件容器中共享。
+> 当前实现：[播放契约](netease-music-playback.md)。设计依据：[V2 / M1](../roadmap/netease-v2-m1-playback-plan.md)及[目录配置与 Dock 约定](../roadmap/netease-v2-libvlc-tool-and-dock-design.md)；真实 Host/Dock 验收仍待完成。
 
 ## 项目结构
 
@@ -41,7 +41,7 @@ Host 容器，或保存 `IPluginRegistration` 供运行时使用。
 
 ## Standalone/MainWindow 应当做什么
 
-当前 [MainWindow](../../src/MusicNetEasePlugin.Standalone/MainWindow.axaml.cs)使用同一服务注册入口和真实 `MainDocument`，仅替换数据目录与 `IDocumentLifetime` 关闭信号。账号会话的共享和页面所有者取消规则见[HTTP 与会话契约](netease-http-session.md)。
+当前 [MainWindow](../../src/MusicNetEasePlugin.Standalone/MainWindow.axaml.cs)使用同一服务注册入口、真实 `MainDocument`/`MusicWorkspace` 和 `MusicSettingsTool`，以音乐/设置页签承载，提供独立数据目录与 `IDocumentLifetime`。账号取消见[HTTP 与会话契约](netease-http-session.md)，播放所有者规则见[播放契约](netease-music-playback.md)。当前 SDK 没有 Tool 主动打开 Document 的公开端口，Tool 提示使用 Host“新建”入口。
 
 Standalone 的 `MainWindow` 是开发工作台，不是插件对 Host 暴露的正式窗体。它应当保持轻薄，只负责：
 

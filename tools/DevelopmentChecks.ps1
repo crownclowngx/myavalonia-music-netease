@@ -69,6 +69,54 @@ function Assert-DevelopmentTrx {
     return $total
 }
 
+function Assert-M1TestMap {
+    param([string]$TrxPath, [string]$MapPath)
+    # 映射是经审阅的实际方法清单，不在门禁里扫描 Trait 字符串冒充执行证据。
+    $map = Get-Content -LiteralPath $MapPath -Raw | ConvertFrom-Json -AsHashtable
+    if ($map.schemaVersion -ne 1 -or !$map.methods.Count -or !$map.scenarios.Count) { throw 'M1 测试映射为空或版本无效。' }
+    $settings = [Xml.XmlReaderSettings]::new(); $settings.DtdProcessing = [Xml.DtdProcessing]::Prohibit
+    $reader = [Xml.XmlReader]::Create([IO.Path]::GetFullPath($TrxPath), $settings)
+    try { $xml = [Xml.XmlDocument]::new(); $xml.Load($reader) } finally { $reader.Dispose() }
+    $executed = @{}
+    foreach ($definition in $xml.SelectNodes('//*[local-name()="TestDefinitions"]/*[local-name()="UnitTest"]')) {
+        $method = $definition.SelectSingleNode('*[local-name()="TestMethod"]')
+        $id = $definition.GetAttribute('id')
+        $result = @($xml.SelectNodes('//*[local-name()="Results"]/*[local-name()="UnitTestResult"]') | Where-Object { $_.GetAttribute('testId') -eq $id })
+        if ($null -eq $method -or $result.Count -ne 1 -or $result[0].GetAttribute('outcome') -ne 'Passed') { throw '测试映射缺少唯一的通过结果。' }
+        $name = $method.GetAttribute('className') + '.' + $method.GetAttribute('name')
+        if (!$executed.ContainsKey($name)) { $executed[$name] = 0 }
+        $executed[$name]++
+    }
+    foreach ($name in $map.methods.Keys) {
+        if ([int]$map.methods[$name] -le 0 -or !$executed.ContainsKey($name) -or $executed[$name] -lt [int]$map.methods[$name]) {
+            throw "M1 必测方法或参数化用例未执行：$name"
+        }
+    }
+    $required = @()
+    foreach ($group in @(@('P',6),@('A',6),@('C',6),@('B',7),@('L',9),@('E',7),@('T',9),@('U',8))) {
+        foreach ($number in 1..$group[1]) { $required += '{0}{1:00}' -f $group[0],$number }
+    }
+    foreach ($scenario in $required) {
+        if (!$map.scenarios.ContainsKey($scenario) -or !$map.scenarios[$scenario].Count) { throw "缺少 M1 场景映射：$scenario" }
+        foreach ($name in $map.scenarios[$scenario]) {
+            if (!$map.methods.ContainsKey($name) -or !$executed.ContainsKey($name)) { throw "场景引用未执行的方法：$scenario / $name" }
+        }
+    }
+    return @{ scenarios = $required.Count; methods = $map.methods.Count; executedCases = ($executed.Values | Measure-Object -Sum).Sum }
+}
+
+function Assert-M1Artifacts {
+    param([string]$RunDirectory)
+    $native = Get-Content -LiteralPath (Join-Path $RunDirectory 'libvlc-offline.json') -Raw | ConvertFrom-Json -AsHashtable
+    if ($native.actualDeviceOutput -ne $false -or !$native.ActiveVersion -or !$native.ActiveDirectory -or
+        $native.sample.sha256 -notmatch '^[0-9a-fA-F]{64}$' -or $native.measurements.Count -lt 12 -or
+        @($native.measurements | Where-Object { $_.decodedFrames -le 0 }).Count) { throw '真实离线解码证据缺项或把 PCM 误报为设备输出。' }
+    foreach ($name in @('m1-music-and-settings.png', 'm1-compact.png')) {
+        $bytes = [IO.File]::ReadAllBytes((Join-Path $RunDirectory $name))
+        if ($bytes.Length -lt 1024 -or [Convert]::ToHexString($bytes[0..7]) -ne '89504E470D0A1A0A') { throw "缺少有效的生产 View 渲染证据：$name" }
+    }
+}
+
 function Get-MarkdownAnchors {
     param([string]$Text)
     $seen = @{}

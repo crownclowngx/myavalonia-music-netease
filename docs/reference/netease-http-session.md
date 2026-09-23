@@ -19,7 +19,7 @@
 | NeteaseAuthApi.LogoutAsync | logout | eapi POST `/api/logout` | 离线流程；真实账号远端退出待验证 |
 
 eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全新进程证明网易云 App 路径获取 QR 和 801 不需要匿名 Cookie 或 xeapi 初始化；该路径的真实 803 授权仍缺单独验证记录。微信路径已完成真实授权、回调与账号核验。
-未实现短信/密码登录、扫码 Cookie 刷新、多账号、搜索和播放。新版播放协议 xeapi 与音乐能力按[能力路线图](../roadmap/netease-capability-roadmap.md)推进。
+未实现短信/密码登录、扫码 Cookie 刷新和多账号。V2 已新增 xeapi、搜索、详情和单曲播放，端点、媒体与引擎契约见[音乐与播放当前契约](netease-music-playback.md)。
 
 ## 2. 职责与资源所有权
 
@@ -28,9 +28,9 @@ eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全
 - `IQrLoginProvider` 只负责创建扫码尝试；`IQrLoginAttempt` 拥有二维码图片、私有状态与释放责任。微信与网易 App 各实现一次创建/检查，共享后续账号核验与保存；View 不接触 UUID、codekey、code 或 state。
 - `NeteaseAuthApi` 解释四个端点；`NeteaseTransport` 执行 HTTP、限制响应大小并转换安全异常；`NeteaseRequestEncoder`/`NeteaseCrypto` 负责协议。
 - `ProtectedLoginSessionStore` 只处理文件；`ISessionProtector` 只处理当前用户保护。平台保护失败不能降级为明文。
-- `AddMusicNetEasePluginServices` 是唯一组合入口。服务容器复用六个命名 Client：web、eapi、images、social、wechat、wechat-poll；`NeteaseFlurlClients.Dispose` 清空私有缓存并释放 Client。没有静态 CookieJar 或全局 Flurl 修改。
+- `AddMusicNetEasePluginServices` 是唯一组合入口。服务容器复用九个命名 Client：web、eapi、xeapi、keys、media、images、social、wechat、wechat-poll；`NeteaseFlurlClients.Dispose` 清空私有缓存并释放 Client。没有静态 CookieJar 或全局 Flurl 修改。
 - `MainView` 拥有解码后的二维码/头像 Bitmap，替换、解绑、视觉树拆卸时释放。暂时离开视觉树不代表 Document 关闭。
-- Host 生命周期先异步停止登录，再由容器释放依赖；同时支持 SDK 当前使用的同步 Dispose。Standalone 使用相同服务与 View，仅提供关闭令牌及独立目录。
+- Host 生命周期先异步停止播放并释放媒体，再撤销登录工作，最后由容器释放依赖；同时支持 SDK 当前使用的同步 Dispose。Standalone 使用相同服务与 View，仅提供关闭令牌及独立目录。
 
 采用普通类、枚举、不可变记录和少量窄接口；没有通用 API 平台、事件总线、通用仓储或状态机框架。
 
@@ -68,6 +68,8 @@ CookieContainer 解释标准过期/删除属性，白名单只保留 MUSIC_U、M
 退出立即撤销内存账号与旧代次，等待旧操作收口，清除本地文件，再请求远端退出。
 即使退出令牌已取消，本地清除仍执行；本地清除失败和远端未确认分别报告。
 关闭发起页面只取消它拥有的操作，其他页面关闭不能取消它；已经提交的共享账号不会因页面关闭而退出。
+
+音乐访问经 `LoginMusicSession` 获得带账号 epoch、凭据版本和撤销 Token 的内部快照；没有第二份账号存储。Cookie 更新复用此处的提交/补偿顺序，退出会立即撤销搜索、资源解析、缓冲和播放资格；旧 epoch 的失效响应不会退出新登录账号。
 
 ## 5. 数据目录与文件格式
 

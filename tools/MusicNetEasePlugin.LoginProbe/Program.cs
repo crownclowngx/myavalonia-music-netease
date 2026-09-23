@@ -5,9 +5,11 @@ using MusicNetEasePlugin.Infrastructure.Http;
 
 if (args.Length > 0)
 {
+    if (args.Length is 7 or 9 && args[0] == "--music" && args[1] == "--session-directory" && args[3] == "--keyword" && args[5] == "--output" && (args.Length == 7 || args[7] == "--runtime-directory"))
+        return await MusicProbe.RunAsync(args[2], args[4], args[6], args.Length == 9 ? args[8] : null);
     if (args.Length == 3 && args[0] == "--wechat" && args[1] == "--output")
         return await WeChatProbe.RunAsync(args[2]);
-    Console.Error.WriteLine("用法：不带参数运行未登录探针；或 --wechat --output <二维码图片绝对路径>");
+    Console.Error.WriteLine("用法：无参数为未登录探针；--wechat --output <二维码路径>；--music --session-directory <既有会话目录> --keyword <歌曲关键词> --output <报告路径> [--runtime-directory <LibVLC目录>] 为显式无声解码验证。");
     return 2;
 }
 

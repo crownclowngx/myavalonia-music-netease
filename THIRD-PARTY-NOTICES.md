@@ -3,8 +3,18 @@
 网易协议实现参考 NeteaseCloudMusicApiEnhanced/api-enhanced：
 https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/tree/a8c781fd64faab17fedfd46e0615a2609307f163
 
-涉及 Infrastructure/Protocol/NeteaseCrypto.cs、Infrastructure/Http 下的协议请求组装，以及离线协议向量。
+涉及 Infrastructure/Protocol/NeteaseCrypto.cs、XeapiCrypto.cs、Infrastructure/Http 下的协议请求组装，以及离线协议向量。
 原作者及 Enhanced 贡献者的实现为协议移植依据。运行时使用的 NuGet 包保留各自许可；本地凭据保护不使用这些网易协议算法。
+
+V2 新增的锁定依赖及 NuGet 元数据声明：
+
+| 包 | 版本 | 许可声明 / 来源 |
+| --- | --- | --- |
+| LibVLCSharp | 3.10.0 | LGPL-2.1-or-later；[VideoLAN 源码](https://github.com/videolan/libvlcsharp/tree/3.10.0) |
+| VideoLAN.LibVLC.Windows | 3.0.23.1 | LGPL-2.1-or-later；[NuGet 包](https://www.nuget.org/packages/VideoLAN.LibVLC.Windows/3.0.23.1)，原生组件及模块保留各自声明 |
+| BouncyCastle.Cryptography | 2.6.2 | MIT；[项目源码](https://github.com/bcgit/bc-csharp) |
+
+应用采用动态 LibVLC 适配；运行库可通过设置选用外部完整目录。源码与锁定版本信息随本说明保留，原生库没有改写。
 
 上游许可证原文：
 

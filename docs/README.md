@@ -1,7 +1,7 @@
 # MusicNetEasePlugin 文档导航
 
 > 本插件唯一文档总导航；更新日期：2026-09-23。
-> 当前基线：用户已确认登录可用；搜索、播放、歌单等能力按路线图推进，尚未实现。
+> 当前基线：登录、搜索、单曲播放与设置 Tool 已实现；真实账号 MP3 及两种运行库来源已解码，M1 真实 Host/Dock 与听感验收待完成；歌单等后续能力尚未实现。
 
 ## 使用与后续开发
 
@@ -9,8 +9,9 @@
 | --- | --- | --- |
 | 如何构建与运行 | [项目首页](../README.md)、[扫码登录快速开始](quick-start/netease-login.md) | 本地开发入口、独立数据目录、扫码、恢复、退出与排错 |
 | 下一步开发什么 | [能力路线图](roadmap/netease-capability-roadmap.md) | M1–M5 能力范围、先后依赖、验收标准与首轮任务拆分 |
-| 如何实现 M1 | [V2：搜索与单曲播放方案](roadmap/netease-v2-m1-playback-plan.md) | SOLID 分工、跨平台音频、账号设置 Tool、S0–S5 步骤与本地开发门禁；待实施 |
-| 多个插件如何使用 LibVLC | [V2：运行库、Tool 与 Dock 专项设计](roadmap/netease-v2-libvlc-tool-and-dock-design.md) | 内置优先/指定目录、设置生效、共享库、VideoSecurityPlayer 踩坑对照；待实施 |
+| 如何播放与配置运行库 | [搜索播放快速开始](quick-start/netease-playback.md)、[当前播放契约](reference/netease-music-playback.md) | 搜索、单曲控制、共享路径、开发产物与探针 |
+| 如何实现 M1 | [V2：搜索与单曲播放方案](roadmap/netease-v2-m1-playback-plan.md) | SOLID 分工、S0–S5 进度与剩余验收 |
+| 多个插件如何使用 LibVLC | [V2：运行库、Tool 与 Dock 专项设计](roadmap/netease-v2-libvlc-tool-and-dock-design.md) | 内置优先/指定目录、设置生效、VideoSecurityPlayer 踩坑对照；共享目录已解码，真实共存待验收 |
 | 当前具体实现了什么 | [HTTP 与会话契约](reference/netease-http-session.md) | 微信/App 登录、已接入端点、Flurl、会话、取消和生命周期 |
 | 上游还有哪些能力 | [api-enhanced 能力清单](reference/netease-api-enhanced-capabilities.md) | 固定提交的模块索引与移植边界；不代表插件已支持 |
 
@@ -32,7 +33,7 @@
 | 文档 | 用途 |
 | --- | --- |
 | [登录开发验证矩阵](maintenance/netease-login-verification.md) | 协议、HTTP、状态、存储、UI、微信专项测试与人工验证范围；本地开发检查入口 |
-| [V2 / M1 专用开发验证矩阵](maintenance/netease-v2-m1-playback-verification.md) | 搜索、播放、路径/Tool、Dock、共享运行库、资源与各平台验收；新增场景待实施 |
+| [V2 / M1 专用开发验证矩阵](maintenance/netease-v2-m1-playback-verification.md) | 搜索、播放、路径/Tool、Dock、共享运行库、资源与各平台验收；自动映射和人工边界分开维护 |
 | [开发部署、正式发布与验收](maintenance/deployment-and-release.md) | 私有依赖声明、干净部署目录、正式 ZIP 和真实 Host 验收；按实际任务选择流程 |
 
 当前开发不使用 AIFLOW、Windows CI 或发布门禁。发布说明保留为正式交付时的参考；文档整理不会触发构建、部署或发布。
@@ -42,6 +43,8 @@
 完整入口见[归档索引](archive/README.md)。原 V1 登录计划已经归档，后续能力由当前路线图承接；尚未覆盖的验证项继续在维护矩阵跟踪。
 
 最近一次有完整仓库记录的开发部署是[微信登录实现与验证记录](archive/records/netease-v1/wechat-login-implementation-20260922.md)，其中同时记录微信授权、自动验证、部署与清理。早期 App 版记录保留在归档中。
+
+最新功能实施见[V2 / M1 实现与验证记录](archive/records/netease-v2/m1-implementation-20260923.md)，包括本地门禁、真实 MP3 解码、共享目录与两种开发暂存产物；本次没有替换正在运行的 Host 插件。
 
 ## 文档目录与维护约定
 

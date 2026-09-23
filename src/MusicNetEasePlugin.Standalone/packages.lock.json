@@ -250,8 +250,10 @@
       "musicneteaseplugin.plugin": {
         "type": "Project",
         "dependencies": {
+          "BouncyCastle.Cryptography": "[2.6.2, 2.6.2]",
           "CommunityToolkit.Mvvm": "[8.4.2, 8.4.2]",
           "Flurl.Http": "[4.0.2, 4.0.2]",
+          "LibVLCSharp": "[3.10.0, 3.10.0]",
           "MyAvaloniaManagement.Icons": "[3.4.1, 3.4.1]",
           "MyAvaloniaManagement.PluginSdk": "[3.4.1, 3.4.1]",
           "MyAvaloniaManagement.PluginSdk.UI": "[3.4.1, 3.4.1]",
@@ -274,6 +276,12 @@
           "SkiaSharp.NativeAssets.WebAssembly": "3.119.4"
         }
       },
+      "BouncyCastle.Cryptography": {
+        "type": "CentralTransitive",
+        "requested": "[2.6.2, 2.6.2]",
+        "resolved": "2.6.2",
+        "contentHash": "7oWOcvnntmMKNzDLsdxAYqApt+AjpRpP2CShjMfIa3umZ42UQMvH0tl1qAliYPNYO6vTdcGMqnRrCPmsfzTI1w=="
+      },
       "CommunityToolkit.Mvvm": {
         "type": "CentralTransitive",
         "requested": "[8.4.2, 8.4.2]",
@@ -288,6 +296,12 @@
         "dependencies": {
           "Flurl": "4.0.0"
         }
+      },
+      "LibVLCSharp": {
+        "type": "CentralTransitive",
+        "requested": "[3.10.0, 3.10.0]",
+        "resolved": "3.10.0",
+        "contentHash": "VHuOfq8Xtb/lNz0asvCm5qDjgTmfB3m3lC40Dz9iH9oL3DM0fSXHjZaLxdtYVr5nsldJoh5BTeG8MtODprhC9Q=="
       },
       "MyAvaloniaManagement.Icons": {
         "type": "CentralTransitive",
