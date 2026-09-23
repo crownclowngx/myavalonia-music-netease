@@ -32,7 +32,8 @@ public sealed class PlaybackUiTests
             using var tool = new MusicSettingsTool(login, settings, new DirectoryProbe(p => new(p, [])), runtime, ui);
             var music = new MusicView { DataContext = document }; var settingsView = new MusicSettingsView { DataContext = tool };
             var grid = new Grid { ColumnDefinitions = new ColumnDefinitions("2*,*") };
-            Grid.SetColumn(settingsView, 1); grid.Children.Add(new ScrollViewer { Content = music }); grid.Children.Add(settingsView);
+            // V3 的播放条需要真实的有限高度；外包 ScrollViewer 会重新引入手机式整页滚动。
+            Grid.SetColumn(settingsView, 1); grid.Children.Add(music); grid.Children.Add(settingsView);
             var window = new Window { Width = 1080, Height = 880, Content = grid };
             try
             {
@@ -40,7 +41,7 @@ public sealed class PlaybackUiTests
                 tool.DirectoryPath = "尚未保存的共享目录";
                 await document.SearchAsync(0, "音乐"); Dispatcher.UIThread.RunJobs();
                 document.SelectedTrack = document.Tracks[0]; await document.PlayCommand.ExecuteAsync(null); Dispatcher.UIThread.RunJobs();
-                Assert.True(music.GetVisualDescendants().OfType<Button>().Single(b => Equals(b.Content, "暂停")).IsEnabled);
+                Assert.True(music.FindControl<Button>("PauseButton")!.IsEnabled);
                 for (var i = 0; i < 20; i++)
                 {
                     window.Content = null; window.Content = grid; Dispatcher.UIThread.RunJobs();
@@ -82,6 +83,7 @@ public sealed class PlaybackUiTests
                 }
             }
             finally { window.Close(); }
+            return true;
         }, default);
     }
 }

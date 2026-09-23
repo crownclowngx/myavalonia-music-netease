@@ -71,9 +71,24 @@ function Assert-DevelopmentTrx {
 
 function Assert-M1TestMap {
     param([string]$TrxPath, [string]$MapPath)
+    $required = @()
+    foreach ($group in @(@('P',6),@('A',6),@('C',6),@('B',7),@('L',9),@('E',7),@('T',9),@('U',8))) {
+        foreach ($number in 1..$group[1]) { $required += '{0}{1:00}' -f $group[0],$number }
+    }
+    return Assert-DevelopmentTestMap $TrxPath $MapPath $required
+}
+
+function Assert-V3TestMap {
+    param([string]$TrxPath, [string]$MapPath)
+    # AUTO 编号仅代表可自动重复的子场景，不冒充系统主题、真实 Dock 或硬件帧时间验收。
+    return Assert-DevelopmentTestMap $TrxPath $MapPath @('THEME-AUTO','DOCUMENT-AUTO','TOOL-AUTO','LOGIN-AUTO','MOTION-AUTO','PREFERENCES-AUTO','RESOURCE-AUTO')
+}
+
+function Assert-DevelopmentTestMap {
+    param([string]$TrxPath, [string]$MapPath, [string[]]$Required)
     # 映射是经审阅的实际方法清单，不在门禁里扫描 Trait 字符串冒充执行证据。
     $map = Get-Content -LiteralPath $MapPath -Raw | ConvertFrom-Json -AsHashtable
-    if ($map.schemaVersion -ne 1 -or !$map.methods.Count -or !$map.scenarios.Count) { throw 'M1 测试映射为空或版本无效。' }
+    if ($map.schemaVersion -ne 1 -or !$map.methods.Count -or !$map.scenarios.Count) { throw '测试映射为空或版本无效。' }
     $settings = [Xml.XmlReaderSettings]::new(); $settings.DtdProcessing = [Xml.DtdProcessing]::Prohibit
     $reader = [Xml.XmlReader]::Create([IO.Path]::GetFullPath($TrxPath), $settings)
     try { $xml = [Xml.XmlDocument]::new(); $xml.Load($reader) } finally { $reader.Dispose() }
@@ -89,20 +104,45 @@ function Assert-M1TestMap {
     }
     foreach ($name in $map.methods.Keys) {
         if ([int]$map.methods[$name] -le 0 -or !$executed.ContainsKey($name) -or $executed[$name] -lt [int]$map.methods[$name]) {
-            throw "M1 必测方法或参数化用例未执行：$name"
+            throw "必测方法或参数化用例未执行：$name"
         }
     }
-    $required = @()
-    foreach ($group in @(@('P',6),@('A',6),@('C',6),@('B',7),@('L',9),@('E',7),@('T',9),@('U',8))) {
-        foreach ($number in 1..$group[1]) { $required += '{0}{1:00}' -f $group[0],$number }
-    }
     foreach ($scenario in $required) {
-        if (!$map.scenarios.ContainsKey($scenario) -or !$map.scenarios[$scenario].Count) { throw "缺少 M1 场景映射：$scenario" }
+        if (!$map.scenarios.ContainsKey($scenario) -or !$map.scenarios[$scenario].Count) { throw "缺少场景映射：$scenario" }
         foreach ($name in $map.scenarios[$scenario]) {
             if (!$map.methods.ContainsKey($name) -or !$executed.ContainsKey($name)) { throw "场景引用未执行的方法：$scenario / $name" }
         }
     }
-    return @{ scenarios = $required.Count; methods = $map.methods.Count; executedCases = ($executed.Values | Measure-Object -Sum).Sum }
+    return @{ scenarios = $required.Count; methods = $map.methods.Count; executedCases = ($map.methods.Keys | ForEach-Object { $executed[$_] } | Measure-Object -Sum).Sum }
+}
+
+function Get-V3ScreenshotNames {
+    foreach ($theme in @('light','dark')) {
+        foreach ($width in @(1200,800,520)) { "v3-document-$theme-$width.png" }
+        foreach ($width in @(280,320,420,640)) { "v3-tool-$theme-$width.png" }
+        "v3-login-$theme.png"
+    }
+    'v3-host-theme-dark-composition.png'
+}
+
+function Assert-V3Artifacts {
+    param([string]$RunDirectory)
+    foreach ($name in (Get-V3ScreenshotNames)) {
+        $bytes = [IO.File]::ReadAllBytes((Join-Path $RunDirectory $name))
+        if ($bytes.Length -lt 1024 -or [Convert]::ToHexString($bytes[0..7]) -ne '89504E470D0A1A0A') { throw "缺少 V3 实际渲染截图：$name" }
+    }
+    $motion = Get-Content -LiteralPath (Join-Path $RunDirectory 'v3-motion-observation.json') -Raw | ConvertFrom-Json -AsHashtable
+    if ($motion.schemaVersion -ne 1 -or !$motion.environment -or $motion.realHost -ne $false -or $motion.frameTimeMeasured -ne $false -or
+        $motion.detachedViews -ne 40 -or $motion.retainedViews -ne 0 -or $motion.samples.Count -ne 6) {
+        throw 'V3 动效证据缺项、视图残留或把 Headless 误报为真 Host / 帧时间。'
+    }
+    foreach ($reduced in @($false,$true)) {
+        foreach ($scenario in @('idle','playing','hidden')) {
+            $sample = @($motion.samples | Where-Object { $_.reducedMotion -eq $reduced -and $_.scenario -eq $scenario })
+            if ($sample.Count -ne 1 -or $sample[0].wallMilliseconds -lt 450 -or $sample[0].cpuMilliseconds -lt 0 -or
+                $sample[0].allocatedBytes -lt 0 -or $sample[0].activeFadeAfter -ne $false) { throw "V3 动效采样不完整或仍有淡入：$reduced / $scenario" }
+        }
+    }
 }
 
 function Assert-M1Artifacts {

@@ -4,13 +4,23 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:views="using:MusicNetEasePlugin.Features.Main"
     xmlns:settings="using:MusicNetEasePlugin.Features.Settings"
-    Width="900"
-    Height="820"
-    MinWidth="540"
-    MinHeight="500"
+    Width="1180"
+    Height="740"
+    MinWidth="280"
+    MinHeight="240"
     Title="网易云音乐 · 独立预览">
-  <TabControl>
-    <TabItem Header="音乐与登录"><views:MainView /></TabItem>
-    <TabItem Header="账号与播放设置"><settings:MusicSettingsView x:Name="SettingsView" /></TabItem>
-  </TabControl>
+  <DockPanel>
+    <WrapPanel DockPanel.Dock="Top" Margin="8" Orientation="Horizontal">
+      <ComboBox x:Name="ThemeSelector" SelectedIndex="0" SelectionChanged="ThemeChanged" Margin="0,0,8,0" AutomationProperties.Name="预览主题">
+        <ComboBoxItem Content="跟随系统" /><ComboBoxItem Content="浅色" /><ComboBoxItem Content="深色" />
+      </ComboBox>
+      <ComboBox x:Name="PreviewSelector" SelectedIndex="0" SelectionChanged="PreviewChanged" AutomationProperties.Name="预览尺寸">
+        <ComboBoxItem Content="并排工作区" /><ComboBoxItem Content="窄 Document" /><ComboBoxItem Content="窄 Tool" /><ComboBoxItem Content="底部 Tool" />
+      </ComboBox>
+    </WrapPanel>
+    <Grid x:Name="PreviewLayout" ColumnDefinitions="*,320">
+      <views:MainView x:Name="DocumentView" />
+      <settings:MusicSettingsView Grid.Column="1" x:Name="SettingsView" />
+    </Grid>
+  </DockPanel>
 </Window>

@@ -9,6 +9,7 @@ using MusicNetEasePlugin.Application.Playback;
 using MusicNetEasePlugin.Infrastructure.Audio;
 using MusicNetEasePlugin.Infrastructure.Media;
 using MusicNetEasePlugin.Features.Music;
+using MusicNetEasePlugin.Application.Appearance;
 
 namespace MusicNetEasePlugin.Plugin;
 
@@ -34,6 +35,8 @@ public static class MusicNetEasePluginServices
             new ProtectedLoginSessionStore(Path.GetFullPath(root), provider.GetRequiredService<ISessionProtector>()));
         services.TryAddSingleton<LoginCoordinator>();
         services.TryAddSingleton<ILoginUiDispatcher, LoginUiDispatcher>();
+        services.TryAddSingleton<IUiPreferencesStore>(_ => new UiPreferencesStore(Path.GetFullPath(root)));
+        services.TryAddSingleton<UiPreferences>();
         services.TryAddSingleton<ILibVlcSettingsStore>(_ => new LibVlcSettingsStore(Path.GetFullPath(root)));
         services.TryAddSingleton<ILibVlcDirectoryProbe, LibVlcDirectoryProbe>();
         services.TryAddSingleton(provider => new LibVlcRuntimeResolver(
@@ -53,7 +56,8 @@ public static class MusicNetEasePluginServices
         services.TryAddScoped(provider => new MusicWorkspace(provider.GetRequiredService<IMusicCatalogApi>(),
             provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<PlaybackCoordinator>(),
             provider.GetRequiredService<LoginCoordinator>(), provider.GetRequiredService<ILoginUiDispatcher>(),
-            provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>()));
+            provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>(),
+            provider.GetRequiredService<UiPreferences>()));
         return services;
     }
 }

@@ -89,6 +89,43 @@ try {
     $native.measurements[0].decodedFrames=19200; $native | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $nativePath
     [IO.File]::WriteAllBytes((Join-Path $directory 'm1-compact.png'),[byte[]]::new(0))
     Expect-Rejection { Assert-M1Artifacts $directory }; $checks++
+    # V3 必测范围和证据缺项同样必须使门禁失败，避免界面测试提前退出却留下绿色 TRX。
+    $v3MapPath = Join-Path $directory 'v3.json'
+    $v3Map = @{ schemaVersion=1; methods=@{ 'Fixture.Pass'=1 }; scenarios=@{} }
+    $v3Scenarios = @('THEME-AUTO','DOCUMENT-AUTO','TOOL-AUTO','LOGIN-AUTO','MOTION-AUTO','PREFERENCES-AUTO','RESOURCE-AUTO')
+    foreach ($scenario in $v3Scenarios) { $v3Map.scenarios[$scenario] = @('Fixture.Pass') }
+    function Save-V3Map { $v3Map | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $v3MapPath }
+    $m1Trx | Set-Content -LiteralPath $path; Save-V3Map
+    if ((Assert-V3TestMap $path $v3MapPath).scenarios -ne 7) { throw '正确 V3 映射被拒绝。' }; $checks++
+    foreach ($scenario in $v3Scenarios) {
+        $v3Map.scenarios.Remove($scenario); Save-V3Map
+        Expect-Rejection { Assert-V3TestMap $path $v3MapPath }; $checks++
+        $v3Map.scenarios[$scenario] = @('Fixture.Pass')
+    }
+    $v3Map.methods['Fixture.Pass']=2; Save-V3Map
+    Expect-Rejection { Assert-V3TestMap $path $v3MapPath }; $checks++
+    foreach ($name in (Get-V3ScreenshotNames)) { [IO.File]::WriteAllBytes((Join-Path $directory $name),$png) }
+    $motionPath = Join-Path $directory 'v3-motion-observation.json'
+    $motion = @{ schemaVersion=1; environment='fixture'; realHost=$false; frameTimeMeasured=$false; detachedViews=40; retainedViews=0;
+        samples=@(foreach ($reduced in @($false,$true)) { foreach ($scenario in @('idle','playing','hidden')) {
+            @{reducedMotion=$reduced; scenario=$scenario; wallMilliseconds=500; cpuMilliseconds=0; allocatedBytes=0; activeFadeAfter=$false}
+        } }) }
+    function Save-Motion { $motion | ConvertTo-Json -Depth 6 | Set-Content -LiteralPath $motionPath }
+    Save-Motion; Assert-V3Artifacts $directory; $checks++
+    foreach ($name in @('realHost','frameTimeMeasured')) {
+        $motion[$name]=$true; Save-Motion; Expect-Rejection { Assert-V3Artifacts $directory }; $checks++; $motion[$name]=$false
+    }
+    $motion.retainedViews=1; Save-Motion; Expect-Rejection { Assert-V3Artifacts $directory }; $checks++; $motion.retainedViews=0
+    $motion.samples[0].activeFadeAfter=$true; Save-Motion; Expect-Rejection { Assert-V3Artifacts $directory }; $checks++; $motion.samples[0].activeFadeAfter=$false
+    $motion.samples[0].wallMilliseconds=1; Save-Motion; Expect-Rejection { Assert-V3Artifacts $directory }; $checks++; $motion.samples[0].wallMilliseconds=500
+    $motion.samples[0].scenario='missing'; Save-Motion; Expect-Rejection { Assert-V3Artifacts $directory }; $checks++; $motion.samples[0].scenario='idle'; Save-Motion
+    foreach ($name in (Get-V3ScreenshotNames)) {
+        [IO.File]::WriteAllBytes((Join-Path $directory $name),[byte[]]::new(0))
+        Expect-Rejection { Assert-V3Artifacts $directory }; $checks++
+        [IO.File]::WriteAllBytes((Join-Path $directory $name),$png)
+    }
+    Remove-Item -LiteralPath $motionPath
+    Expect-Rejection { Assert-V3Artifacts $directory }; $checks++
     Write-Host "门禁自测通过：$checks 项判定。"
 }
 finally {

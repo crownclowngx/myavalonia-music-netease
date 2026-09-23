@@ -1,0 +1,46 @@
+{
+  "schemaVersion": 1,
+  "methods": {
+    "MusicNetEasePlugin.Tests.DesktopUiTests.真实Document主题尺寸与播放区域验证": 2,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.真实Tool宽窄布局和主题切换保留草稿": 2,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.登录区深浅主题保留二维码白底与操作": 2,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲": 1,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.动效开关成本对照与已脱离视图可回收": 1,
+    "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立": 1,
+    "MusicNetEasePlugin.Tests.UiPreferencesTests.偏好独立原子保存且取消不覆盖旧文件": 1,
+    "MusicNetEasePlugin.Tests.UiPreferencesTests.损坏或未知版本保留原文件并给出读取反馈": 4,
+    "MusicNetEasePlugin.Tests.UiPreferencesTests.迟到读取不能覆盖用户选择且读取只执行一次": 1,
+    "MusicNetEasePlugin.Tests.UiPreferencesTests.快速修改串行保存且失败不撤销本次减少动效": 1
+  },
+  "scenarios": {
+    "THEME-AUTO": [
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Document主题尺寸与播放区域验证",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Tool宽窄布局和主题切换保留草稿",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立"
+    ],
+    "DOCUMENT-AUTO": [
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Document主题尺寸与播放区域验证"
+    ],
+    "TOOL-AUTO": [
+      "MusicNetEasePlugin.Tests.DesktopUiTests.真实Tool宽窄布局和主题切换保留草稿"
+    ],
+    "LOGIN-AUTO": [
+      "MusicNetEasePlugin.Tests.DesktopUiTests.登录区深浅主题保留二维码白底与操作"
+    ],
+    "MOTION-AUTO": [
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效开关成本对照与已脱离视图可回收"
+    ],
+    "PREFERENCES-AUTO": [
+      "MusicNetEasePlugin.Tests.UiPreferencesTests.偏好独立原子保存且取消不覆盖旧文件",
+      "MusicNetEasePlugin.Tests.UiPreferencesTests.损坏或未知版本保留原文件并给出读取反馈",
+      "MusicNetEasePlugin.Tests.UiPreferencesTests.迟到读取不能覆盖用户选择且读取只执行一次",
+      "MusicNetEasePlugin.Tests.UiPreferencesTests.快速修改串行保存且失败不撤销本次减少动效",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效随祖先隐藏最小化偏好和重挂收口且不停止歌曲"
+    ],
+    "RESOURCE-AUTO": [
+      "MusicNetEasePlugin.Tests.DesktopUiTests.动效开关成本对照与已脱离视图可回收",
+      "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立"
+    ]
+  }
+}

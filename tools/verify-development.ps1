@@ -1,6 +1,6 @@
 #requires -Version 7.0
 [CmdletBinding()]
-param([ValidateSet('Login', 'M1')][string]$Milestone = 'M1')
+param([ValidateSet('Login', 'M1', 'V3')][string]$Milestone = 'V3')
 $ErrorActionPreference = 'Stop'
 . (Join-Path $PSScriptRoot 'DevelopmentChecks.ps1')
 $root = [IO.Path]::GetFullPath((Join-Path $PSScriptRoot '..'))
@@ -17,9 +17,14 @@ try {
     Invoke-CheckedProcess 'dotnet' @('test', 'tests/MusicNetEasePlugin.Tests/MusicNetEasePlugin.Tests.csproj', '-c', 'Debug', '--no-build', '--no-restore', '--logger', 'trx;LogFileName=netease-login-development.trx', '--results-directory', $results) $root 180
     $passed = Assert-DevelopmentTrx (Join-Path $results 'netease-login-development.trx') $started $results
     $coverage = $null
-    if ($Milestone -eq 'M1') {
+    if ($Milestone -in @('M1','V3')) {
         $coverage = Assert-M1TestMap (Join-Path $results 'netease-login-development.trx') (Join-Path $PSScriptRoot 'm1-test-map.json')
         Assert-M1Artifacts $results
+    }
+    $uiCoverage = $null
+    if ($Milestone -eq 'V3') {
+        $uiCoverage = Assert-V3TestMap (Join-Path $results 'netease-login-development.trx') (Join-Path $PSScriptRoot 'v3-test-map.json')
+        Assert-V3Artifacts $results
     }
     Assert-MarkdownLinks $root
     Invoke-CheckedProcess 'git' @('diff', '--check') $root
@@ -30,9 +35,9 @@ try {
     @{ runId = $runId; revision = $revision; workingTreeDirty = $dirty; testsPassed = $passed;
         startedUtc = $started.ToString('o'); completedUtc = [datetimeoffset]::UtcNow.ToString('o');
         machine = [Runtime.InteropServices.RuntimeInformation]::OSDescription;
-        milestone = $Milestone; scenarioCoverage = $coverage;
+        milestone = $Milestone; scenarioCoverage = $coverage; uiScenarioCoverage = $uiCoverage;
         realAccountVerified = $false; audibleOutputVerified = $false; hostVerified = $false; releaseGateExecuted = $false } |
-        ConvertTo-Json | Set-Content (Join-Path $results 'verification.json') -Encoding utf8
+        ConvertTo-Json -Depth 6 | Set-Content (Join-Path $results 'verification.json') -Encoding utf8
     Write-Host "本地开发门禁通过：$passed 项测试；证据目录 $results"
 }
 finally { $env:NETEASE_TEST_ARTIFACTS = $previousArtifacts }

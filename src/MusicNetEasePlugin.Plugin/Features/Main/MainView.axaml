@@ -1,67 +1,65 @@
-<UserControl
-    x:Class="MusicNetEasePlugin.Features.Main.MainView"
-    xmlns="https://github.com/avaloniaui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:vm="using:MusicNetEasePlugin.Features.Main"
-    xmlns:music="using:MusicNetEasePlugin.Features.Music"
-    x:DataType="vm:MainDocument">
-  <ScrollViewer Background="#F5F6F8">
-    <StackPanel Margin="32" Spacing="22" MaxWidth="820" HorizontalAlignment="Center">
-      <StackPanel Spacing="6">
-        <TextBlock Text="网易云音乐" FontSize="28" FontWeight="SemiBold" Foreground="#17202E" />
-        <TextBlock Text="连接你的账号，让音乐回到日常。" Foreground="#667085" />
-      </StackPanel>
-      <Border Background="White" CornerRadius="16" Padding="28" BorderBrush="#E6E8EC" BorderThickness="1">
-        <StackPanel Spacing="20">
-          <Grid ColumnDefinitions="Auto,*">
-            <Border Width="56" Height="56" CornerRadius="28" Background="#FFF0F1" ClipToBounds="True">
-              <Grid>
-                <TextBlock Text="云" FontSize="24" Foreground="#D92D40" HorizontalAlignment="Center" VerticalAlignment="Center" />
-                <Image x:Name="AvatarImage" Stretch="UniformToFill" />
-              </Grid>
-            </Border>
-            <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center" Spacing="4">
-              <TextBlock Text="{Binding AccountName}" Foreground="#17202E" FontSize="20" FontWeight="SemiBold" />
-              <TextBlock Text="{Binding AccountId}" Foreground="#667085" />
-            </StackPanel>
-          </Grid>
-          <StackPanel IsVisible="{Binding !IsSignedIn}" Spacing="14" HorizontalAlignment="Center">
-            <Border Width="248" Height="248" Background="White" BorderBrush="#E6E8EC" BorderThickness="1" CornerRadius="12" Padding="12">
-              <Grid>
-                <TextBlock Text="点击下方按钮获取二维码" Foreground="#98A2B3" TextWrapping="Wrap"
-                           HorizontalAlignment="Center" VerticalAlignment="Center" />
-                <Image x:Name="QrImage" Stretch="Uniform" />
-              </Grid>
-            </Border>
-            <TextBlock Text="{Binding QrInstruction}" Foreground="#667085" TextWrapping="Wrap" />
-            <WrapPanel HorizontalAlignment="Center">
-              <Button Content="微信扫码登录 / 更新" Command="{Binding StartLoginCommand}" Margin="4"
-                      Background="#07A35A" Foreground="White" Padding="18,10" />
-              <Button Content="网易云 App 扫码" Command="{Binding StartNeteaseLoginCommand}" Margin="4" Padding="18,10" />
-              <Button Content="取消" Command="{Binding CancelLoginCommand}" Margin="4" Padding="18,10" />
-              <Button Content="重试恢复" Command="{Binding RestoreCommand}" Margin="4" Padding="18,10" />
-            </WrapPanel>
-          </StackPanel>
-          <StackPanel IsVisible="{Binding IsSignedIn}" Spacing="12">
-            <TextBlock Text="账号已连接" Foreground="#067647" FontSize="18" />
-            <TextBlock Text="{Binding SessionHint}" Foreground="#667085" TextWrapping="Wrap" />
-            <Button IsVisible="{Binding NeedsSaveRetry}" Content="重试保存登录信息" Command="{Binding RetrySaveCommand}" />
-          </StackPanel>
-          <Border Background="#F8F9FB" CornerRadius="8" Padding="14">
-            <StackPanel Spacing="8">
-              <ProgressBar IsVisible="{Binding IsBusy}" IsIndeterminate="True" Height="3" />
-              <TextBlock Text="{Binding StatusMessage}" Foreground="#344054" TextWrapping="Wrap" />
-              <TextBlock IsVisible="{Binding NeedsCleanup}" Text="仍有未清除的本地登录信息，请重试清除。" Foreground="#B42318" TextWrapping="Wrap" />
-            </StackPanel>
-          </Border>
-          <Button Content="退出 / 清除本地登录信息" Command="{Binding LogoutCommand}" HorizontalAlignment="Right" />
-        </StackPanel>
-      </Border>
-      <Border IsVisible="{Binding IsSignedIn}" Background="White" CornerRadius="16" Padding="24">
-        <music:MusicView DataContext="{Binding Music}" />
-      </Border>
-      <TextBlock Text="登录信息仅保存在当前用户的数据目录。关闭页面不会退出已连接的账号。"
-                 Foreground="#98A2B3" TextWrapping="Wrap" FontSize="12" />
+<UserControl x:Class="MusicNetEasePlugin.Features.Main.MainView" x:Name="MainRoot"
+ xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Main" xmlns:music="using:MusicNetEasePlugin.Features.Music"
+ xmlns:conv="using:Avalonia.Data.Converters" x:DataType="vm:MainDocument"
+ Background="{DynamicResource NeteaseDocumentBackgroundBrush}" Foreground="{DynamicResource NeteaseTextBrush}" FontSize="13">
+ <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
+  <ResourceInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseThemeResources.axaml" />
+ </ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
+ <UserControl.Styles><StyleInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseControlStyles.axaml" /></UserControl.Styles>
+ <Grid RowDefinitions="Auto,Auto,*">
+  <Border Classes="netease-divider" Padding="12,6">
+   <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+    <TextBlock Text="网易云音乐" FontSize="16" FontWeight="SemiBold" VerticalAlignment="Center" />
+    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+     <Border Width="24" Height="24" CornerRadius="12" ClipToBounds="True" IsVisible="{Binding IsSignedIn}" Background="{DynamicResource NeteasePanelBrush}" VerticalAlignment="Center">
+      <Grid><TextBlock Text="云" HorizontalAlignment="Center" VerticalAlignment="Center" Foreground="{DynamicResource NeteaseAccentBrush}" /><Image x:Name="AvatarImage" Stretch="UniformToFill" /></Grid>
+     </Border>
+     <TextBlock x:Name="AccountSummary" Text="{Binding AccountName}" MaxWidth="160" TextTrimming="CharacterEllipsis" IsVisible="{Binding IsSignedIn}" VerticalAlignment="Center" ToolTip.Tip="{Binding AccountId}" />
+     <Button Classes="netease-button" Classes.netease-motion="{Binding #MainRoot.Motion.IsEnabled}" Content="账号" AutomationProperties.Name="账号操作">
+      <Button.Flyout><MenuFlyout>
+       <MenuItem Header="恢复登录" Command="{Binding RestoreCommand}" />
+       <MenuItem Header="重试保存登录信息" Command="{Binding RetrySaveCommand}" IsVisible="{Binding NeedsSaveRetry}" />
+       <Separator />
+       <MenuItem Header="退出 / 清除本地登录信息" Command="{Binding LogoutCommand}" />
+      </MenuFlyout></Button.Flyout>
+     </Button>
     </StackPanel>
+   </Grid>
+  </Border>
+  <Border Grid.Row="1" Padding="12,6" Background="{DynamicResource NeteasePanelBrush}" IsVisible="{Binding NeedsSaveRetry}">
+   <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+    <TextBlock Text="{Binding SessionHint}" TextWrapping="Wrap" VerticalAlignment="Center" Foreground="{DynamicResource NeteaseWarningBrush}" />
+    <Button Grid.Column="1" Classes="netease-button" Content="重试保存" Command="{Binding RetrySaveCommand}" />
+   </Grid>
+  </Border>
+  <!-- 未登录只滚动登录主体；已登录的音乐区始终获得有限高度，列表与播放条分别布局。 -->
+  <ScrollViewer Grid.Row="2" IsVisible="{Binding !IsSignedIn}" HorizontalScrollBarVisibility="Disabled">
+   <Grid x:Name="LoginLayout" ColumnDefinitions="224,*" RowDefinitions="Auto,Auto" Margin="20,24" ColumnSpacing="24" RowSpacing="16" MaxWidth="760" HorizontalAlignment="Stretch">
+    <Border x:Name="QrSurface" Width="224" Height="224" Padding="12" Background="White" CornerRadius="4" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="1" VerticalAlignment="Top">
+     <!-- 二维码与静区必须保持黑白图像；白底只限此处，不能扩展到登录面板。 -->
+     <Grid><TextBlock Text="选择扫码方式" Foreground="#606060" HorizontalAlignment="Center" VerticalAlignment="Center" /><Image x:Name="QrImage" Stretch="Uniform" /></Grid>
+    </Border>
+    <StackPanel x:Name="LoginDetails" Grid.Column="1" Spacing="10" VerticalAlignment="Center">
+     <TextBlock Text="连接音乐账号" FontSize="18" FontWeight="SemiBold" />
+     <TextBlock Classes="netease-secondary" Text="{Binding QrInstruction}" TextWrapping="Wrap" />
+     <WrapPanel>
+      <Button Classes="netease-button primary" Classes.netease-motion="{Binding #MainRoot.Motion.IsEnabled}" Content="微信扫码登录 / 更新" Command="{Binding StartLoginCommand}" Margin="0,0,6,6" />
+      <Button Classes="netease-button" Classes.netease-motion="{Binding #MainRoot.Motion.IsEnabled}" Content="网易云 App 扫码" Command="{Binding StartNeteaseLoginCommand}" Margin="0,0,0,6" />
+     </WrapPanel>
+     <StackPanel Orientation="Horizontal" Spacing="6">
+      <Button Classes="netease-button" Content="取消" Command="{Binding CancelLoginCommand}" IsVisible="{Binding IsBusy}" />
+      <Button Classes="netease-button" Content="重试恢复" Command="{Binding RestoreCommand}" />
+     </StackPanel>
+     <ProgressBar Height="3" IsVisible="{Binding IsBusy}">
+      <ProgressBar.IsIndeterminate><MultiBinding Converter="{x:Static conv:BoolConverters.And}"><Binding Path="IsBusy" /><Binding ElementName="MainRoot" Path="Motion.IsEnabled" /></MultiBinding></ProgressBar.IsIndeterminate>
+     </ProgressBar>
+     <TextBlock x:Name="LoginStatus" Text="{Binding StatusMessage}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+     <TextBlock Text="仍有未清除的本地登录信息，可从账号菜单重试清除。" IsVisible="{Binding NeedsCleanup}" TextWrapping="Wrap" Foreground="{DynamicResource NeteaseErrorBrush}" />
+     <TextBlock Classes="netease-secondary" Text="登录信息仅保存在当前用户目录。关闭页面不会退出账号。" TextWrapping="Wrap" />
+    </StackPanel>
+   </Grid>
   </ScrollViewer>
+  <Border Grid.Row="2" IsVisible="{Binding IsSignedIn}"><music:MusicView x:Name="MusicContent" DataContext="{Binding Music}" /></Border>
+ </Grid>
 </UserControl>

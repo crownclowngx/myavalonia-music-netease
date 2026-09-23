@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MusicNetEasePlugin.Application.Authentication;
 using MyAvaloniaManagement.PluginSdk;
+using MusicNetEasePlugin.Application.Appearance;
 
 namespace MusicNetEasePlugin.Features.Main;
 
@@ -31,9 +32,10 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     private DocumentPresentationState _presentation = new("网易云音乐");
 
     public MainDocument(LoginCoordinator login, ILoginUiDispatcher dispatcher, IAccountImageSource images, IDocumentLifetime lifetime,
-        Music.MusicWorkspace? music = null)
+        Music.MusicWorkspace? music = null, UiPreferences? preferences = null)
     {
         Music = music;
+        Preferences = preferences;
         (_login, _dispatcher, _images) = (login, dispatcher, images);
         StartLoginCommand = new AsyncRelayCommand(() => _login.StartAsync(_owner, _closing.Token),
             CanStart,
@@ -55,6 +57,7 @@ public sealed class MainDocument : ObservableObject, IPluginDocument, IDisposabl
     }
 
     public DocumentPresentationState Presentation => _presentation;
+    public UiPreferences? Preferences { get; }
     public event EventHandler? PresentationChanged;
     public IAsyncRelayCommand StartLoginCommand { get; }
     public IAsyncRelayCommand StartNeteaseLoginCommand { get; }

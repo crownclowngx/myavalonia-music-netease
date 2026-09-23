@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using MusicNetEasePlugin.Application.Authentication;
 using MusicNetEasePlugin.Application.Playback;
 using MyAvaloniaManagement.PluginSdk;
+using MusicNetEasePlugin.Application.Appearance;
 
 namespace MusicNetEasePlugin.Features.Music;
 
@@ -44,10 +45,11 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     private MusicTrack? _selected;
     private PlaybackSnapshot _snapshot = new(0, PlaybackState.Idle);
     public MusicWorkspace(IMusicCatalogApi catalog, IMusicSessionAccessor sessions, PlaybackCoordinator playback,
-        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null)
+        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null)
     {
         (_catalog, _sessions, _playback, _login, _ui) = (catalog, sessions, playback, login, ui);
         _images = images;
+        Preferences = preferences;
         SearchCommand = new AsyncRelayCommand(() => SearchAsync(0, Keyword), AsyncRelayCommandOptions.AllowConcurrentExecutions);
         NextCommand = new AsyncRelayCommand(() => SearchAsync(_offset + 30, _searchedKeyword), () => HasMore && !IsLoading);
         PreviousCommand = new AsyncRelayCommand(() => SearchAsync(Math.Max(0, _offset - 30), _searchedKeyword), () => _offset > 0 && !IsLoading);
@@ -62,6 +64,8 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         _lifetime = lifetime.ClosingToken.Register(Close);
     }
     public ObservableCollection<MusicTrack> Tracks { get; } = [];
+    public UiPreferences? Preferences { get; }
+    public bool IsPaused => _snapshot.State == PlaybackState.Paused;
     public string Keyword { get => _keyword; set => SetProperty(ref _keyword, value); }
     public MusicTrack? SelectedTrack { get => _selected; set { if (SetProperty(ref _selected, value)) PlayCommand.NotifyCanExecuteChanged(); } }
     public string SearchMessage { get => _message; private set => SetProperty(ref _message, value); }
@@ -158,7 +162,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         var coverChanged = _snapshot.Track?.Id != snapshot.Track?.Id || _snapshot.Track?.Cover != snapshot.Track?.Cover;
         _snapshot = snapshot;
         if (coverChanged) StartCover(snapshot.Track?.Cover);
-        foreach (var name in new[] { nameof(CurrentTrack), nameof(Album), nameof(PlaybackMessage), nameof(StateText), nameof(IsTrial), nameof(PositionText), nameof(Progress), nameof(Volume) })
+        foreach (var name in new[] { nameof(CurrentTrack), nameof(Album), nameof(PlaybackMessage), nameof(StateText), nameof(IsPaused), nameof(IsTrial), nameof(PositionText), nameof(Progress), nameof(Volume) })
             OnPropertyChanged(name);
         PauseCommand.NotifyCanExecuteChanged(); ResumeCommand.NotifyCanExecuteChanged(); StopCommand.NotifyCanExecuteChanged();
     }

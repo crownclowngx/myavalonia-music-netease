@@ -1,33 +1,52 @@
-<UserControl xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- x:Class="MusicNetEasePlugin.Features.Settings.MusicSettingsView"
- xmlns:vm="using:MusicNetEasePlugin.Features.Settings" x:DataType="vm:MusicSettingsTool">
- <ScrollViewer>
-  <StackPanel Margin="16" Spacing="12">
-   <TextBlock Text="账号与播放设置" FontSize="20" FontWeight="SemiBold" />
-   <TextBlock Text="{Binding AccountText}" TextWrapping="Wrap" />
-   <TextBlock Text="{Binding SessionText}" TextWrapping="Wrap" />
-   <TextBlock Text="扫码登录：从「新建」打开网易云音乐页面。" TextWrapping="Wrap" />
-   <WrapPanel>
-    <Button Content="恢复登录" Command="{Binding RestoreCommand}" Margin="0,0,8,8" />
-    <Button Content="重试保存" Command="{Binding RetrySaveLoginCommand}" Margin="0,0,8,8" />
-    <Button Content="退出账号" Command="{Binding LogoutCommand}" Margin="0,0,8,8" />
-   </WrapPanel>
-   <Separator />
-   <TextBlock Text="LibVLC 运行库目录" FontWeight="SemiBold" />
-   <TextBlock Text="有效内置库优先；也可配置多个插件共用的目录。" TextWrapping="Wrap" />
-   <TextBox Text="{Binding DirectoryPath, Mode=TwoWay}" PlaceholderText="包含 libvlc 和 plugins 的完整目录" />
-   <WrapPanel>
-    <Button Content="选择目录" Click="ChooseDirectory" Margin="0,0,8,8" />
-    <Button Content="检测" Command="{Binding CheckCommand}" Margin="0,0,8,8" />
-    <Button Content="保存" Command="{Binding SaveCommand}" Margin="0,0,8,8" />
-    <Button Content="清空配置" Command="{Binding ClearCommand}" Margin="0,0,8,8" />
-    <Button Content="刷新状态" Command="{Binding ReloadCommand}" Margin="0,0,8,8" />
-   </WrapPanel>
-   <TextBlock Text="已保存的配置目录：" />
-   <SelectableTextBlock Text="{Binding SavedDirectory}" TextWrapping="Wrap" />
-   <SelectableTextBlock Text="{Binding CandidateRuntime}" TextWrapping="Wrap" />
-   <SelectableTextBlock Text="{Binding ActiveRuntime}" TextWrapping="Wrap" />
-   <TextBlock Text="{Binding Message}" TextWrapping="Wrap" />
-  </StackPanel>
+<UserControl x:Class="MusicNetEasePlugin.Features.Settings.MusicSettingsView" x:Name="SettingsRoot"
+ xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Settings" x:DataType="vm:MusicSettingsTool"
+ Background="{DynamicResource NeteaseToolBackgroundBrush}" Foreground="{DynamicResource NeteaseTextBrush}" FontSize="13">
+ <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries>
+  <ResourceInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseThemeResources.axaml" />
+ </ResourceDictionary.MergedDictionaries></ResourceDictionary></UserControl.Resources>
+ <UserControl.Styles><StyleInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseControlStyles.axaml" /></UserControl.Styles>
+ <ScrollViewer HorizontalScrollBarVisibility="Disabled">
+  <Grid x:Name="SettingsLayout" Margin="8" RowDefinitions="Auto,Auto,Auto" ColumnDefinitions="*" RowSpacing="10" ColumnSpacing="16">
+   <StackPanel x:Name="AccountSection" Spacing="6">
+    <Border Classes="netease-divider" Padding="0,0,0,6"><TextBlock Classes="netease-section" Text="账号" /></Border>
+    <TextBlock Text="{Binding AccountText}" TextWrapping="Wrap" />
+    <TextBlock Classes="netease-secondary" Text="{Binding SessionText}" TextWrapping="Wrap" />
+    <StackPanel Orientation="Horizontal" Spacing="6">
+     <Button Classes="netease-button" Classes.netease-motion="{Binding #SettingsRoot.Motion.IsEnabled}" Content="恢复登录" Command="{Binding RestoreCommand}" />
+     <Button Classes="netease-button" Content="重试保存" Command="{Binding RetrySaveLoginCommand}" IsVisible="{Binding NeedsLoginSaveRetry}" />
+     <Button Classes="netease-button" Content="更多" AutomationProperties.Name="更多账号操作"><Button.Flyout><MenuFlyout><MenuItem Header="退出账号" Command="{Binding LogoutCommand}" /></MenuFlyout></Button.Flyout></Button>
+    </StackPanel>
+    <TextBlock Classes="netease-secondary" Text="扫码登录：从「新建」打开网易云音乐。" TextWrapping="Wrap" />
+   </StackPanel>
+   <StackPanel x:Name="RuntimeSection" Grid.Row="1" Spacing="6">
+    <Border Classes="netease-divider" Padding="0,0,0,6"><TextBlock Classes="netease-section" Text="播放运行库" /></Border>
+    <TextBlock Classes="netease-secondary" Text="自定义目录 · 有效内置库优先" TextWrapping="Wrap" />
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+     <TextBox x:Name="DirectoryInput" Classes="netease-input" Text="{Binding DirectoryPath, Mode=TwoWay}" PlaceholderText="LibVLC 目录" AutomationProperties.Name="LibVLC 目录草稿" />
+     <Button Grid.Column="1" Classes="netease-button" Content="…" Click="ChooseDirectory" ToolTip.Tip="选择运行库目录" AutomationProperties.Name="选择运行库目录" />
+    </Grid>
+    <StackPanel Orientation="Horizontal" Spacing="6">
+     <Button x:Name="CheckDirectoryButton" Classes="netease-button" Classes.netease-motion="{Binding #SettingsRoot.Motion.IsEnabled}" Content="检测目录" Command="{Binding CheckCommand}" />
+     <Button x:Name="SaveDirectoryButton" Classes="netease-button primary" Content="保存配置" Command="{Binding SaveCommand}" />
+    </StackPanel>
+    <TextBlock x:Name="SettingsStatus" Text="{Binding Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+    <Border Classes="netease-divider" Padding="0,6"><TextBlock Classes="netease-section" Text="实际状态" /></Border>
+    <TextBlock Classes="netease-secondary" Text="已保存的配置目录" />
+    <SelectableTextBlock Text="{Binding SavedDirectory}" TextWrapping="Wrap" />
+    <SelectableTextBlock x:Name="CandidateStatus" Classes="netease-secondary" Text="{Binding CandidateRuntime}" TextWrapping="Wrap" />
+    <SelectableTextBlock x:Name="ActiveStatus" Text="{Binding ActiveRuntime}" TextWrapping="Wrap" />
+    <StackPanel Orientation="Horizontal" Spacing="6">
+     <Button Classes="netease-button" Content="刷新状态" Command="{Binding ReloadCommand}" />
+     <Button Classes="netease-button" Content="清空配置" Command="{Binding ClearCommand}" />
+    </StackPanel>
+   </StackPanel>
+   <StackPanel x:Name="AppearanceSection" Grid.Row="2" Spacing="4">
+    <Border Classes="netease-divider" Padding="0,0,0,6"><TextBlock Classes="netease-section" Text="界面" /></Border>
+    <CheckBox x:Name="ReduceMotionToggle" Content="减少动态效果" IsChecked="{Binding Preferences.ReduceMotion, Mode=TwoWay}" FontSize="13" MinHeight="28" />
+    <TextBlock Classes="netease-secondary" Text="{Binding Preferences.Message}" TextWrapping="Wrap" />
+    <Button Classes="netease-button" Content="重试保存界面偏好" Command="{Binding Preferences.RetrySaveCommand}" HorizontalAlignment="Left" IsVisible="{Binding Preferences.Message, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+   </StackPanel>
+  </Grid>
  </ScrollViewer>
 </UserControl>

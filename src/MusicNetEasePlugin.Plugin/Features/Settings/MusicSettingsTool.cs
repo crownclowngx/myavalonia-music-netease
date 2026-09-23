@@ -2,6 +2,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using MusicNetEasePlugin.Application.Authentication;
 using MusicNetEasePlugin.Application.Playback;
+using MusicNetEasePlugin.Application.Appearance;
 
 namespace MusicNetEasePlugin.Features.Settings;
 
@@ -30,9 +31,10 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
     private string _candidate = "尚未检查候选运行库。";
     private Task? _initialization;
     public MusicSettingsTool(LoginCoordinator login, ILibVlcSettingsStore store, ILibVlcDirectoryProbe probe,
-        IPlaybackRuntimeStatus runtime, ILoginUiDispatcher ui)
+        IPlaybackRuntimeStatus runtime, ILoginUiDispatcher ui, UiPreferences? preferences = null)
     {
         (_login, _store, _probe, _runtime, _ui) = (login, store, probe, runtime, ui);
+        Preferences = preferences;
         CheckCommand = new AsyncRelayCommand(CheckAsync);
         SaveCommand = new AsyncRelayCommand(() => SaveAsync(false));
         ClearCommand = new AsyncRelayCommand(() => SaveAsync(true));
@@ -45,6 +47,8 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
         ApplyLogin(login.Snapshot);
     }
     public string DirectoryPath { get => _directory; set { if (SetProperty(ref _directory, value ?? "")) Interlocked.Increment(ref _editVersion); } }
+    public UiPreferences? Preferences { get; }
+    public bool NeedsLoginSaveRetry => _login.Snapshot is { Account: not null, Remembered: false };
     internal long DraftVersion => Volatile.Read(ref _editVersion);
     public string SavedDirectory { get => _saved; private set => SetProperty(ref _saved, value); }
     public string Message { get => _message; private set => SetProperty(ref _message, value); }
@@ -143,6 +147,7 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
         _loginRevision = snapshot.Revision;
         AccountText = snapshot.Account is { } account ? $"{account.Nickname} · {account.Id}" : "尚未登录";
         SessionText = snapshot.Message;
+        OnPropertyChanged(nameof(NeedsLoginSaveRetry));
     }
     private void Post(Action action) => _ui.Post(() => { if (!_disposed) action(); });
     public void Dispose()
