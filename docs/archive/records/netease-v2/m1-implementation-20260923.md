@@ -1,8 +1,10 @@
 # V2 / M1 搜索、单曲播放与 LibVLC 设置实现记录
 
+> 后续状态：V1–V4 已于 2026-09-23 根据用户确认完成手工验收，见[验收收口记录](../netease-v1-v4-acceptance-20260923.md)。本文结果和未验收项是当次历史快照，原始证据保持不变。
+
 > 日期：2026-09-23，Windows x64 本地开发。实施起点：`cb061f3`（V2 路径/Tool/Dock 设计），登录基线：`c469f91`；本记录随实现提交，具体提交见 Git 日志。
 > 当前结论：核心功能已实现，自动回归及真实账号 MP3 解码通过；M1 真实扬声器、Standalone 操作、Host/Dock 与双插件共存尚未完成验收。
-> 方案：[V2 主方案](../../../roadmap/netease-v2-m1-playback-plan.md)；契约：[音乐与播放](../../../reference/netease-music-playback.md)；步骤：[快速开始](../../../quick-start/netease-playback.md)。未使用 AIFLOW、Windows CI 或发布门禁。
+> 方案：[V2 主方案](../../plans/netease-v2-m1-playback-plan.md)；契约：[音乐与播放](../../../reference/netease-music-playback.md)；步骤：[快速开始](../../../quick-start/netease-playback.md)。未使用 AIFLOW、Windows CI 或发布门禁。
 
 ## 1. 实际实现
 

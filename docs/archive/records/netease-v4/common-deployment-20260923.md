@@ -1,5 +1,7 @@
 # V4 / M2 开发部署与中间产物清理（2026-09-23）
 
+> 后续状态：V1–V4 已于 2026-09-23 根据用户确认完成手工验收，见[验收收口记录](../netease-v1-v4-acceptance-20260923.md)。本文结果和未验收项是当次历史快照，原始证据保持不变。
+
 > 用户指定目标：`D:\data\avalonia\Controls`，复用 Common 中的 LibVLC。
 > 源码基线：`f2654b248e920874227dc1129abe06856de18d46`。
 > [M2 实施记录](m2-implementation-20260923.md) · [部署说明](../../../maintenance/deployment-and-release.md) · [部署文件摘要](assets/common-deployment.json) · [清理结果与绝对路径](assets/cleanup-result.json)。

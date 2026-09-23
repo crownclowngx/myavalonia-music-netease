@@ -1,9 +1,14 @@
 # V4：M2 日常播放器实施指导
 
-> 更新：2026-09-23。状态：**V4.0–V4.5 功能及 V4.6 完整自动门禁已完成，真实验收单列待完成**。实际结果见[专用实施记录](../archive/records/netease-v4/m2-implementation-20260923.md)。
-> 对应[能力路线图](netease-capability-roadmap.md)“M2：形成可日常使用的播放器”；V4 是实施文档编号，不是插件包版本。
+> 归档收口：2026-09-23，现有 V1–V4 已实现并由用户确认手工验收完成，见[验收收口记录](../records/netease-v1-v4-acceptance-20260923.md)。
+> 下文保留各阶段设计、当时状态与待办快照；不作为当前待实施清单。现行行为以[播放契约](../../reference/netease-music-playback.md)、[日常播放器](../../reference/netease-daily-player.md)和[文档导航](../../README.md)为准；后续候选由[路线图](../../roadmap/netease-capability-roadmap.md)承接。
+
+## 历史方案快照
+
+> 更新：2026-09-23。状态：**V4.0–V4.5 功能及 V4.6 完整自动门禁已完成，真实验收单列待完成**。实际结果见[专用实施记录](../records/netease-v4/m2-implementation-20260923.md)。
+> 对应[能力路线图](../../roadmap/netease-capability-roadmap.md)“M2：形成可日常使用的播放器”；V4 是实施文档编号，不是插件包版本。
 > 源码核对基线：`afb3159`。承接 V2 单曲播放与 V3 桌面界面；M1 听感、真实 Host/Dock 及 V3 剩余实机验收继续保留，不因进入 M2 自动完成。
-> 配套：[V4 / M2 专用开发验证矩阵](../maintenance/netease-v4-m2-daily-player-verification.md)。本文保留实施设计语气；当前落地契约见[日常播放器说明](../reference/netease-daily-player.md)，完成状态由第 13 节和实际证据共同维护。
+> 配套：[V4 / M2 专用开发验证矩阵](../../maintenance/netease-v4-m2-daily-player-verification.md)。本文保留实施设计语气；当前落地契约见[日常播放器说明](../../reference/netease-daily-player.md)，完成状态由第 13 节和实际证据共同维护。
 
 ## 1. 目标与首要规定
 
@@ -35,13 +40,13 @@
 
 | `afb3159` 设计基线事实 | V4 改动及依据（现已实施） |
 | --- | --- |
-| [MusicContracts](../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicContracts.cs) 中 `MusicSession` 有 epoch/version，未携带账号 ID | 在唯一会话提交者锁内捕获已核验 `AccountId` 与 epoch；不能把 UI 的账号字段与另一时刻的会话拼接 |
-| [MusicWorkspace](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicWorkspace.cs) 把页面 `_closing.Token` 交给播放，并在关闭时 `StopAsync(_owner)` | 播放接受后改由账号/插件寿命拥有；页面关闭只取消搜索、浏览、图片和订阅，不能取消已接纳的播放 |
-| [PlaybackCoordinator](../../src/MusicNetEasePlugin.Plugin/Application/Playback/PlaybackCoordinator.cs) 是共享单曲协调器，自然结束只收口 | 保留其单曲执行职责，新增队列协调者决定下一首；终态必须带原播放代次且只消费一次 |
-| [FlurlMediaBuffer](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Media/FlurlMediaBuffer.cs) 完整下载后交付本地文件，64 MiB/120 秒上限 | 优先沿用完整缓冲实现 seek，补进度和有限重试；不把本次目标自动扩大成 Range 流式播放器 |
-| [LibVlcAudioOutput](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Audio/LibVlcAudioOutput.cs) 只有打开/暂停/停止/音量 | 增加可定位能力和带目标代次的定位命令；原生回调仍只上报事实，不重入原生控制 |
-| [服务注册](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs) 已共享播放器；[生命周期](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginLifecycle.cs) 先收口播放后登录 | 新增共享队列及恢复协调；停止前捕获续播位置，等待持久化尾任务，再依序释放单曲、媒体、账号及容器 |
-| [开发入口](../../tools/verify-development.ps1) 在设计基线仅支持 Login/M1/V3 | 已扩展完整 V4 并设为默认；旧 V3 结果不能当作 M2 通过，实际运行记录分别保留 |
+| [MusicContracts](../../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicContracts.cs) 中 `MusicSession` 有 epoch/version，未携带账号 ID | 在唯一会话提交者锁内捕获已核验 `AccountId` 与 epoch；不能把 UI 的账号字段与另一时刻的会话拼接 |
+| [MusicWorkspace](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicWorkspace.cs) 把页面 `_closing.Token` 交给播放，并在关闭时 `StopAsync(_owner)` | 播放接受后改由账号/插件寿命拥有；页面关闭只取消搜索、浏览、图片和订阅，不能取消已接纳的播放 |
+| [PlaybackCoordinator](../../../src/MusicNetEasePlugin.Plugin/Application/Playback/PlaybackCoordinator.cs) 是共享单曲协调器，自然结束只收口 | 保留其单曲执行职责，新增队列协调者决定下一首；终态必须带原播放代次且只消费一次 |
+| [FlurlMediaBuffer](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Media/FlurlMediaBuffer.cs) 完整下载后交付本地文件，64 MiB/120 秒上限 | 优先沿用完整缓冲实现 seek，补进度和有限重试；不把本次目标自动扩大成 Range 流式播放器 |
+| [LibVlcAudioOutput](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Audio/LibVlcAudioOutput.cs) 只有打开/暂停/停止/音量 | 增加可定位能力和带目标代次的定位命令；原生回调仍只上报事实，不重入原生控制 |
+| [服务注册](../../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs) 已共享播放器；[生命周期](../../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginLifecycle.cs) 先收口播放后登录 | 新增共享队列及恢复协调；停止前捕获续播位置，等待持久化尾任务，再依序释放单曲、媒体、账号及容器 |
+| [开发入口](../../../tools/verify-development.ps1) 在设计基线仅支持 Login/M1/V3 | 已扩展完整 V4 并设为默认；旧 V3 结果不能当作 M2 通过，实际运行记录分别保留 |
 
 V4 会有意替换 M1 的“关闭播放所有者停止”契约。实施 V4.2 时同步修改 `SearchDocumentTests`、`PlaybackCoordinatorTests` 和相关映射/当前说明；保留“页面工作被取消、账号退出停止、旧事件失效”的覆盖。V2/V3 历史记录不改写，新记录说明迁移原因。
 
@@ -240,12 +245,12 @@ git diff --check
 
 | 随实施同步的文档 | 要更新的事实 |
 | --- | --- |
-| [路线图](netease-capability-roadmap.md)、[总导航](../README.md)、[项目首页](../../README.md) | V4 阶段、真实已实现能力和入口 |
-| [播放当前契约](../reference/netease-music-playback.md)、[HTTP 与会话](../reference/netease-http-session.md) | 队列/定位/失败/恢复规则，新端点与预算、AccountId/epoch |
-| [界面当前契约](../reference/netease-desktop-ui.md)、[窗口职责](../reference/project-and-window-responsibilities.md) | 新界面、关闭继续播放、最终释放和 Standalone 差异 |
-| [播放快速开始](../quick-start/netease-playback.md) | 我的歌单、模式、歌词、队列、暂停恢复、排错与限制 |
-| [M1 矩阵](../maintenance/netease-v2-m1-playback-verification.md)、[V3 矩阵](../maintenance/netease-v3-ui-verification.md)、[V4 矩阵](../maintenance/netease-v4-m2-daily-player-verification.md) | 旧语义迁移、新场景映射、自动/人工边界与未完成项 |
-| 专用记录（实施时新建） | `docs/archive/records/netease-v4/m2-implementation-YYYYMMDD.md`；源码基线、阶段、实际命令、TRX、脱敏截图/解码数据、失败及未执行项；同步[归档索引](../archive/README.md) |
+| [路线图](../../roadmap/netease-capability-roadmap.md)、[总导航](../../README.md)、[项目首页](../../../README.md) | V4 阶段、真实已实现能力和入口 |
+| [播放当前契约](../../reference/netease-music-playback.md)、[HTTP 与会话](../../reference/netease-http-session.md) | 队列/定位/失败/恢复规则，新端点与预算、AccountId/epoch |
+| [界面当前契约](../../reference/netease-desktop-ui.md)、[窗口职责](../../reference/project-and-window-responsibilities.md) | 新界面、关闭继续播放、最终释放和 Standalone 差异 |
+| [播放快速开始](../../quick-start/netease-playback.md) | 我的歌单、模式、歌词、队列、暂停恢复、排错与限制 |
+| [M1 矩阵](../../maintenance/netease-v2-m1-playback-verification.md)、[V3 矩阵](../../maintenance/netease-v3-ui-verification.md)、[V4 矩阵](../../maintenance/netease-v4-m2-daily-player-verification.md) | 旧语义迁移、新场景映射、自动/人工边界与未完成项 |
+| 专用记录（实施时新建） | `docs/archive/records/netease-v4/m2-implementation-YYYYMMDD.md`；源码基线、阶段、实际命令、TRX、脱敏截图/解码数据、失败及未执行项；同步[归档索引](../README.md) |
 
 不预建假执行记录，不填写预计测试数量为通过数量。方案、当前实现、验证矩阵与专用记录随各阶段同步；实机未执行项不因代码完成而勾选。
 

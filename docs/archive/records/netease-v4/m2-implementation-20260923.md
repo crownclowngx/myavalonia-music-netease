@@ -1,6 +1,8 @@
 # V4 / M2 实施与开发验证记录（2026-09-23）
 
-> 实施依据：[V4 方案](../../../roadmap/netease-v4-m2-daily-player-plan.md)与[专用矩阵](../../../maintenance/netease-v4-m2-daily-player-verification.md)。按阶段独立提交；本记录随当日工作追加。
+> 后续状态：V1–V4 已于 2026-09-23 根据用户确认完成手工验收，见[验收收口记录](../netease-v1-v4-acceptance-20260923.md)。本文结果和未验收项是当次历史快照，原始证据保持不变。
+
+> 实施依据：[V4 方案](../../plans/netease-v4-m2-daily-player-plan.md)与[专用矩阵](../../../maintenance/netease-v4-m2-daily-player-verification.md)。按阶段独立提交；本记录随当日工作追加。
 > 仅本地开发验证，不使用 AIFLOW、Windows CI、发布门禁或部署。
 
 ## V4.0：接口与定位技术基线

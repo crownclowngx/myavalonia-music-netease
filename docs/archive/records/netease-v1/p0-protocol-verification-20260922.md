@@ -1,5 +1,7 @@
 # 网易登录 P0：协议与 Flurl 最小验证
 
+> 后续状态：V1–V4 已于 2026-09-23 根据用户确认完成手工验收，见[验收收口记录](../netease-v1-v4-acceptance-20260923.md)。本文结果和未验收项是当次历史快照，原始证据保持不变。
+
 > 日期：2026-09-22；状态：首批自动验证与未登录联网探针已完成，授权后真实账号验证未执行。
 > 实施起点：38d77ff6ccfea145448450c80e70a7779346f40a；上游固定提交：a8c781fd64faab17fedfd46e0615a2609307f163。
 > 配套：[实施计划](../../plans/netease-v1-flurl-login-plan.md)、[专用矩阵](../../../maintenance/netease-login-verification.md)。

@@ -1,10 +1,15 @@
 # 网易云音乐 V3：Document / Tool 紧凑桌面布局、深浅主题与轻量动效改造方案
 
+> 归档收口：2026-09-23，现有 V1–V4 已实现并由用户确认手工验收完成，见[验收收口记录](../records/netease-v1-v4-acceptance-20260923.md)。
+> 下文保留各阶段设计、当时状态与待办快照；不作为当前待实施清单。现行行为以[播放契约](../../reference/netease-music-playback.md)、[日常播放器](../../reference/netease-daily-player.md)和[文档导航](../../README.md)为准；后续候选由[路线图](../../roadmap/netease-capability-roadmap.md)承接。
+
+## 历史方案快照
+
 > 对象：仅 `MusicNetEasePlugin` 的音乐 Document、账号与播放设置 Tool，以及复用它们的 Standalone。
 > 状态：V3 核心实现及本地自动验证完成；真实 Host/Dock、系统主题联动、缩放与硬件性能验收待完成。实施状态见第 10 节。
 > 创建日期：2026-09-23。调研基线：`3018bb30ea6152fa4f7addf312540aad99df395e`；编写前本插件工作树干净。
 > 编号：承接 V1 登录、V2 搜索与单曲播放，采用 **V3**；属于改造序号，不修改插件包、SDK 或能力里程碑编号。
-> 关联：[当前播放契约](../reference/netease-music-playback.md) · [V2 运行库、Tool 与 Dock 设计](netease-v2-libvlc-tool-and-dock-design.md) · [能力路线图](netease-capability-roadmap.md)。
+> 关联：[当前播放契约](../../reference/netease-music-playback.md) · [V2 运行库、Tool 与 Dock 设计](netease-v2-libvlc-tool-and-dock-design.md) · [能力路线图](../../roadmap/netease-capability-roadmap.md)。
 
 **本轮目标：把音乐 Document 改成紧凑、现代的桌面播放器，把 Tool 改成紧凑的属性设置面板，两者随 Host 的深色、浅色主题即时切换，并用少量短动画反馈交互。** 现代感来自清晰层次、统一密度和及时反馈；动效必须具有明确用途，并在静止或隐藏时停止消耗装饰性渲染资源。
 
@@ -12,21 +17,21 @@
 
 ### 1.1 改造前源码事实（基线 3018bb3）
 
-以下描述改造前问题，链接指向当前文件便于对照；现行行为以[当前界面契约](../reference/netease-desktop-ui.md)为准。
+以下描述改造前问题，链接指向当前文件便于对照；现行行为以[当前界面契约](../../reference/netease-desktop-ui.md)为准。
 
 | 位置 | 当前实现 | 影响与改造判断 |
 | --- | --- | --- |
-| [MainView.axaml](../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml) | 根 `ScrollViewer Background="#F5F6F8"`；账号卡片和包住 `MusicView` 的卡片均为 `Background="White"` | **确实存在公共的浅色外层，但它在本插件 Document 内。** 即使内部控件跟随深色主题，外层仍是浅色 |
+| [MainView.axaml](../../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml) | 根 `ScrollViewer Background="#F5F6F8"`；账号卡片和包住 `MusicView` 的卡片均为 `Background="White"` | **确实存在公共的浅色外层，但它在本插件 Document 内。** 即使内部控件跟随深色主题，外层仍是浅色 |
 | 同一 MainView | `Margin="32"`、`MaxWidth="820"`、水平居中；卡片圆角 16、内边距 24–28；标题字号 28 | 宽工作区仍显示居中窄栏，账号区占据首屏，内容像手机登录页或网页卡片 |
 | 同一 MainView | 正文、说明、状态文字分别固定为 `#17202E`、`#667085`、`#344054` 等 | 只替换背景会留下深色文字；必须成组处理背景、文字、边框和状态色 |
-| [MusicView.axaml](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) | 整体 `StackPanel`；搜索结果固定高 260；每首歌三行；封面、歌名、专辑、进度、按钮、音量继续纵向排列 | 高窗口没有用于增加结果区域；主要播放操作可能落到外层滚动区域下方 |
+| [MusicView.axaml](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) | 整体 `StackPanel`；搜索结果固定高 260；每首歌三行；封面、歌名、专辑、进度、按钮、音量继续纵向排列 | 高窗口没有用于增加结果区域；主要播放操作可能落到外层滚动区域下方 |
 | 同一 MusicView | 试听文字固定 `#B54708`，封面占位底色固定 `#18777777` | 深色下的状态对比度与占位层次需要单独处理 |
-| [MusicSettingsView.axaml](../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsView.axaml) | `ScrollViewer + StackPanel`，边距 16、间距 12、标题字号 20，多组 `WrapPanel` 按钮和长路径文字 | **没有发现与 Document 相同的白色根背景。** Tool 主要需要紧凑分区、操作分组和宽度适配，不能套用同一个根因 |
-| [Standalone App](../../src/MusicNetEasePlugin.Standalone/App.axaml) | 仅加载 `FluentTheme`，没有插件双色资源 | 当前预览不能证明插件已经正确处理自定义背景和状态色 |
+| [MusicSettingsView.axaml](../../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsView.axaml) | `ScrollViewer + StackPanel`，边距 16、间距 12、标题字号 20，多组 `WrapPanel` 按钮和长路径文字 | **没有发现与 Document 相同的白色根背景。** Tool 主要需要紧凑分区、操作分组和宽度适配，不能套用同一个根因 |
+| [Standalone App](../../../src/MusicNetEasePlugin.Standalone/App.axaml) | 仅加载 `FluentTheme`，没有插件双色资源 | 当前预览不能证明插件已经正确处理自定义背景和状态色 |
 
 在本插件生产源码中未发现强制 `RequestedThemeVariant="Light"` 或设置全局主题的代码。固定颜色不会阻止主题传播，但会让对应区域的颜色不随主题变化；部分默认控件变深、外层仍浅时，还会形成混搭。
 
-作为只读核对，Host 的 [App.axaml](../../../../avalonia_dock_simple_test/Host/MyAvaloniaManagement/App.axaml) 已有 Light / Dark 资源和 Dock 双色预设，[ApplicationThemeService](../../../../avalonia_dock_simple_test/Host/MyAvaloniaManagement/Business/Appearance/ApplicationThemeService.cs) 会设置应用主题。本轮有充分依据先修插件自身；尚未用当前部署产物做运行时截图与资源来源检查，不能宣称排除了所有 Host 或部署因素。
+作为只读核对，Host 的 [App.axaml](../../../../../avalonia_dock_simple_test/Host/MyAvaloniaManagement/App.axaml) 已有 Light / Dark 资源和 Dock 双色预设，[ApplicationThemeService](../../../../../avalonia_dock_simple_test/Host/MyAvaloniaManagement/Business/Appearance/ApplicationThemeService.cs) 会设置应用主题。本轮有充分依据先修插件自身；尚未用当前部署产物做运行时截图与资源来源检查，不能宣称排除了所有 Host 或部署因素。
 
 ### 1.2 改造优先级
 
@@ -230,14 +235,14 @@ Avalonia 官方说明支持以主题字典和动态资源响应主题变化；�
 
 | 文件/区域 | 改造职责 |
 | --- | --- |
-| [MainView](../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml) 及其 code-behind | Document 壳、紧凑账号摘要和登录区；移除固定浅色容器；维护二维码与头像位图订阅 |
-| [MusicView](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) 及其 code-behind | 弹性结果区域、列式列表与底部播放条；保留封面释放及搜索回车行为 |
-| [MusicSettingsView](../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsView.axaml) 及其 code-behind | 分组、目录编辑与真实状态展示；保留文件选择器的挂载代次、模型身份与草稿版本校验 |
+| [MainView](../../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml) 及其 code-behind | Document 壳、紧凑账号摘要和登录区；移除固定浅色容器；维护二维码与头像位图订阅 |
+| [MusicView](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) 及其 code-behind | 弹性结果区域、列式列表与底部播放条；保留封面释放及搜索回车行为 |
+| [MusicSettingsView](../../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsView.axaml) 及其 code-behind | 分组、目录编辑与真实状态展示；保留文件选择器的挂载代次、模型身份与草稿版本校验 |
 | `Styles/Netease*.axaml`（已实现） | 局部双色资源、紧凑类样式、少量短过渡；不承担业务状态判断 |
 | 插件 UI 偏好与必要 View 可见性处理（已实现） | 保存单一减少动态效果选项，投影有效开关；隐藏时收口自有动效，不接管播放器寿命 |
-| [MainDocument](../../src/MusicNetEasePlugin.Plugin/Features/Main/MainDocument.cs)、[MusicWorkspace](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicWorkspace.cs)、[MusicSettingsTool](../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsTool.cs) | 仅补必要显示投影，不重写登录、媒体协议、播放所有权或运行库加载规则 |
-| [Standalone MainWindow](../../src/MusicNetEasePlugin.Standalone/MainWindow.axaml) | 预览主题与宽窄尺寸，复用真实 View；不把宽 Tab 页当作窄 Dock Tool 的验收 |
-| [UiCompositionTests](../../tests/MusicNetEasePlugin.Tests/UiCompositionTests.cs)、[PlaybackUiTests](../../tests/MusicNetEasePlugin.Tests/PlaybackUiTests.cs) | 更新真实布局夹具与语义断言，补充主题、尺寸和状态保留覆盖 |
+| [MainDocument](../../../src/MusicNetEasePlugin.Plugin/Features/Main/MainDocument.cs)、[MusicWorkspace](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicWorkspace.cs)、[MusicSettingsTool](../../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsTool.cs) | 仅补必要显示投影，不重写登录、媒体协议、播放所有权或运行库加载规则 |
+| [Standalone MainWindow](../../../src/MusicNetEasePlugin.Standalone/MainWindow.axaml) | 预览主题与宽窄尺寸，复用真实 View；不把宽 Tab 页当作窄 Dock Tool 的验收 |
+| [UiCompositionTests](../../../tests/MusicNetEasePlugin.Tests/UiCompositionTests.cs)、[PlaybackUiTests](../../../tests/MusicNetEasePlugin.Tests/PlaybackUiTests.cs) | 更新真实布局夹具与语义断言，补充主题、尺寸和状态保留覆盖 |
 
 必须维持的行为：
 
@@ -299,7 +304,7 @@ git diff --check
 
 ## 10. 本轮实施状态与取舍
 
-实现提交 `0a491b2`，实际结果见[实施记录](../archive/records/netease-v3/ui-implementation-20260923.md)，可重复方法见[V3 专项验证](../maintenance/netease-v3-ui-verification.md)。
+实现提交 `0a491b2`，实际结果见[实施记录](../records/netease-v3/ui-implementation-20260923.md)，可重复方法见[V3 专项验证](../../maintenance/netease-v3-ui-verification.md)。
 
 | 阶段 | 状态与证据范围 |
 | --- | --- |

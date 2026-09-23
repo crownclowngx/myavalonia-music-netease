@@ -1,7 +1,7 @@
 # Document / Tool 当前界面契约（V3 布局 + V4 播放器）
 
-> 更新：2026-09-23。紧凑布局、双色资源、减少动态效果与本地自动门禁已实现。
-> [改造方案](../roadmap/netease-v3-desktop-ui-and-theme-plan.md) · [专项验证方法](../maintenance/netease-v3-ui-verification.md) · [当次实施记录](../archive/records/netease-v3/ui-implementation-20260923.md)。真实 Host/Dock 和硬件帧时间仍待专项验收。
+> 更新：2026-09-23。V3 布局与 V4 播放器均已实现并完成手工验收，依据见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。
+> [改造方案](../archive/plans/netease-v3-desktop-ui-and-theme-plan.md) · [专项验证方法](../maintenance/netease-v3-ui-verification.md) · [当次实施记录](../archive/records/netease-v3/ui-implementation-20260923.md)。自动与手工验收分别留证；本次用户确认不新增硬件帧时间数值。
 
 ## 页面与密度
 
@@ -62,4 +62,4 @@ Tool 的“减少动态效果”立即作用于同一插件容器中的全部 Vi
 
 ## Standalone 预览
 
-预览支持跟随系统/浅色/深色与并排工作区/窄 Document/窄 Tool/底部 Tool，始终复用同一套生产 View 和模型。真实 Host 的 Dock 拖拽、浮窗和回停必须另行验证。
+预览支持跟随系统/浅色/深色与并排工作区/窄 Document/窄 Tool/底部 Tool，始终复用同一套生产 View 和模型。后续变更仍需在真实 Host 回归 Dock 拖拽、浮窗和回停，Standalone 预览不代替这些场景。

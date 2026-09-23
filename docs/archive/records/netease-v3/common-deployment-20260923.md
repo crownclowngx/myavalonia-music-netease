@@ -1,5 +1,7 @@
 # V3 开发部署：复用 Common LibVLC（2026-09-23）
 
+> 后续状态：V1–V4 已于 2026-09-23 根据用户确认完成手工验收，见[验收收口记录](../netease-v1-v4-acceptance-20260923.md)。本文结果和未验收项是当次历史快照，原始证据保持不变。
+
 > 用户指定目标：`D:\data\avalonia\Controls`，不携带原生 LibVLC。源码基线 `2a8f5ea`，包含 V3 实现 `0a491b2`。
 > [V3 实施与测试](ui-implementation-20260923.md) · [可复用部署说明](../../../maintenance/deployment-and-release.md) · [本次文件摘要](assets/common-deployment.json)。
 

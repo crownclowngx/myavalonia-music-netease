@@ -1,9 +1,9 @@
 # 网易云音乐扫码登录专用开发验证
 
 > 用途：维护[当前登录实现](../reference/netease-http-session.md)的测试矩阵、本地开发门禁和人工验证范围；原方案见[归档计划](../archive/plans/netease-v1-flurl-login-plan.md)。
-> 状态：当前维护矩阵；核对日期：2026-09-22。原场景映射见第 10 节，微信矩阵见第 12 节；真实微信扫码已验证，其他人工项以[微信专项记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)的边界为准。
+> 状态：登录实现、自动回归与用户手工验收已完成；核对日期：2026-09-23。手工结论见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)；原场景映射见第 10 节，微信矩阵见第 12 节。
 > 约束：SOLID 优先、模式朴素、详细中文注释；不使用 AIFLOW、Windows CI、seal、发布 Windows Smoke、发布覆盖率或发布重复性门禁。
-> 后续扩展：[V2 / M1 验证矩阵](netease-v2-m1-playback-verification.md)规划音乐能力测试与同一开发门禁入口的扩展；本页继续作为登录回归依据，当前脚本行为不因方案编写而改变。
+> 当前回归入口：默认 V4，包含登录、M1 与 V3 回归；[V2 / M1 矩阵](netease-v2-m1-playback-verification.md)和[V4 / M2 矩阵](netease-v4-m2-daily-player-verification.md)维护音乐能力，本页继续作为登录回归依据。
 
 ## 1. 测试分层与夹具原则
 
@@ -121,7 +121,7 @@ S11 中平台相关测试在支持的本地开发环境执行；这不构成 Win
 
 ## 7. M：人工验证清单
 
-2026-09-22 通过显式微信探针完成 M01 的微信授权及账号核验部分；探针未保存会话，未完成 M04/M06。原网易 App 真实 803 及 M02–M08 仍待人工执行。不把凭据、二维码原图或账号完整响应提交到仓库。
+2026-09-22 的微信探针只验证了授权及账号核验，未保存会话。现有 V1 手工验收已由用户于 2026-09-23 确认完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)；下表保留为后续人工回归方法，不再作为本轮未完成清单。不把凭据、二维码原图或账号完整响应提交到仓库。
 
 | 编号 | 操作 | 观察与留证 |
 | --- | --- | --- |
@@ -134,13 +134,13 @@ S11 中平台相关测试在支持的本地开发环境执行；这不构成 Win
 | M07 | 头像慢/失败、保存目录不可写、退出清理失败 | 登录与图片、内存与持久化、远端与本地退出结果分别显示 |
 | M08 | 真实 Host 内打开/关闭/重开页面及 Host 退出 | 使用公开 SDK 生命周期；没有后台轮询或已释放视图回调 |
 
-M08 属于手动开发联调观察；文件已按用户指定路径进行开发部署，不运行 Windows CI、发布 Smoke 或其他发布门禁。部署通过不代表真实 Host 已验收；尚无 Host 联调证据时记录“未验证”。
+M08 属于手动开发联调观察；文件已按用户指定路径进行开发部署，不运行 Windows CI、发布 Smoke 或其他发布门禁。部署与 Host 操作分别记录；当前手工验收依据见本页顶部记录，后续回归按当次实际结果登记。
 
 ## 8. 本地开发门禁入口与判定
 
 已提供薄的 [verify-development.ps1](../../tools/verify-development.ps1) 入口，复用以下标准命令，并检查每个退出码及 TRX 完整性。入口只做本仓开发验证，不调 host 发布工具。
 
-首选在本仓根目录执行 `pwsh -NoProfile -File tools/verify-development.ps1`。其核心命令如下：
+首选在本仓根目录执行 `pwsh -NoProfile -File tools/verify-development.ps1`，默认 V4。`-Milestone Login` 同样运行全量测试，仅省略音乐/界面附加映射和产物判定。其核心命令如下：
 
 ```powershell
 dotnet restore MusicNetEasePlugin.slnx --locked-mode
@@ -173,7 +173,7 @@ git diff --check
 4. 运行 `git diff --check`，确认修改仅涉及预期 Markdown。
 5. 不执行应用构建、单测、账号登录、安装部署、Windows CI 或发布门禁。
 
-本文件已从 roadmap 迁至 maintenance；当次执行结果保存于 archive/records。下表区分自动覆盖、审查与人工待验证，不用场景标签数量冒充实际验证。
+本文件已从 roadmap 迁至 maintenance；当次执行结果保存于 archive/records。下表区分自动覆盖、审查与人工验证方法，不用场景标签数量冒充实际验证。
 
 ## 10. 当前自动覆盖与剩余边界
 
@@ -184,7 +184,7 @@ git diff --check
 | P07 | ProtocolTests：明文、密文、gzip、畸形响应、解压上限 | 自动 |
 | P08–P09 | ProtocolTests、[UiCompositionTests](../../tests/MusicNetEasePlugin.Tests/UiCompositionTests.cs)：本地 QR、非法 key、生产 View 重挂与图片清理 | 自动；实际扫码解析留给 M01 |
 | P10 | [P0 联网记录](../archive/records/netease-v1/p0-protocol-verification-20260922.md) | 全新进程 key/801/未登录；未证明真实 803 |
-| H01、L11、U05 | UiCompositionTests：重复解析复用、两个容器隔离、同步释放 Client | 自动；真实 Host 对象图待 M08 |
+| H01、L11、U05 | UiCompositionTests：重复解析复用、两个容器隔离、同步释放 Client | 自动；真实 Host 对象图由 M08 人工回归覆盖 |
 | H02–H04、H06–H07、H11 | HttpTests：800–803、HTTP/业务错误、超时、预取消与在途 handler 取消、Cookie 属性和期限替换 | 自动 |
 | H05、L10 | [LoginFailureTests](../../tests/MusicNetEasePlugin.Tests/LoginFailureTests.cs)：定时器登记后推进时间、重试上限、Retry-After、异常码停止 | 自动；不等待真实分钟 |
 | H08、L04–L06、L08、S08 | [LoginCoordinatorTests](../../tests/MusicNetEasePlugin.Tests/LoginCoordinatorTests.cs)、LoginFailureTests：迟到响应、验证与退出竞争、提交后取消补偿 | 自动；断电与跨进程不在保证范围 |
@@ -194,11 +194,11 @@ git diff --check
 | L01–L03、L07、L09、L12 | LoginCoordinatorTests：账号验证、缺失 Cookie、两类过期、保存重试、退出失败、重复关闭/观察者异常 | 自动 |
 | S01–S02、S06–S08、S10–S11 | [SessionStoreTests](../../tests/MusicNetEasePlugin.Tests/SessionStoreTests.cs)：真实隔离文件、坏文件/版本、取消/目标冲突、真实 DPAPI | 自动；跨 Windows 用户观察另行人工验证 |
 | S03–S05 | LoginCoordinatorTests：恢复合并、网络失败保留文件、失效不发布、不刷新 QR Cookie | 自动 |
-| S09、U03–U04 | [MainDocumentTests](../../tests/MusicNetEasePlugin.Tests/MainDocumentTests.cs)、LoginCoordinatorTests、UiCompositionTests | 所有者取消、关闭、共享账号保留与视图重挂自动；Host 退出待 M08 |
+| S09、U03–U04 | [MainDocumentTests](../../tests/MusicNetEasePlugin.Tests/MainDocumentTests.cs)、LoginCoordinatorTests、UiCompositionTests | 所有者取消、关闭、共享账号保留与视图重挂自动；Host 退出由 M08 人工回归覆盖 |
 | U01、U06 | MainDocumentTests、UiCompositionTests：标题/取消回归、按钮、QR/账号切换 | 自动；模板替换说明见阶段记录 |
 | A01–A04 | [当前契约](../reference/netease-http-session.md)与阶段记录 | 代码审查，不用源码字符串测试代替 |
 | G01–G07 | verify-development.ps1、自测、本矩阵、文档检查及日期记录 | 自动校验与审查结合；结论见当轮记录 |
-| M01–M08 | 第 7 节人工清单及微信专项记录 | M01 微信授权与账号核验已通过；其余边界见第 7 节 |
+| M01–M08 | 第 7 节人工清单、历史微信记录与验收收口记录 | 用户已确认现有登录手工验收完成；历史探针边界见第 7 节 |
 
 Trait 便于检索，不能替代实际断言。默认自动测试没有真实账号，不扫描个人数据目录。
 

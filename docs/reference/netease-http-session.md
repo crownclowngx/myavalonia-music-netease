@@ -1,6 +1,6 @@
 # 网易登录 HTTP 与会话契约
 
-> 状态：当前登录与会话实现，默认微信扫码、网易云 App 备用；核对日期：2026-09-22。自动验证见[专用回归矩阵](../maintenance/netease-login-verification.md)，真实微信闭环见[微信专项记录](../archive/records/netease-v1/wechat-login-implementation-20260922.md)。
+> 状态：当前登录与会话实现，默认微信扫码、网易云 App 备用；核对日期：2026-09-23。用户已确认手工验收完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)；自动回归见[登录矩阵](../maintenance/netease-login-verification.md)。
 
 ## 1. 接入范围与来源
 
@@ -16,9 +16,9 @@
 | NeteaseAuthApi.CheckQrAsync | login_qr_check | eapi POST `/api/login/qrcode/client/login` | 800–803 离线测试；联网观测 801 |
 | NeteaseAuthApi.CheckAccountAsync | login_status | weapi POST `/api/w/nuser/account/get` | 一致性离线测试、联网未登录和真实微信授权账号核验 |
 | ProtectedLoginSessionStore | 本地能力 | DPAPI 保存、加载、清除 | 隔离文件测试与本机 CurrentUser 保护测试 |
-| NeteaseAuthApi.LogoutAsync | logout | eapi POST `/api/logout` | 离线流程；真实账号远端退出待验证 |
+| NeteaseAuthApi.LogoutAsync | logout | eapi POST `/api/logout` | 离线流程；整体手工验收已由用户确认，依据见本页顶部记录 |
 
-eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全新进程证明网易云 App 路径获取 QR 和 801 不需要匿名 Cookie 或 xeapi 初始化；该路径的真实 803 授权仍缺单独验证记录。微信路径已完成真实授权、回调与账号核验。
+eapi/weapi 的逻辑路径由编码器变成 `/eapi/…`、`/weapi/…`。P0 全新进程证明网易云 App 路径获取 QR 和 801 不需要匿名 Cookie 或 xeapi 初始化。微信路径另有真实授权、回调与账号核验记录。后续 V1 手工验收已由用户确认完成，未补写逐请求原始记录。
 未实现短信/密码登录、扫码 Cookie 刷新和多账号。V2 已新增 xeapi、搜索、详情和单曲播放，端点、媒体与引擎契约见[音乐与播放当前契约](netease-music-playback.md)。
 
 V4 已新增当前账号歌单、n=0 详情、分批曲目以及两代歌词读取；账号 ID 在提交者锁内随 epoch 捕获，新增端点复用受控提交和响应预算。`/api/user/playlist` 为 weapi，`/api/v6/playlist/detail`、批量 `/api/v3/song/detail`、`/api/song/lyric` 和 `/api/song/lyric/v1` 为 eapi。固定描述、只读探针与解析夹具可核对；歌词新接口仅网络/协议失败回退旧接口，限流/失效不重放。协议及浏览约定见[日常播放器当前实现](netease-daily-player.md)。
@@ -34,7 +34,7 @@ V4 已新增当前账号歌单、n=0 详情、分批曲目以及两代歌词读�
 - `ProtectedLoginSessionStore` 只处理文件；`ISessionProtector` 只处理当前用户保护。平台保护失败不能降级为明文。
 - `AddMusicNetEasePluginServices` 是唯一组合入口。服务容器复用九个命名 Client：web、eapi、xeapi、keys、media、images、social、wechat、wechat-poll；`NeteaseFlurlClients.Dispose` 清空私有缓存并释放 Client。没有静态 CookieJar 或全局 Flurl 修改。
 - `MainView` 拥有解码后的二维码/头像 Bitmap，替换、解绑、视觉树拆卸时释放。暂时离开视觉树不代表 Document 关闭。
-- Host 生命周期先异步停止播放并释放媒体，再撤销登录工作，最后由容器释放依赖；同时支持 SDK 当前使用的同步 Dispose。Standalone 使用相同服务与 View，仅提供关闭令牌及独立目录。
+- Host 生命周期先停止接纳账号恢复，再收口队列并保存停止前位置，依次释放歌词、持久化、单曲播放和登录服务；同时支持 SDK 当前使用的同步 Dispose。Standalone 使用相同服务与 View，提供关闭令牌、独立目录与主题/布局预览。
 
 采用普通类、枚举、不可变记录和少量窄接口；没有通用 API 平台、事件总线、通用仓储或状态机框架。
 
@@ -89,7 +89,7 @@ Standalone 可用 `--data-dir` 指定独立开发目录；不要与正在运行�
 
 - `device.id`：非敏感、稳定的 52 位十六进制设备标识；退出保留。
 - `session.bin`：Windows DPAPI CurrentUser 保护的版本 1 JSON，包含设备标识及四类必要 Cookie/有效期；最大 128 KiB。不保存密码、验证码、二维码 key 或账号完整正文。
-- 同目录随机临时文件，写入并 Flush 后原子替换；提交前可取消，提交后由协调器核对代次。退出仅删除 session.bin。
+- 同目录随机临时文件，写入并 Flush 后原子替换；提交前可取消，提交后由协调器核对代次。登录存储退出仅删除 session.bin；V4 另由播放账号桥接清空该账号续播队列，保留本地历史。
 - 坏文件、未知版本、保护不可用、目录/删除失败均为 Storage 错误；可以显式重新扫码修复设备元数据。会话内嵌设备标识优先，避免两文件更新中断破坏已提交会话。
 
 当前目标仍为 Windows x64。其他系统不会明文落盘；平台扩展必须另加保护实现与验证。

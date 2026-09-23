@@ -1,9 +1,14 @@
 # 网易云音乐 V2：LibVLC 路径、账号设置 Tool 与 Dock 专项设计
 
-> 日期：2026-09-23。状态：核心设计已实现，真实 Host/Dock 与双插件共存待验收；隶属 [V2 / M1 主方案](netease-v2-m1-playback-plan.md)，不另起里程碑。实际契约与差异见[播放说明](../reference/netease-music-playback.md)。
+> 归档收口：2026-09-23，现有 V1–V4 已实现并由用户确认手工验收完成，见[验收收口记录](../records/netease-v1-v4-acceptance-20260923.md)。
+> 下文保留各阶段设计、当时状态与待办快照；不作为当前待实施清单。现行行为以[播放契约](../../reference/netease-music-playback.md)、[日常播放器](../../reference/netease-daily-player.md)和[文档导航](../../README.md)为准；后续候选由[路线图](../../roadmap/netease-capability-roadmap.md)承接。
+
+## 历史方案快照
+
+> 日期：2026-09-23。状态：核心设计已实现，真实 Host/Dock 与双插件共存待验收；隶属 [V2 / M1 主方案](netease-v2-m1-playback-plan.md)，不另起里程碑。实际契约与差异见[播放说明](../../reference/netease-music-playback.md)。
 > 依据：用户确认 LibVLCSharp + LibVLC，要求内置优先、可手动指定多个插件共用的 LibVLC 目录，并在 Tool 中展示登录信息与配置。
 > 参考：VideoSecurityPlayer 工作区基线 `4549c44` 的相关源码、Dock 测试及历史记录；本次只读核对，未修改或运行视频插件。
-> 验证：[V2 专用开发验证矩阵](../maintenance/netease-v2-m1-playback-verification.md)中的 E/T/U/R 场景。保持 SOLID、朴素设计和详细中文注释；不使用 AIFLOW、Windows CI 或发布门禁。
+> 验证：[V2 专用开发验证矩阵](../../maintenance/netease-v2-m1-playback-verification.md)中的 E/T/U/R 场景。保持 SOLID、朴素设计和详细中文注释；不使用 AIFLOW、Windows CI 或发布门禁。
 
 ## 1. 确定的能力边界
 
@@ -122,9 +127,9 @@ Standalone 以音乐/设置页签复用真实 Document/Tool 模型和 View；登
 
 来源入口：
 
-- [VideoSecurityPlayer 组合与生命周期注册](../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Plugin/VideoSecurityPlayerPluginModule.cs)、[目录探针](../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Business/SecretVideoPlayer/Playback/PlaybackDeployment.cs)、[LibVLC 初始化](../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Business/SecretVideoPlayer/Playback/LibVlcRuntime.cs)。
-- [原生命令串行调度](../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Business/SecretVideoPlayer/Playback/PlaybackNativeDispatcher.cs)、[视频表面绑定协调](../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Views/SecretVideoPlayer/Playback/PlaybackSurfaceCoordinator.cs)、[真实表面失效通知](../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Views/SecretVideoPlayer/EmbeddedVideoSurface.cs)。
-- [Dock/恢复策略测试](../../../myavalonia-video-security-player/tests/VideoSecurityPlayer.Tests/VideoToolStabilityTests.cs)、[接入与踩坑记录](../../../myavalonia-video-security-player/docs/secret-video-player/troubleshooting/integration-and-conventions.md)、[R1 资源实验与未完成边界](../../../myavalonia-video-security-player/docs/secret-video-player/reference/R1-IMPLEMENTATION-AND-VALIDATION.md)。
+- [VideoSecurityPlayer 组合与生命周期注册](../../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Plugin/VideoSecurityPlayerPluginModule.cs)、[目录探针](../../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Business/SecretVideoPlayer/Playback/PlaybackDeployment.cs)、[LibVLC 初始化](../../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Business/SecretVideoPlayer/Playback/LibVlcRuntime.cs)。
+- [原生命令串行调度](../../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Business/SecretVideoPlayer/Playback/PlaybackNativeDispatcher.cs)、[视频表面绑定协调](../../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Views/SecretVideoPlayer/Playback/PlaybackSurfaceCoordinator.cs)、[真实表面失效通知](../../../../myavalonia-video-security-player/src/VideoSecurityPlayer.Plugin/Views/SecretVideoPlayer/EmbeddedVideoSurface.cs)。
+- [Dock/恢复策略测试](../../../../myavalonia-video-security-player/tests/VideoSecurityPlayer.Tests/VideoToolStabilityTests.cs)、[接入与踩坑记录](../../../../myavalonia-video-security-player/docs/secret-video-player/troubleshooting/integration-and-conventions.md)、[R1 资源实验与未完成边界](../../../../myavalonia-video-security-player/docs/secret-video-player/reference/R1-IMPLEMENTATION-AND-VALIDATION.md)。
 
 视频插件当前注册四个 Document，`VideoToolStabilityTests` 的历史名称不能作为它已实现账号设置 Tool 的证据。本次 Tool 依据音乐插件现有 SDK 边界新增。
 
@@ -134,4 +139,4 @@ S0 先验证两种运行库来源、原生加载路径及与视频插件共存�
 
 自动测试覆盖优先级、失败分类、原子保存、配置代次、Tool 单例和订阅；真实 Host 验证 Dock 停靠/浮动、自动隐藏/重开、关闭窗口、账号退出和共享运行库。实际音频、实际加载路径、原生资源趋势分别留证；不借用视频插件的 Windows CI 或发布门禁。
 
-运行库选择、Tool 与新增自动测试已实现；真实账号 MP3 已分别通过内置库和 VideoSecurityPlayer 已部署目录解码。Headless 完成 View 重挂与草稿保留；真实 Host/Dock、同时运行两插件与加载顺序仍待验收，详见[实施记录](../archive/records/netease-v2/m1-implementation-20260923.md)。
+运行库选择、Tool 与新增自动测试已实现；真实账号 MP3 已分别通过内置库和 VideoSecurityPlayer 已部署目录解码。Headless 完成 View 重挂与草稿保留；真实 Host/Dock、同时运行两插件与加载顺序仍待验收，详见[实施记录](../records/netease-v2/m1-implementation-20260923.md)。

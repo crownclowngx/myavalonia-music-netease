@@ -1,7 +1,7 @@
 # 扫码登录开发快速开始
 
-> 状态：用户已确认登录可用，默认使用微信扫码。核对日期：2026-09-22。
-> 本文介绍当前操作；真实验证覆盖及剩余人工项见[维护矩阵](../maintenance/netease-login-verification.md)。
+> 状态：V1 登录功能已实现，手工验收已由用户于 2026-09-23 确认完成；默认使用微信扫码，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。
+> 本文介绍当前操作；后续回归方法见[维护矩阵](../maintenance/netease-login-verification.md)。
 
 ## 1. 构建与启动
 

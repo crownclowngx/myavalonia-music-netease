@@ -1,7 +1,7 @@
 # V3 紧凑界面与主题专用开发验证
 
-> 更新：2026-09-23。自动套件和本地 V3 门禁已实现，真实 Host/Dock 与硬件性能验收待完成。
-> [设计方案](../roadmap/netease-v3-desktop-ui-and-theme-plan.md) · [当前界面契约](../reference/netease-desktop-ui.md) · [当次结果与证据](../archive/records/netease-v3/ui-implementation-20260923.md)。不使用 AIFLOW、Windows CI 或发布门禁。
+> 更新：2026-09-23。V3 实现、自动验证与手工验收已完成，用户确认依据见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。
+> [设计方案](../archive/plans/netease-v3-desktop-ui-and-theme-plan.md) · [当前界面契约](../reference/netease-desktop-ui.md) · [当次结果与证据](../archive/records/netease-v3/ui-implementation-20260923.md)。不使用 AIFLOW、Windows CI 或发布门禁。
 
 ## 运行方式
 
@@ -25,7 +25,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V3
 | PREFERENCES-AUTO | UiPreferencesTests 覆盖原子保存、取消、默认、损坏/未知版本、迟到读取、读一次、串行合并写、失败与重试；共享 View 同步 | M03；文件重建读取已有断言，真实重启插件体验另验 |
 | RESOURCE-AUTO | 离线固定数据开/关动效 × 空闲/播放/隐藏；淡入有界结束；20 轮后 40 个音乐/设置 View 可回收；不新增 Application 资源 | M04 自动观察子集，不是硬件帧时间或 CPU 性能达标认证 |
 
-既有 M1 全量用例继续保护登录、搜索、账号代次、双 Document 播放所有权、真实离线 PCM 解码、目录选择器迟到结果、位图与资源释放。详见 [M1 验证矩阵](netease-v2-m1-playback-verification.md)。
+既有 M1 全量用例继续保护登录、搜索、账号代次、双 Document 共享播放与页面寿命、真实离线 PCM 解码、目录选择器迟到结果、位图与资源释放。详见 [M1 验证矩阵](netease-v2-m1-playback-verification.md)。
 
 Headless Dispatch 必须使用可等待的泛型异步重载，lambda 明确返回值，防止误选 async void 导致测试提前结束。截图存在只证明生成了文件，仍需视觉审阅。
 
@@ -40,7 +40,7 @@ Headless Dispatch 必须使用可等待的泛型异步重载，lambda 明确返�
 
 审阅背景/前景、主操作边界、长文本、登录例外、选中与滚动；不能因为 PNG 头正确就宣布视觉通过。Headless 渲染及调度会贡献进程 CPU，短采样只用于观察和复现，不能计算“插件动画占用率”或承诺零消耗。
 
-## 尚待人工验收
+## 手工验收与后续回归
 
 | 项目 | 操作及应记录内容 |
 | --- | --- |
@@ -49,6 +49,6 @@ Headless Dispatch 必须使用可等待的泛型异步重载，lambda 明确返�
 | 键盘与缩放 | Tab、回车、列表选择和音量；100%/150%/200% 与跨屏；焦点、裁字和菜单 |
 | 扫码识别 | 实际手机扫描，核对静区和白底；图片显示不等于识别通过 |
 | 动效实机成本 | 同机固定数据多轮对照；真实滚动、快速交互、隐藏和最小化；记录机器、缩放、采样时长、输入延迟和帧时间 |
-| M1 遗留验收 | 扬声器听感、真实双插件共存等继续按 M1 矩阵逐项留证 |
+| M1 播放回归 | 扬声器听感、真实双插件共存等按 M1 矩阵复验并记录当次结果 |
 
-自动部分完成不勾销以上项目；部署和正式发布各自实际执行后新增记录。
+现有 V3 手工验收已由用户确认完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。以上保留为后续回归方法，整体确认不补造具体缩放样本、机器参数或硬件帧时间；部署和正式发布分别记录。

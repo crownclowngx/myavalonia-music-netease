@@ -2,7 +2,7 @@
 
 登录后打开“我的歌单”，选中歌单并点击“打开所选歌单”，可分页浏览、播放全部或从这里播放。搜索和歌单均可追加歌曲或安排下一首；“播放队列”可调整顺序和四种模式。当前增量见[日常播放器说明](../reference/netease-daily-player.md)。
 
-> 当前支持 Windows x64。功能已经实现；真实账号与两种运行库来源已解码验证，真实 Host/Dock 和扬声器听感待验收。完整边界见[当前播放契约](../reference/netease-music-playback.md)。
+> 当前支持 Windows x64，V1–V4 已实现并完成手工验收，依据见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。完整边界见[当前播放契约](../reference/netease-music-playback.md)。
 
 ## 开始播放
 
@@ -27,7 +27,7 @@
 
 Tool 关闭只隐藏，再打开保留草稿。扫码入口仍在“新建”的网易云音乐 Document 中；当前 SDK 没有让 Tool 直接打开 Document 的公开端口。
 
-## V3 界面与动效
+## 界面与动效
 
 Document 和 Tool 跟随所在 Host 窗口的深浅主题。结果列表独立滚动，底部播放条固定；窄窗口自动减少显示列。Tool 底部“界面 → 减少动态效果”立即关闭本插件额外过渡并保存偏好，账号和播放配置不受影响。完整说明见[当前界面契约](../reference/netease-desktop-ui.md)。
 

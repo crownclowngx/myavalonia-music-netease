@@ -1,9 +1,14 @@
 # 网易云音乐 V2：M1 搜索与单曲播放实施方案
 
-> 状态：核心功能、真实账号解码探针与 M1 本地开发门禁已实现；真实扬声器、Standalone 操作和 Host/Dock/双插件共存验收仍待完成。当前契约见[实现说明](../reference/netease-music-playback.md)，本轮证据见[实施记录](../archive/records/netease-v2/m1-implementation-20260923.md)。
+> 归档收口：2026-09-23，现有 V1–V4 已实现并由用户确认手工验收完成，见[验收收口记录](../records/netease-v1-v4-acceptance-20260923.md)。
+> 下文保留各阶段设计、当时状态与待办快照；不作为当前待实施清单。现行行为以[播放契约](../../reference/netease-music-playback.md)、[日常播放器](../../reference/netease-daily-player.md)和[文档导航](../../README.md)为准；后续候选由[路线图](../../roadmap/netease-capability-roadmap.md)承接。
+
+## 历史方案快照
+
+> 状态：核心功能、真实账号解码探针与 M1 本地开发门禁已实现；真实扬声器、Standalone 操作和 Host/Dock/双插件共存验收仍待完成。当前契约见[实现说明](../../reference/netease-music-playback.md)，本轮证据见[实施记录](../records/netease-v2/m1-implementation-20260923.md)。
 > 创建日期：2026-09-22；更新日期：2026-09-23。源码基线：`c469f919e931e60d30797cbd357d245e84e7cf01`；初版文档提交：`f14eece`。本次按用户要求补充内置优先/指定 LibVLC 目录、账号与设置 Tool，以及 VideoSecurityPlayer 的 Dock 经验。
-> 编号：承接已归档的 [V1 登录方案](../archive/plans/netease-v1-flurl-login-plan.md)，使用 **V2**；对应能力路线图的 **M1**，不改变插件包版本或 SDK 版本。
-> 配套：[运行库、Tool 与 Dock 专项设计](netease-v2-libvlc-tool-and-dock-design.md) · [V2 / M1 专用开发验证矩阵](../maintenance/netease-v2-m1-playback-verification.md) · [能力路线图](netease-capability-roadmap.md) · [当前登录契约](../reference/netease-http-session.md)。
+> 编号：承接已归档的 [V1 登录方案](netease-v1-flurl-login-plan.md)，使用 **V2**；对应能力路线图的 **M1**，不改变插件包版本或 SDK 版本。
+> 配套：[运行库、Tool 与 Dock 专项设计](netease-v2-libvlc-tool-and-dock-design.md) · [V2 / M1 专用开发验证矩阵](../../maintenance/netease-v2-m1-playback-verification.md) · [能力路线图](../../roadmap/netease-capability-roadmap.md) · [当前登录契约](../../reference/netease-http-session.md)。
 
 ## 1. 目标与首要规定
 
@@ -103,7 +108,7 @@ Windows x64 首先验证内置和指定目录两条路径。Linux x64 需明确�
 
 特别是 Linux，当前官方 `Core.Initialize` 文档说明其目录参数不受支持，另指向 `LD_LIBRARY_PATH`。[官方 API 说明](https://docs.videolan.me/libvlcsharp/api/LibVLCSharp.Shared.Core.html) 因此指定目录功能也必须有对应平台的实际加载验证，不能直接照搬 Windows；不通过修改 Host 全局环境掩盖插件之间的依赖问题。
 
-**播放引擎跨平台与整个插件跨平台分别跟踪。** 当前 [会话保护](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Persistence/SessionProtection.cs)仅实现 Windows DPAPI，构建固定为 `win-x64`。后续还需受保护存储、Host/SDK 和按 RID 构建适配。Windows M1 可以单独验收；其他平台只在相应加载、输出、登录/会话及 Host 验证完成后标为已支持。
+**播放引擎跨平台与整个插件跨平台分别跟踪。** 当前 [会话保护](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Persistence/SessionProtection.cs)仅实现 Windows DPAPI，构建固定为 `win-x64`。后续还需受保护存储、Host/SDK 和按 RID 构建适配。Windows M1 可以单独验收；其他平台只在相应加载、输出、登录/会话及 Host 验证完成后标为已支持。
 
 ## 4. SOLID 分工与设计思路
 
@@ -244,7 +249,7 @@ S0 可以先使用已知歌曲 ID，S2 搜索开发可在接口边界明确后�
 
 ## 9. 单元测试与本地开发门禁
 
-专用用例、拟建测试文件、自动/人工边界及门禁自测见[V2 / M1 验证矩阵](../maintenance/netease-v2-m1-playback-verification.md)。继续使用现有 Tests 项目，新增测试与所有登录回归在同轮运行。
+专用用例、拟建测试文件、自动/人工边界及门禁自测见[V2 / M1 验证矩阵](../../maintenance/netease-v2-m1-playback-verification.md)。继续使用现有 Tests 项目，新增测试与所有登录回归在同轮运行。
 
 已扩展 `tools/verify-development.ps1`，支持并默认使用 `-Milestone M1`：复用同一 restore/build/test/报告校验实现，增加 M1 场景映射检查和独立结果目录。命令可直接执行：
 
@@ -264,7 +269,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone M1
 | --- | --- |
 | 本方案 | S0–S5 进度、技术决策、M1 边界和未完成事项 |
 | [运行库、Tool 与 Dock 专项设计](netease-v2-libvlc-tool-and-dock-design.md) | 来源优先级、配置生效、共享目录、Dock 经验和源码依据 |
-| [专用开发验证矩阵](../maintenance/netease-v2-m1-playback-verification.md) | P/A/C/B/L/E/T/U/D/G/R 场景映射到真实测试及证据，持续维护 |
+| [专用开发验证矩阵](../../maintenance/netease-v2-m1-playback-verification.md) | P/A/C/B/L/E/T/U/D/G/R 场景映射到真实测试及证据，持续维护 |
 | `docs/reference/netease-music-playback.md`（实施后新增） | 已接入搜索/详情/播放接口、音频格式、媒体限额、状态和生命周期现行契约 |
 | `docs/quick-start/netease-playback.md`（实施后新增） | 实际可用的搜索、播放、停止、音量、试听及失败排错步骤 |
 | `docs/archive/records/netease-v2/`（实施时新增） | 带日期的选型、实施、TRX、真实播放、Host 和开发部署记录，分别列出未执行项 |
@@ -285,6 +290,6 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone M1
 - [ ] S4：生产界面与 Standalone 接线、Headless 重挂已完成；真实 Standalone 听感和 Host/Dock 待验收。
 - [ ] S5：M1 本地门禁、完整回归、当前契约及专用记录已完成；R 类人工核心验收仍待完成，M1 不标记全部验收通过。
 
-实现差异：容器复用一个 LibVLC，每首歌重建 MediaPlayer/Media 并带独立事件代次；原生回调使用事件缓存，禁止重入状态 getter。Windows 为本插件私有 LibVLCSharp 绑定所选原生句柄，不设置全局搜索路径。Tool 直接打开 Document 的设想按公开 SDK 边界调整为“新建”引导。详见[当前播放契约](../reference/netease-music-playback.md)。
+实现差异：容器复用一个 LibVLC，每首歌重建 MediaPlayer/Media 并带独立事件代次；原生回调使用事件缓存，禁止重入状态 getter。Windows 为本插件私有 LibVLCSharp 绑定所选原生句柄，不设置全局搜索路径。Tool 直接打开 Document 的设想按公开 SDK 边界调整为“新建”引导。详见[当前播放契约](../../reference/netease-music-playback.md)。
 
-当前已执行自动测试、真实音乐接口和内置/指定库解码，并生成两种干净开发暂存产物；尚未替换正在运行的 Host，也未执行真实听感、Dock/双插件共存或发布验收。阶段状态以[本轮记录](../archive/records/netease-v2/m1-implementation-20260923.md)为准。
+当前已执行自动测试、真实音乐接口和内置/指定库解码，并生成两种干净开发暂存产物；尚未替换正在运行的 Host，也未执行真实听感、Dock/双插件共存或发布验收。阶段状态以[本轮记录](../records/netease-v2/m1-implementation-20260923.md)为准。

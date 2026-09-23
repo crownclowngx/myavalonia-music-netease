@@ -1,8 +1,8 @@
 # 临时部署、正式发布与验收
 
-> 用途：开发部署与正式发布的可复用操作参考。当前目标为 Windows x64；本文不表示已完成正式发布或 Host 验收。
+> 用途：开发部署与正式发布的可复用操作参考。当前目标为 Windows x64；现有 V1–V4 手工验收已由用户确认完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)；本文不表示已完成正式发布。
 
-最近一次开发部署见[V4 Common LibVLC 部署与清理记录](../archive/records/netease-v4/common-deployment-20260923.md)：M2 无原生库产物已替换指定 Controls，公共库和用户配置保持不变；附当前与历史中间产物清理结果及剩余目录，尚未启动 Host 验收。此前[V3 部署](../archive/records/netease-v3/common-deployment-20260923.md)、[M1 公共库配置记录](../archive/records/netease-v2/shared-libvlc-deployment-20260923.md)、[微信部署](../archive/records/netease-v1/wechat-login-implementation-20260922.md)和[App 部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
+最近一次开发部署见[V4 Common LibVLC 部署与清理记录](../archive/records/netease-v4/common-deployment-20260923.md)：M2 无原生库产物已替换指定 Controls，公共库和用户配置保持不变；附当前与历史中间产物清理结果及剩余目录，该次部署未启动 Host，后续手工验收已由用户确认完成。此前[V3 部署](../archive/records/netease-v3/common-deployment-20260923.md)、[M1 公共库配置记录](../archive/records/netease-v2/shared-libvlc-deployment-20260923.md)、[微信部署](../archive/records/netease-v1/wechat-login-implementation-20260922.md)和[App 部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
 
 部署分为开发期临时联调和正式 ZIP 发布。两者都必须使用 Build 包筛选出的干净插件目录，不能直接复制
 普通 `bin/Debug` 或 `bin/Release`，因为普通输出可能包含 Host 应当统一提供的共享程序集。
@@ -123,7 +123,8 @@ Host 提供的导入入口；若由维护者手工解压，也必须保留 ZIP �
 - 已声明的网易云音乐 Document 与账号设置 Tool 出现在预期菜单或 Dock 区域；
 - 多次打开页面时，各自展示资源与订阅正确释放，共享账号状态一致；只有发起页面关闭才取消它拥有的登录尝试；
 - 验证账号设置 Tool 隐藏、恢复与 singleton 草稿状态；它关闭不停止音乐 Document 的播放；
-- 保存、恢复、关闭和生命周期行为符合插件声明；
+- 播放时关闭任意或最后一个 Document 后继续播放，重开能控制同一队列；账号退出停止并清除续播队列；
+- Host 退出保存停止前位置并完整释放，重启核验账号后恢复为暂停，主动继续才出声；
 - Host 没有报告共享程序集、私有依赖、入口类型或稳定 ID 错误；
 - 替换为正式 ZIP 后完整重启 Host，并再次完成一次关键业务流程。
 

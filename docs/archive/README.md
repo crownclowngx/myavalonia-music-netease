@@ -1,15 +1,27 @@
-# 历史计划与实施记录
+# 已完成方案与历史记录
 
-> 归档整理日期：2026-09-23。这里保留当时的方案、观察结果和交付证据。
-> 当前入口：[文档总导航](../README.md) · [能力路线图](../roadmap/netease-capability-roadmap.md) · [HTTP 与会话契约](../reference/netease-http-session.md)。
+> 更新日期：2026-09-23。V1–V4 已实现并由用户确认手工验收完成，详见[验收收口记录](records/netease-v1-v4-acceptance-20260923.md)。
+> 当前入口：[文档总导航](../README.md) · [能力路线图](../roadmap/netease-capability-roadmap.md) · [日常播放器契约](../reference/netease-daily-player.md)。
 
-## 归档计划与剩余事项
+## 已完成方案与当前承接
 
-| 文档 | 归档原因 | 当前承接位置 |
+| 已归档方案 | 完成范围 | 当前承接位置 |
 | --- | --- | --- |
-| [V1：Flurl 接入与扫码登录计划](plans/netease-v1-flurl-login-plan.md) | 登录已有实现，用户确认可用；原 P4–P5 已展开为能力路线图 | 后续功能见[能力路线图](../roadmap/netease-capability-roadmap.md)，实际协议见[当前契约](../reference/netease-http-session.md)，验证覆盖与剩余人工项见[维护矩阵](../maintenance/netease-login-verification.md) |
+| [V1：Flurl 接入与扫码登录](plans/netease-v1-flurl-login-plan.md) | 登录实现与手工验收完成；原扩展设想按实际能力分流 | [会话契约](../reference/netease-http-session.md)、[登录矩阵](../maintenance/netease-login-verification.md)；未实施扩展见路线图 |
+| [V2：M1 搜索与单曲播放](plans/netease-v2-m1-playback-plan.md) | 搜索、单曲播放、账号/播放设置实现与手工验收完成 | [播放契约](../reference/netease-music-playback.md)、[播放矩阵](../maintenance/netease-v2-m1-playback-verification.md) |
+| [V2：LibVLC 路径、Tool 与 Dock](plans/netease-v2-libvlc-tool-and-dock-design.md) | V2 配套设计实现与手工验收完成 | [播放快速开始](../quick-start/netease-playback.md)、[项目与窗口职责](../reference/project-and-window-responsibilities.md) |
+| [V3：紧凑桌面界面与主题](plans/netease-v3-desktop-ui-and-theme-plan.md) | 布局、主题、轻量动效实现与手工验收完成 | [界面契约](../reference/netease-desktop-ui.md)、[界面矩阵](../maintenance/netease-v3-ui-verification.md) |
+| [V4：M2 日常播放器](plans/netease-v4-m2-daily-player-plan.md) | 歌单、队列、歌词、历史与恢复实现及手工验收完成 | [日常播放器契约](../reference/netease-daily-player.md)、[V4 矩阵](../maintenance/netease-v4-m2-daily-player-verification.md) |
 
-原计划中的阶段标识、授权背景和待办是历史快照，不作为新的执行指令。归档不表示尚未记录的 Host、重启恢复、远端退出或正式发布验证已经完成。
+方案正文保留设计时的约束、阶段标识和待办快照，不作为新的执行指令；旧页面所有者规则以 V4 当前契约为准。原 V1 的播放器扩展已由 V2–V4 落地，其余候选统一由路线图承接。
+
+## 验收与文档收口
+
+| 日期 | 记录 | 依据与范围 |
+| --- | --- | --- |
+| 2026-09-23 | [V1–V4 验收收口与文档整理](records/netease-v1-v4-acceptance-20260923.md) | 用户确认现有 V 编号内容已实现并完成手工验收；方案归档、当前契约和维护矩阵去漂移 |
+
+以下实施记录的证明范围均指当次操作；其中“待验收”“未启动 Host”不代表当前仍未完成。原始 TRX、截图、探针与部署摘要保持原样，后续用户确认由上表单独承接。正式发布、跨平台适配和 M3–M5 不包含在本次验收结论中。
 
 ## 实施与验证记录
 

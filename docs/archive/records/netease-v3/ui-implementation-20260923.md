@@ -1,7 +1,9 @@
 # V3 紧凑桌面界面、双色主题与轻量动效实施记录
 
+> 后续状态：V1–V4 已于 2026-09-23 根据用户确认完成手工验收，见[验收收口记录](../netease-v1-v4-acceptance-20260923.md)。本文结果和未验收项是当次历史快照，原始证据保持不变。
+
 > 日期：2026-09-23（Asia/Shanghai）。对象仅 MusicNetEasePlugin 的 Document / Tool、共用预览、测试与本地开发工具。
-> [当前契约](../../../reference/netease-desktop-ui.md) · [专项维护矩阵](../../../maintenance/netease-v3-ui-verification.md) · [V3 方案](../../../roadmap/netease-v3-desktop-ui-and-theme-plan.md)。
+> [当前契约](../../../reference/netease-desktop-ui.md) · [专项维护矩阵](../../../maintenance/netease-v3-ui-verification.md) · [V3 方案](../../plans/netease-v3-desktop-ui-and-theme-plan.md)。
 
 ## 源码与交付
 
