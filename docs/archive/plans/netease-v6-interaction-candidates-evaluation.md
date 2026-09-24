@@ -1,8 +1,10 @@
 # V6 · 歌词抽屉与交互体验候选评估
 
+> 分类归档：2026-09-24。18 项候选的决策与实现已完成，本文作为评估快照保留；下文“待选择 / 可选 / 待实施”及原交付路径均为提案时记录。当前行为见[界面契约](../../reference/netease-desktop-ui.md)，完整验收仍由[待验清单](../../maintenance/netease-v5-v6-acceptance.md)跟踪。
+
 > 日期：2026-09-23。后续决策：**用户已批准完整执行 V6-01～18**，见 [专用修改方案](netease-v6-drawer-and-interaction-change-plan.md)。下文保留评估时的候选、成本与取舍，不代表已经实现。
 > 对象：`myavalonia-music-netease`。V6 延续现有 V 编号，仅表示本轮方案文档序号，不是插件包版本，也不表示 V5 已完成。
-> 来源：用户提出的右侧歌词抽屉、当前生产代码，以及 [V5 完成度复核](../maintenance/netease-v5-completion-audit-20260923.md)。优先级与相对成本为方案判断，不是实测收益或工期承诺。
+> 来源：用户提出的右侧歌词抽屉、当前生产代码，以及 [V5 完成度复核](../records/netease-v5/completion-audit-20260923.md)。优先级与相对成本为方案判断，不是实测收益或工期承诺。
 > 状态更新：18 项均已批准并接入生产代码。以下建议顺序、可选性质和评估话术保留为原始提案记录；当前状态以专用修改方案、验证矩阵及实施记录为准。
 
 ## 1. 这份文档如何评估
@@ -33,11 +35,11 @@
 
 ### 3.1 直接复用，不重复建设
 
-- [MusicView](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) 已有固定底部播放条和右侧队列容器。当前歌词占主内容区，队列在宽屏并排、窄屏切为主内容页。
-- [MusicNavigation](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicNavigation.cs) 保存浏览页，但显示歌词会隐藏搜索、歌单或历史；这是抽屉改造的关键状态差异。
-- [LyricsView](../../src/MusicNetEasePlugin.Plugin/Features/Music/LyricsView.axaml.cs) 和 [LyricsWorkspace](../../src/MusicNetEasePlugin.Plugin/Features/Music/LyricsWorkspace.cs) 已有同步高亮、翻译、手动浏览暂停跟随、回到当前歌词、失败重试与可见性控制。现有滚动是 `ScrollIntoView`，不能描述为已实现平滑居中。
-- [播放条](../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml) 已有音量弹层、静音恢复、四模式、失败提示和重试；[定位模型](../../src/MusicNetEasePlugin.Plugin/Features/Music/TimelineWorkspace.cs) 已有拖动草稿和单次提交，不需要重写音量或定位基础能力。
-- [队列界面](../../src/MusicNetEasePlugin.Plugin/Features/Music/QueueView.axaml) 和 [队列模型](../../src/MusicNetEasePlugin.Plugin/Features/Music/QueueWorkspace.cs) 已有定位当前项、上移/下移、移除及带版本校验的清空确认。拖拽、撤销应作为增量，不能把这些已有功能重新记作新增。
+- [MusicView](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) 已有固定底部播放条和右侧队列容器。当前歌词占主内容区，队列在宽屏并排、窄屏切为主内容页。
+- [MusicNavigation](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicNavigation.cs) 保存浏览页，但显示歌词会隐藏搜索、歌单或历史；这是抽屉改造的关键状态差异。
+- [LyricsView](../../../src/MusicNetEasePlugin.Plugin/Features/Music/LyricsView.axaml.cs) 和 [LyricsWorkspace](../../../src/MusicNetEasePlugin.Plugin/Features/Music/LyricsWorkspace.cs) 已有同步高亮、翻译、手动浏览暂停跟随、回到当前歌词、失败重试与可见性控制。现有滚动是 `ScrollIntoView`，不能描述为已实现平滑居中。
+- [播放条](../../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml) 已有音量弹层、静音恢复、四模式、失败提示和重试；[定位模型](../../../src/MusicNetEasePlugin.Plugin/Features/Music/TimelineWorkspace.cs) 已有拖动草稿和单次提交，不需要重写音量或定位基础能力。
+- [队列界面](../../../src/MusicNetEasePlugin.Plugin/Features/Music/QueueView.axaml) 和 [队列模型](../../../src/MusicNetEasePlugin.Plugin/Features/Music/QueueWorkspace.cs) 已有定位当前项、上移/下移、移除及带版本校验的清空确认。拖拽、撤销应作为增量，不能把这些已有功能重新记作新增。
 - 当前多个 Document 共享账号、队列和播放器，各自保留浏览状态。关页、重挂和隐藏界面不应停止音乐。
 
 ### 3.2 V5 差项如何接入 V6
@@ -226,7 +228,7 @@ V6-15 的整页改进可单独评估，但任何新抽屉都必须具备基本�
 3. **按使用频率增强：** V6-03、04、05、09、11、14、18。喜欢看歌词可优先 04/05，常用键盘可优先 11。
 4. **队列复杂操作：** 经常整理长队列时再选择 V6-16、17；两项可分开，不为拖拽预先构造通用撤销框架。
 
-喜欢/收藏、歌单写入、推荐、下载、桌面歌词、系统媒体键、独立迷你窗口、睡眠定时与封面取色等可继续评估，但不自动合并到本次改造。它们已有或适合独立的能力/系统集成范围，见 [能力路线图](netease-capability-roadmap.md)。
+喜欢/收藏、歌单写入、推荐、下载、桌面歌词、系统媒体键、独立迷你窗口、睡眠定时与封面取色等可继续评估，但不自动合并到本次改造。它们已有或适合独立的能力/系统集成范围，见 [能力路线图](../../roadmap/netease-capability-roadmap.md)。
 
 ## 9. 实施时的设计原则草案
 
@@ -346,7 +348,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V5
 | --- | --- | --- |
 | 用户评估后 | `docs/roadmap/netease-v6-drawer-and-interaction-change-plan.md` | 选中/排除项、最终交互、状态转换、职责、文件影响、兼容边界与实施顺序 |
 | 与修改方案配套 | `docs/maintenance/netease-v6-drawer-and-interaction-verification-plan.md` | 稳定场景编号、单元/组件/集成/实机划分、门禁自测、性能基线与验收标准 |
-| 真实实施过程中 | `docs/maintenance/netease-v6-drawer-and-interaction-implementation.md` | 实际实现、中文设计说明位置、偏差、本轮证据、失败/待测与用户验收状态 |
+| 真实实施过程中 | [实施记录（现已按日期归档）](../records/netease-v6/drawer-and-interaction-implementation-20260923.md) | 实际实现、中文设计说明位置、偏差、本轮证据、失败/待测与用户验收状态 |
 
 实现时同步 `reference/netease-desktop-ui.md`、`reference/netease-daily-player.md`、相关播放契约、`quick-start/netease-playback.md`、项目 README 和文档导航。只把已经实现的行为写入“当前契约”。
 

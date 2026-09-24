@@ -1,6 +1,6 @@
 # V5 · 启动注册故障修复（2026-09-23）
 
-> 本记录只关闭启动加载故障，不表示 V5 已正式完成。[完成度复核](../../../maintenance/netease-v5-completion-audit-20260923.md)列出剩余范围。
+> 本记录只关闭启动加载故障，不表示 V5 已正式完成。[完成度复核](completion-audit-20260923.md)列出剩余范围。
 > [完整本地门禁](startup-fix-20260923/gate/verification.json) · [真实 Host 前后对照](startup-fix-20260923/host-startup-comparison.json) · [部署摘要](startup-fix-20260923/deployment.json) · [标准清理](startup-fix-20260923/cleanup.json)
 
 ## 根因与修复

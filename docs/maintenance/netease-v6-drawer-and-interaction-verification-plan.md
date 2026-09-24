@@ -1,6 +1,7 @@
 # V6 · 抽屉与交互专用验证矩阵
 
-> 2026-09-23；V6-01～18 全部获批。以下是必需验证要求，结果见 [实施记录](netease-v6-drawer-and-interaction-implementation.md)。仅本地开发检查，不运行 Windows CI、发布门禁或 AIFLOW。
+> 2026-09-23；V6-01～18 全部获批。以下是必需验证要求，结果见 [实施记录](../archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)。仅本地开发检查，不运行 Windows CI、发布门禁或 AIFLOW。
+> 当前状态：18 项已实现、本地开发验证通过；原[修改方案](../archive/plans/netease-v6-drawer-and-interaction-change-plan.md)已归档，剩余性能与实机事项统一见[待验清单](netease-v5-v6-acceptance.md)。本矩阵继续用于回归。
 
 | 场景 | 候选 | 必需行为与边界 |
 | --- | --- | --- |

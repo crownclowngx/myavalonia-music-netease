@@ -1,7 +1,7 @@
 # V5 修复版重新编译、部署与清理（2026-09-23）
 
 > 用户再次要求部署至 `D:\data\avalonia\Controls`，不携带 libVLC，清理中间产物与旧版本。
-> 源码提交 `cca46ba6f29cba5fd958371be2d21c282f1707cf`；V5 其余待决范围未继续开发，整体完成度见[复核清单](../../../maintenance/netease-v5-completion-audit-20260923.md)。
+> 源码提交 `cca46ba6f29cba5fd958371be2d21c282f1707cf`；V5 其余待决范围未继续开发，整体完成度见[复核清单](completion-audit-20260923.md)。
 > [部署摘要](assets/redeployment-20260923.json) · [清理明细及剩余绝对路径](assets/redeployment-cleanup-20260923.json)
 
 ## 构建与实际部署

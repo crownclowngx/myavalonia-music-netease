@@ -1,11 +1,13 @@
 # V5 · 轻量交互与 UI 专用实施记录
 
-> 日期：2026-09-23。对应 [V5 方案](../roadmap/netease-v5-lightweight-interaction-and-ui-plan.md)与 [专用验证矩阵](netease-v5-ui-interaction-verification-plan.md)。本记录保留首轮主体实现；重新核查确认 A–D 尚未全部收口，见 [完成度复核](netease-v5-completion-audit-20260923.md)。阶段 E 的取色、平滑居中、拖拽和撤销仍为可选项。
+> 后续状态（2026-09-24 整理）：本文是 V5 首轮实现的历史快照。C01–C08、歌词居中、队列拖动 / 撤销等后续由 [V6 实施记录](../netease-v6/drawer-and-interaction-implementation-20260923.md)承接；封面取色未纳入 V6，性能及实机待验继续保留。当前结论见[文档导航](../../../README.md#当前状态与待验范围)，下文原始结果不改写。
+
+> 日期：2026-09-23。对应 [V5 方案](../../plans/netease-v5-lightweight-interaction-and-ui-plan.md)与 [专用验证矩阵](../../../maintenance/netease-v5-ui-interaction-verification-plan.md)。本记录保留首轮主体实现；重新核查确认 A–D 尚未全部收口，见 [完成度复核](completion-audit-20260923.md)。阶段 E 的取色、平滑居中、拖拽和撤销仍为可选项。
 > 本记录区分代码完成、自动验证、资源测量和实机验收。V1–V4 的用户验收不自动延伸到 V5。未使用 AIFLOW、Windows CI 或发布门禁。
 
 ## 0. 当前完成状态更正
 
-此前自动门禁未覆盖 Host 的贡献根注册所有权，实际启动拒绝了重复登记设置 Tool 的插件。该故障已修复；新一轮 309 项测试、249 项门禁自测通过，实际部署的同一 Host 启动复测诊断为 0 条，见[启动修复记录](../archive/records/netease-v5/startup-fix-20260923.md)。
+此前自动门禁未覆盖 Host 的贡献根注册所有权，实际启动拒绝了重复登记设置 Tool 的插件。该故障已修复；新一轮 309 项测试、249 项门禁自测通过，实际部署的同一 Host 启动复测诊断为 0 条，见[启动修复记录](startup-fix-20260923.md)。
 
 “主体代码已接入”不等于 A–D 全部完成。恢复提示、操作反馈、加载/定位反馈、部分紧凑布局等仍有方案差项，性能和实机验收未收口；后文首轮数据保留历史事实，当前结论以完成度复核为准。
 
@@ -51,7 +53,7 @@
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V5
 ```
 
-首轮自动门禁 **307 项测试全部通过、0 失败、0 跳过**；门禁自身 **249 项失败注入/校验检查通过**，Debug 编译 0 警告、0 错误。运行编号 `20260923-093716-a76d8003`，见[完整验证摘要](../archive/records/netease-v5/gate-20260923/verification.json)及同目录原始 TRX、原生离线解码、图片预算、10 张 V5 截图和来源记录。门禁记录基于 `a9b85f0` 上的开发工作树，源码 SHA256 为 `DCA795554C7D4A5844243C41435F7E1DE7BBF8AA361F518FBF1C02CC8CAAE563`；部署前再次核对一致。归档保持运行时的真实身份，不改写为事后的提交号；Git 对该证据目录禁用换行转换，重新检出后仍保留原始文件摘要。
+首轮自动门禁 **307 项测试全部通过、0 失败、0 跳过**；门禁自身 **249 项失败注入/校验检查通过**，Debug 编译 0 警告、0 错误。运行编号 `20260923-093716-a76d8003`，见[完整验证摘要](gate-20260923/verification.json)及同目录原始 TRX、原生离线解码、图片预算、10 张 V5 截图和来源记录。门禁记录基于 `a9b85f0` 上的开发工作树，源码 SHA256 为 `DCA795554C7D4A5844243C41435F7E1DE7BBF8AA361F518FBF1C02CC8CAAE563`；部署前再次核对一致。归档保持运行时的真实身份，不改写为事后的提交号；Git 对该证据目录禁用换行转换，重新检出后仍保留原始文件摘要。
 
 门禁依次运行自身失败注入、locked restore、Debug 零警告构建、全部测试、M1/V3/M2/V5 场景映射、原生离线解码、图片预算与截图来源、静态资源、相对链接、diff 及源码未变化检查。V5 的 30 项行为场景映射实际方法和参数化例数；U04 由产品资产检查覆盖；G01–G05 由 PowerShell 自测覆盖。
 
@@ -59,7 +61,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V5
 
 ## 5. 同条件资源观测
 
-[原始 V4 样本](../archive/records/netease-v5/assets/v4-baseline.json)、[原始 V5 样本](../archive/records/netease-v5/assets/v5-observation.json)、[汇总 JSON](../archive/records/netease-v5/assets/resource-comparison.json)。同机 Windows x64、.NET 10.0.10、Avalonia Headless + Skia；1200×720、10,000 队列项、1,000 行歌词，假网络/音频；每场景 60 秒，三轮，以下取中位数。
+[原始 V4 样本](assets/v4-baseline.json)、[原始 V5 样本](assets/v5-observation.json)、[汇总 JSON](assets/resource-comparison.json)。同机 Windows x64、.NET 10.0.10、Avalonia Headless + Skia；1200×720、10,000 队列项、1,000 行歌词，假网络/音频；每场景 60 秒，三轮，以下取中位数。
 
 | 场景 | V4 Private Bytes | V5 Private Bytes | V4 单核 CPU | V5 单核 CPU | 60 秒托管分配 V4 → V5 |
 | --- | ---: | ---: | ---: | ---: | ---: |
@@ -77,7 +79,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V5
 
 ## 6. 部署与交付范围
 
-已用独立 Debug 输出、`IncludeLibVlcRuntime=false` 编译，并经 `DeployManagedPlugin` 部署到用户指定的 `D:\data\avalonia\Controls\MusicNetEasePlugin`。12 个文件的名称、长度、SHA256 与干净暂存产物一致；不携带原生 libVLC，保留必要的托管 LibVLCSharp。部署前后公共运行库 425 个文件摘要相同。详见[专用部署与清理记录](../archive/records/netease-v5/deployment-20260923.md)。
+已用独立 Debug 输出、`IncludeLibVlcRuntime=false` 编译，并经 `DeployManagedPlugin` 部署到用户指定的 `D:\data\avalonia\Controls\MusicNetEasePlugin`。12 个文件的名称、长度、SHA256 与干净暂存产物一致；不携带原生 libVLC，保留必要的托管 LibVLCSharp。部署前后公共运行库 425 个文件摘要相同。详见[专用部署与清理记录](deployment-20260923.md)。
 
 相同无原生库 Debug 布局由 6,383,814 增至 6,528,114 字节，增加 **144,300 字节（约 140.92 KiB / 2.26%）**；其中入口 DLL 增加 115,200 字节，PDB 增加 29,100 字节，其余文件摘要未变。
 

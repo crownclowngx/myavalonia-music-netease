@@ -1,6 +1,6 @@
 # V6 · Document / Tool 当前界面契约
 
-> 更新：2026-09-23。V6-01～18 已接入，设计与证据见 [V6 专用实施记录](../maintenance/netease-v6-drawer-and-interaction-implementation.md)。原有实机及性能待验不由自动测试替代。
+> 更新：2026-09-23。V6-01～18 已接入，设计与证据见 [V6 专用实施记录](../archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)。原有实机及性能待验不由自动测试替代。
 
 ## 浏览与播放
 

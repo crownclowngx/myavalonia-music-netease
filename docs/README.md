@@ -1,93 +1,83 @@
-# MusicNetEasePlugin 文档导航
+# 网易云音乐插件文档
 
-> 本插件唯一文档总导航；更新日期：2026-09-23。
-> 当前实现：V6-01～18 已接入，见 [专用实施记录](maintenance/netease-v6-drawer-and-interaction-implementation.md)。V5 原有性能与实机待验继续按 [完成度复核](maintenance/netease-v5-completion-audit-20260923.md)跟踪。V1–V4 用户已确认手工验收完成；对应能力里程碑 M0–M2 已完成。
-> 验收依据：[V1–V4 验收收口记录](archive/records/netease-v1-v4-acceptance-20260923.md)。后续 M3–M5 尚未实施，下一步另行讨论。
+> 本插件唯一文档总导航；整理日期：2026-09-24。当前行为以 `quick-start` 和 `reference` 为准，历史操作与证据见 `archive`。
 
-## 当前使用与实现
+## 按任务查找
 
-| 我想了解 | 文档 | 内容 |
+| 我想做什么 | 从这里阅读 |
+| --- | --- |
+| 了解项目、构建与首次登录 | [项目首页](../README.md)、[扫码登录](quick-start/netease-login.md) |
+| 搜索、播放、管理队列和查看歌词 | [播放器快速开始](quick-start/netease-playback.md) |
+| 配置多个插件共用的 LibVLC | [运行库配置](quick-start/netease-playback.md#配置多个插件共用的-libvlc)、[无原生库构建](quick-start/netease-playback.md#不携带原生库的开发产物) |
+| 修改业务或界面 | [项目与窗口职责](reference/project-and-window-responsibilities.md)、下方当前契约 |
+| 验证改动或查看测试依据 | [验证指南](maintenance/verification.md) |
+| 完成 V5 / V6 剩余验收 | [性能与实机待验清单](maintenance/netease-v5-v6-acceptance.md) |
+| 部署、打包和检查真实 Host | [部署与发布](maintenance/deployment-and-release.md) |
+| 查看下一步候选功能 | [能力路线图](roadmap/netease-capability-roadmap.md) |
+| 按计划开发 M3 音乐库管理 | [V7 专用实施方案](roadmap/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
+| 查找过去的设计、实施与部署 | [归档索引](archive/README.md) |
+| 新增、更新或迁移文档 | [文档维护约定](maintenance/documentation.md) |
+
+## 当前状态与待验范围
+
+V 表示方案 / 实施序号，M 表示能力里程碑，均不是插件包版本。当前插件身份为 `myavalonia.plugin.music.netease`，目标 Windows x64。
+
+| 范围 | 当前结论 | 依据 |
 | --- | --- | --- |
-| 如何构建、登录与恢复账号 | [项目首页](../README.md)、[扫码登录快速开始](quick-start/netease-login.md) | 本地开发入口、独立数据目录、扫码、恢复、退出与排错 |
-| 如何使用播放器 | [日常播放快速开始](quick-start/netease-playback.md) | 搜索、歌单、队列、歌词、历史/恢复、共享运行库配置 |
-| 播放器与运行库如何工作 | [音乐与播放当前契约](reference/netease-music-playback.md) | 单曲执行、账号隔离、媒体预算、LibVLC 来源和设置 Tool |
-| 歌单、队列与歌词如何工作 | [日常播放器当前实现](reference/netease-daily-player.md) | 四模式、定位、歌词、历史、静默恢复与页面寿命 |
-| 界面如何工作 | [Document / Tool 当前界面契约](reference/netease-desktop-ui.md) | 紧凑布局、深浅主题、动效、偏好存储与资源所有权 |
-| V5 交互与 UI 依据什么优化 | [V5 轻量交互与 UI 优化方案](roadmap/netease-v5-lightweight-interaction-and-ui-plan.md) | 官方与开源客户端对照、逐页交互、视觉规范、资源预算和实施验收计划；D 验收及交互差项未收口 |
-| 歌词抽屉与其他交互如何实现 | [V6 专用修改方案](roadmap/netease-v6-drawer-and-interaction-change-plan.md) | 18 项全量范围与状态/业务/视图分工；[原候选评估](roadmap/netease-v6-interaction-candidates-evaluation.md)保留依据 |
-| 登录与请求如何工作 | [HTTP 与会话契约](reference/netease-http-session.md) | 微信/App 登录、Flurl、端点、会话、取消和生命周期 |
-| 后续有哪些候选能力 | [能力路线图](roadmap/netease-capability-roadmap.md) | 已完成 M0–M2，待讨论的 M3–M5 范围与依赖 |
-| 上游还有哪些能力 | [api-enhanced 能力清单](reference/netease-api-enhanced-capabilities.md) | 固定提交的模块索引与移植边界；不代表全部已支持 |
+| V1–V4 / M0–M2 | 登录、播放、日常播放器及早期界面已实现；用户已确认手工验收 | [验收收口记录](archive/records/netease-v1-v4-acceptance-20260923.md) |
+| V5 轻量交互与 UI | 主体已实现，整体验收未收口；旧复核 C01–C08 已由 V6 接续实现，D01–D05 仍待验证 | [V5 历史复核](archive/records/netease-v5/completion-audit-20260923.md)、[V6 承接说明](archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md#5-实机验收及历史问题) |
+| V6 抽屉与交互 | V6-01～18 已实现、本地开发验证通过；完整实机验收未完成 | [实施与自动证据](archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)、[验证矩阵](maintenance/netease-v6-drawer-and-interaction-verification-plan.md) |
+| 最近开发部署 | 2026-09-23 部署到指定 Controls，共用 LibVLC；实际 Host 启动复测通过 | [V6 部署记录](archive/records/netease-v6/deployment-20260923.md) |
+| V7 / M3 音乐库管理 | 实施方案与专用验证矩阵已编写；业务代码、V7 门禁和真实验收均待实施 | [V7 方案](roadmap/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
+| M4–M5 / 正式发布 | 后续功能尚未实施；正式 ZIP 发布、跨平台适配不在已完成结论内 | [能力路线图](roadmap/netease-capability-roadmap.md)、[发布流程](maintenance/deployment-and-release.md) |
 
-V 编号表示方案/实施文档序号，M 编号表示能力里程碑，均不是插件包版本。V6 已全量接入，编号递增不表示 V5 的性能、实机待验自动收口。
+剩余的 D01–D05 性能 / 实机项目与 V6 新增交互验收统一维护在[待验清单](maintenance/netease-v5-v6-acceptance.md)，其中列出已有证据、缺口和关闭条件。V5 的封面取色仍为可选未实施项，见[后续候选](roadmap/netease-capability-roadmap.md#现有界面的可选增强)。方案归档不改变这些状态；后续验证新增带日期记录，再更新清单与本表。
 
-## 开发参考
+## 当前实现与开发参考
 
-| 文档 | 用途与适用范围 |
+| 文档 | 内容 |
 | --- | --- |
-| [项目、Host 与 Standalone 职责](reference/project-and-window-responsibilities.md) | 项目结构、唯一业务实现、公开 SDK、资源所有权和验证分工 |
-| [公共资源与插件图标](reference/plugin-icons.md) | 当前入口图标、注册模式、页面使用和私有依赖声明 |
-| [Workbench Command](reference/workbench-commands.md) | 接入参考；当前未注册命令或快捷键 |
-| [Workflow Action](reference/workflow-actions.md) | Provider / Consumer 接入示例；当前未选择或注册任一角色 |
+| [HTTP 与会话](reference/netease-http-session.md) | 微信 / App 登录、Flurl、端点、受保护会话、取消与生命周期 |
+| [音乐与播放](reference/netease-music-playback.md) | 搜索与单曲执行、账号隔离、媒体预算、LibVLC 来源及设置 |
+| [日常播放器](reference/netease-daily-player.md) | 歌单、共享队列、四模式、定位、歌词、历史和静默恢复 |
+| [Document / Tool 界面](reference/netease-desktop-ui.md) | V6 抽屉、焦点、响应式布局、主题、偏好与图片预算 |
+| [项目与窗口职责](reference/project-and-window-responsibilities.md) | 代码结构、Plugin / Standalone / Tests 分工、公开 SDK 与资源所有权 |
+| [插件图标](reference/plugin-icons.md) | 图标注册、页面使用和私有依赖声明 |
+| [Workbench Command](reference/workbench-commands.md) | 接入参考；当前未注册工作台命令或快捷键，Document 内 Ctrl+F 属于局部输入 |
+| [Workflow Action](reference/workflow-actions.md) | 接入参考；当前未选择或注册 Provider / Consumer 角色 |
+| [固定上游能力清单](reference/netease-api-enhanced-capabilities.md) | 固定提交的模块索引和移植边界；不代表插件已支持全部上游能力 |
 
-业务与界面放在 Plugin，Standalone 和 Tests 复用同一实现。稳定插件身份为 `myavalonia.plugin.music.netease`；manifest 由 Build 包生成。
+## 方案归档与回归验证
 
-## 验证与维护
+V1–V6 原方案及已完成决策的 V6 候选评估统一放在 `archive/plans`；当前行为查 `reference`，剩余验收查 `maintenance`，后续功能查 `roadmap`。V1–V4 已验收，V5 / V6 仍待完整验收，详见[归档索引](archive/README.md)。
 
-| 文档 | 用途 |
-| --- | --- |
-| [登录验证矩阵](maintenance/netease-login-verification.md) | 协议、HTTP、状态、存储、UI、微信专项测试与人工回归方法 |
-| [V2 / M1 播放验证矩阵](maintenance/netease-v2-m1-playback-verification.md) | 搜索、播放、路径/Tool、Dock、共享运行库与平台边界；页面寿命已同步 V4 |
-| [V3 界面验证矩阵](maintenance/netease-v3-ui-verification.md) | 主题、尺寸、动效、资源回收与实机回归方法 |
-| [V4 / M2 日常播放器验证矩阵](maintenance/netease-v4-m2-daily-player-verification.md) | V4 历史完整检查：M2 场景、M1/V3 回归、门禁自测与实机回归方法 |
-| [V5 交互与 UI 专用验证计划](maintenance/netease-v5-ui-interaction-verification-plan.md) | 现行 V5 场景、单元/组件/资源检查、门禁失败注入与证据要求 |
-| [V5 专用实施记录](maintenance/netease-v5-ui-interaction-implementation.md) | 实现差异、自动证据、资源对比、SOLID 分工和实机边界 |
-| [V6 专用验证矩阵](maintenance/netease-v6-drawer-and-interaction-verification-plan.md) | 默认本地开发门禁、15 场景、真实控件与证据来源检查 |
-| [V6 专用实施记录](maintenance/netease-v6-drawer-and-interaction-implementation.md) | 18 项落地、提交、验证结果和人工验收边界 |
-| [V5 完成度重新核查](maintenance/netease-v5-completion-audit-20260923.md) | 未完整实现的体验、未达标/待验证项、可选增强与待用户决定的范围 |
-| [V5 启动故障修复](archive/records/netease-v5/startup-fix-20260923.md) | 注册所有权修复、309 项回归、实际 Host 启动前后复测及重新部署 |
-| [开发部署、正式发布与验收](maintenance/deployment-and-release.md) | 私有依赖、干净部署目录、正式 ZIP 和真实 Host 回归流程 |
+| 范围 | 方案 | 可复用验证 |
+| --- | --- | --- |
+| 登录 | [V1 历史方案](archive/plans/netease-v1-flurl-login-plan.md) | [登录矩阵](maintenance/netease-login-verification.md) |
+| 搜索与单曲播放 | [V2 历史方案](archive/plans/netease-v2-m1-playback-plan.md) | [M1 矩阵](maintenance/netease-v2-m1-playback-verification.md) |
+| 早期桌面界面 | [V3 历史方案](archive/plans/netease-v3-desktop-ui-and-theme-plan.md) | [V3 矩阵](maintenance/netease-v3-ui-verification.md) |
+| 日常播放器 | [V4 历史方案](archive/plans/netease-v4-m2-daily-player-plan.md) | [M2 矩阵](maintenance/netease-v4-m2-daily-player-verification.md) |
+| 轻量交互与 UI | [V5 方案](archive/plans/netease-v5-lightweight-interaction-and-ui-plan.md) | [V5 矩阵](maintenance/netease-v5-ui-interaction-verification-plan.md) |
+| 抽屉与交互 | [V6 方案](archive/plans/netease-v6-drawer-and-interaction-change-plan.md)、[候选评估依据](archive/plans/netease-v6-interaction-candidates-evaluation.md) | [V6 矩阵](maintenance/netease-v6-drawer-and-interaction-verification-plan.md) |
+| 音乐库管理（待开发） | [V7 实施方案](roadmap/netease-v7-m3-music-library-management-plan.md) | [V7 验证规范（待实施）](maintenance/netease-v7-m3-music-library-verification-plan.md) |
 
-以上矩阵继续作为后续回归依据，V1–V4 手工验收已收口。自动测试、用户手工验收和部署分别引用各自记录；正式发布与跨平台适配不包含在本次完成结论中。
+默认完整开发检查为 V6，包含适用的 M1 / V3 / M2 / V5 回归。命令、产物、手工验证与发布边界统一见[验证指南](maintenance/verification.md)。当前本地开发不使用 AIFLOW、Windows CI 或发布门禁。
 
-当前开发不使用 AIFLOW、Windows CI 或发布门禁。
+V7 是下一阶段开发依据，方案保留在 `roadmap`；V7 场景映射及门禁脚本尚未创建，不能执行 `-Milestone V7`，也不改变 V5 / V6 的既有待验结论。
 
-## 已完成方案与历史记录
-
-V1–V4 方案统一移入 [archive/plans](archive/README.md)，设计细节保留供追溯，当前行为以 `reference` 为准。
-
-- [验收收口与文档整理记录](archive/records/netease-v1-v4-acceptance-20260923.md)：本次用户确认、文档归位与漂移修正。
-- [V4 分阶段实施记录](archive/records/netease-v4/m2-implementation-20260923.md)：功能、自动门禁、截图和当时的验证边界。
-- [V4 历史开发部署与清理记录](archive/records/netease-v4/redeployment-20260923-1609.md)：无原生 libVLC 的 12 文件部署与备份；标准清理约 1.91 GiB，另列受自动审批限制的剩余项。
-- [V6 最新部署与清理](archive/records/netease-v6/deployment-20260923.md)：完整本地门禁重跑、12 文件无原生库部署、实际 Host 启动与标准清理；未新增备份，剩余项受自动审批限制。
-- [V5 修复版历史部署与清理](archive/records/netease-v5/redeployment-20260923.md)：12 文件无原生库部署、实际启动复测及当次受限清理结果。
-- [完整归档索引](archive/README.md)：V1 登录、V2 播放、V3 界面与 V4 日常播放器的方案及记录。
-
-旧记录中的“未验收”“未启动 Host”等描述仅代表当次操作，不覆盖后续用户验收结论；原始测试报告和部署摘要保持原样。
-
-## 文档目录与维护约定
+## 文档目录
 
 ```text
 docs/
-├─ README.md          # 唯一总导航
-├─ quick-start/       # 当前可执行的使用与开发步骤
-├─ roadmap/           # 当前能力路线与尚未实施的候选范围
-├─ reference/         # 当前契约、SDK 接入参考、固定上游调研
-├─ maintenance/       # 可复用的回归验证、部署与发布说明
+├─ README.md          # 总导航、当前状态及待验范围
+├─ quick-start/       # 当前可执行的使用步骤
+├─ reference/         # 当前实现契约、开发参考、固定上游索引
+├─ roadmap/           # 尚未实施的能力与可选增强
+├─ maintenance/       # 验证矩阵、待验清单、部署和文档维护方法
 └─ archive/
-   ├─ README.md       # 已完成方案与历史记录索引
-   ├─ plans/          # 已完成方案及历史设计快照
-   └─ records/        # 带日期的实施、验证、部署与验收记录
+   ├─ README.md       # 历史方案、实施与证据索引
+   ├─ plans/          # 历史方案与评估；验收状态单独标明
+   └─ records/        # 带日期的实施、复核、验收及部署记录
 ```
 
-- 当前实现更新 `reference`，使用步骤更新 `quick-start`，后续候选更新 `roadmap`。
-- 已实现且验收收口的版本方案进入 `archive/plans`，可复用验证矩阵继续留在 `maintenance`。
-- 单次测试数量、源码基线、TRX、部署摘要与验收依据保存在对应记录中。
-- 迁移时同步所有相对链接；历史记录只补导航和后续状态入口，不改写原始结果。
-- 仅整理文档时执行以下检查，无需完整业务门禁：
-
-```powershell
-. ./tools/DevelopmentChecks.ps1
-Assert-MarkdownLinks (Get-Location).Path
-git diff --check
-```
+迁移规则和检查命令见[文档维护约定](maintenance/documentation.md)。前轮变更见[入口整理记录](archive/records/documentation/reorganization-20260924.md)，本轮见[V5 / V6 分类记录](archive/records/documentation/classification-20260924.md)。

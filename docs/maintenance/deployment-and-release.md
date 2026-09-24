@@ -2,11 +2,9 @@
 
 > 用途：开发部署与正式发布的可复用操作参考。当前目标为 Windows x64；现有 V1–V4 手工验收已由用户确认完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)；本文不表示已完成正式发布。
 
-最近一次开发部署见[V6 部署与清理记录](../archive/records/netease-v6/deployment-20260923.md)：重新通过 326 项测试与 310 项门禁自测，使用 `IncludeLibVlcRuntime=false` 独立构建并部署 12 个文件；实际 Host 启动 ready、退出码 0、诊断 0 条。未新增备份，标准清理约 1.92 GiB；递归删除被自动审批拒绝，剩余约 224.48 MiB 已逐目录列明。清理后部署文件、Common 与其他插件摘要再次核对一致。
+最近一次已记录的开发部署为 2026-09-23 的 [V6 部署与清理](../archive/records/netease-v6/deployment-20260923.md)：无原生 libVLC 的插件已部署到指定 Controls，实际 Host 启动复测通过。测试数量、文件摘要、清理结果与限制保留在该记录中；本页维护可复用流程。
 
-[V5 修复版部署](../archive/records/netease-v5/redeployment-20260923.md)保留为历史。启动故障根因与修复见[专项记录](../archive/records/netease-v5/startup-fix-20260923.md)，V5 整体状态仍以[完成度复核](netease-v5-completion-audit-20260923.md)为准。
-
-此前[V4 Common LibVLC 部署与清理记录](../archive/records/netease-v4/common-deployment-20260923.md)保留旧部署及中间产物清理结果，该次后续手工验收已由用户确认完成。[V3 部署](../archive/records/netease-v3/common-deployment-20260923.md)、[M1 公共库配置记录](../archive/records/netease-v2/shared-libvlc-deployment-20260923.md)、[微信部署](../archive/records/netease-v1/wechat-login-implementation-20260922.md)和[App 部署](../archive/records/netease-v1/development-deploy-20260922.md)保留为历史。
+V5 启动故障已[修复](../archive/records/netease-v5/startup-fix-20260923.md)，其历史 C01–C08 差项由 V6 接续实现；仍待完成的性能和实机验收见[当前状态](../README.md#当前状态与待验范围)。历次部署按版本收录在[归档索引](../archive/README.md)，不作为本次工作区重新部署的证明。
 
 部署分为开发期临时联调和正式 ZIP 发布。两者都必须使用 Build 包筛选出的干净插件目录，不能直接复制
 普通 `bin/Debug` 或 `bin/Release`，因为普通输出可能包含 Host 应当统一提供的共享程序集。
@@ -122,6 +120,8 @@ ZIP 内保持 `Controls/MusicNetEasePlugin/` 布局；同名外置 `.manifest.js
 Host 提供的导入入口；若由维护者手工解压，也必须保留 ZIP 内的目录层级。
 
 ## 真实 Host 最小验收
+
+V5 / V6 的性能、Dock、输入、显示及业务验收状态统一维护在[待验清单](netease-v5-v6-acceptance.md)。以下是部署后的通用检查，不以启动通过替代完整验收。
 
 - 插件状态显示已加载，manifest 的 ID、版本、入口和 SDK 区间正确；
 - 已声明的网易云音乐 Document 与账号设置 Tool 出现在预期菜单或 Dock 区域；

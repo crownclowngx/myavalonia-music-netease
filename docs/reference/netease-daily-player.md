@@ -2,7 +2,7 @@
 
 ## V6 增量契约
 
-歌词和队列共用非模态右侧抽屉，开关独立于浏览页，窗口限位与用户保存宽度分开。布局、焦点与密度详见 [界面契约](netease-desktop-ui.md)，全量范围及证据见 [专用实施记录](../maintenance/netease-v6-drawer-and-interaction-implementation.md)。
+歌词和队列共用非模态右侧抽屉，开关独立于浏览页，窗口限位与用户保存宽度分开。布局、焦点与密度详见 [界面契约](netease-desktop-ui.md)，全量范围及证据见 [专用实施记录](../archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)。
 
 - `EnqueueAsync` 返回实际本次接纳数量、下一首意图和账号 epoch；UI 不再根据总数变化猜测操作成功。恢复、换曲及另一页面编辑不触发当前页面的伪入队通知。
 - 恢复提示有独立身份，当前页面可收起；主动点播、结构变化或停止清除旧提示。收起本身不开始播放；首次继续仍沿用静默恢复与真实媒体起点校正。
@@ -16,7 +16,7 @@
 > 更新：2026-09-23。V4 / M2 功能、自动验证与手工验收已完成；手工结论依据用户确认，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。
 > [专用验证矩阵](../maintenance/netease-v4-m2-daily-player-verification.md) · [实施记录](../archive/records/netease-v4/m2-implementation-20260923.md)。本页只描述已经接入的增量。
 
-V5 的三页浏览、固定播放条、共享歌曲行、图片预算和设置交互见 [界面契约](netease-desktop-ui.md)，证据见 [专用实施记录](../maintenance/netease-v5-ui-interaction-implementation.md)。
+V5 的三页浏览、固定播放条、共享歌曲行、图片预算和设置交互见 [界面契约](netease-desktop-ui.md)，证据见 [专用实施记录](../archive/records/netease-v5/ui-interaction-implementation-20260923.md)。
 
 ## 歌单与账号
 

@@ -2,7 +2,7 @@
 
 > 用户指定：编译并部署到 `D:\data\avalonia\Controls`，不携带 libVLC；清理中间产物及旧版本副本。
 > 本次为本地开发部署，未运行 AIFLOW、Windows CI、正式 ZIP 或发布门禁。
-> [实施记录](../../../maintenance/netease-v5-ui-interaction-implementation.md) · [门禁证据](gate-20260923/verification.json) · [部署文件摘要](assets/deployment-20260923.json) · [清理明细](assets/cleanup-20260923.json)
+> [实施记录](ui-interaction-implementation-20260923.md) · [门禁证据](gate-20260923/verification.json) · [部署文件摘要](assets/deployment-20260923.json) · [清理明细](assets/cleanup-20260923.json)
 
 ## 编译与部署
 

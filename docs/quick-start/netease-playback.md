@@ -1,6 +1,6 @@
 # V6 日常播放器快速开始
 
-V6 已接入右侧歌词/队列抽屉和完整交互增强，验证边界见 [专用实施记录](../maintenance/netease-v6-drawer-and-interaction-implementation.md)。
+V6 已接入右侧歌词/队列抽屉和完整交互增强，验证边界见 [专用实施记录](../archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)。
 
 - 点击底部“歌词”或“队列”展开同一个右侧抽屉，再点或按 Esc 收起。搜索和播放条一直可用，浏览列表保留。拖动左边线调整宽度，聚焦边线后左右键调整、Home 复位；窗口变窄不会覆盖保存的宽度。
 - 歌词手动浏览后点击“回到当前歌词”恢复居中跟随；右键或键盘菜单选择“跳到此句”定位，暂停时保持暂停。不可定位时菜单显示原因。
@@ -10,7 +10,7 @@ V6 已接入右侧歌词/队列抽屉和完整交互增强，验证边界见 [�
 
 登录后打开“我的歌单”，单击歌单名称，可分页浏览、播放全部或从这里播放。搜索和歌单均可追加歌曲或安排下一首；“播放队列”可调整顺序和四种模式。当前增量见[日常播放器说明](../reference/netease-daily-player.md)。
 
-> V5 主体已接入，尚未正式完成，见 [完成度复核](../maintenance/netease-v5-completion-audit-20260923.md)。启动加载故障已修复，最新部署见 [修复记录](../archive/records/netease-v5/startup-fix-20260923.md)。
+> 当前实现、性能与实机待验统一见[文档导航](../README.md#当前状态与待验范围)。最近开发部署为 2026-09-23 的 [V6 部署与启动复测](../archive/records/netease-v6/deployment-20260923.md)；V5 启动故障修复保留为历史记录。
 > 当前支持 Windows x64，V1–V4 已实现并完成手工验收，依据见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。完整边界见[当前播放契约](../reference/netease-music-playback.md)。
 
 ## 开始播放
@@ -47,7 +47,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V6
 dotnet run --project src/MusicNetEasePlugin.Standalone -c Debug --no-build
 ```
 
-Standalone 支持主题切换和并排/窄 Document/窄 Tool/底部 Tool 预览，复用生产模型和 View，账号数据使用独立目录。默认 V6 门禁保留 M1/V3 的映射、17 张 V3 截图和动效观察，加入 58 个 M2 场景、8 张播放器截图、原生定位/恢复/三曲与生命周期证据。V5 再核验 30 个行为场景、静态资产、图片并发/缓存/引用预算、6 张三尺寸双色详情截图、4 张双色设置/故障截图与资源采样。执行 locked restore、Debug 零警告构建、全部测试、TRX/来源身份/源码指纹/产物检查及文档检查；不连接网易、不读取用户会话、不启动 Host 或系统音频输出。
+Standalone 支持主题切换和并排 / 窄 Document / 窄 Tool / 底部 Tool 预览，复用生产模型和 View，账号数据使用独立目录。默认 V6 检查保留适用的 M1 / V3 / M2 / V5 回归，并核验抽屉、手势、布局与资源证据；不连接网易业务、不读取用户会话、不启动真实 Host 或系统音频输出。检查步骤、产物和证明范围统一见[验证指南](../maintenance/verification.md)。清理 bin/obj 后需重新构建再使用 `--no-build`。
 
 需要显式验证真实账号和 MP3 解码时：
 

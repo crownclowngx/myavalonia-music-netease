@@ -1,7 +1,7 @@
 # V5 · 轻量交互与 UI 专用验证计划
 
-> 日期：2026-09-23。状态：与 [V5 方案](../roadmap/netease-v5-lightweight-interaction-and-ui-plan.md)配套的现行验证矩阵。具体结果见 [V5 实施记录](netease-v5-ui-interaction-implementation.md)；整体未正式完成，差项见 [完成度复核](netease-v5-completion-audit-20260923.md)。
-> 当前完整本地检查为 `pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V5`，包含 M1/V3/V4 回归。
+> 日期：2026-09-23。状态：与 [V5 方案](../archive/plans/netease-v5-lightweight-interaction-and-ui-plan.md)配套的可复用验证矩阵。首轮结果见 [V5 实施记录](../archive/records/netease-v5/ui-interaction-implementation-20260923.md)，当时的差项见[历史复核](../archive/records/netease-v5/completion-audit-20260923.md)；后续承接与待验范围见下方当前入口。
+> 本矩阵对应 `-Milestone V5` 的证据要求，包含 M1/V3/V4 回归；当前默认完整检查为 `-Milestone V6`，继续包含本矩阵，命令见[验证指南](verification.md)。历史复核中的 C01–C08 已由 V6 承接，性能及实机事项持续维护在[待验清单](netease-v5-v6-acceptance.md)。原 V5 布局预期由 V6 明确变更的部分，以 V6 矩阵与当前界面契约为准。
 > 仅规划本地开发验证，不使用 AIFLOW、Windows CI 或发布门禁。
 
 ## 1. 范围与通过条件

@@ -1,8 +1,10 @@
 # V5 · 完成度重新核查与待决事项（2026-09-23）
 
+> 后续状态（2026-09-24 整理）：本文保留 V5 当时的审查结论；C01–C08 已由 [V6 的 18 项实现](../netease-v6/drawer-and-interaction-implementation-20260923.md)承接，不再作为当前未开发清单。D01–D05 性能及实机待验仍保留，当前汇总见[文档导航](../../../README.md#当前状态与待验范围)。下文“未实现 / 等待决定”只描述本次历史复核。
+
 > 结论：**V5 尚未正式完成，不能关闭整个 V5。** 主体功能已有实现，但存在核心体验差项，D 阶段验收尚未收口。原先“核心 A–D 已完成/已接入”的表述过强，已更正。
 > 当前已完成用户授权的启动加载故障修复、309 项本地回归及真实 Host 启动前后复测；其他差项只审查记录，等待用户决定是否继续开发。
-> 依据：[原 V5 方案](../roadmap/netease-v5-lightweight-interaction-and-ui-plan.md)、[验证矩阵](netease-v5-ui-interaction-verification-plan.md)、当前源码及实际证据。未重新调研外部产品，未以截图数量或测试总数替代逐项完成结论。
+> 依据：[原 V5 方案](../../plans/netease-v5-lightweight-interaction-and-ui-plan.md)、[验证矩阵](../../../maintenance/netease-v5-ui-interaction-verification-plan.md)、当前源码及实际证据。未重新调研外部产品，未以截图数量或测试总数替代逐项完成结论。
 
 ## 1. 当前可确认完成的部分
 
@@ -12,7 +14,7 @@
 
 ## 2. 启动故障现已修复
 
-根因是私有 DI 重复注册 Host 拥有的 MusicSettingsTool 贡献根；已移除重复注册并保留 AddTool 声明。修复前实际 Host 报 `PLUGIN_CONTRIBUTION_SERVICE_REGISTRATION_FORBIDDEN`，修复后同一 EXE 就绪并正常退出，诊断 0 条。309 项测试、249 项门禁自测通过，已重新部署且不携带原生 libVLC，见[专项修复记录](../archive/records/netease-v5/startup-fix-20260923.md)。
+根因是私有 DI 重复注册 Host 拥有的 MusicSettingsTool 贡献根；已移除重复注册并保留 AddTool 声明。修复前实际 Host 报 `PLUGIN_CONTRIBUTION_SERVICE_REGISTRATION_FORBIDDEN`，修复后同一 EXE 就绪并正常退出，诊断 0 条。309 项测试、249 项门禁自测通过，已重新部署且不携带原生 libVLC，见[专项修复记录](startup-fix-20260923.md)。
 
 这项故障已关闭，不再列为待开发项。新增注册契约测试修补了原自动门禁遗漏；仍不能因此推导其他未测的 Host 操作全部通过。
 
@@ -22,14 +24,14 @@
 
 | 编号 / 优先级 | 方案要求 | 当前事实与未完成点 | 依据 |
 | --- | --- | --- | --- |
-| C01 / P1 | §5.8 可收起的恢复提示，显示恢复首数、停留位置、就近继续 | 静默恢复已实现；目前只有“已恢复上次队列，点击继续播放”的播放消息，经“查看提示”弹层查看，没有独立的数量/时间/继续/收起提示条 | [恢复协调器](../../src/MusicNetEasePlugin.Plugin/Application/Playback/PlaybackQueueCoordinator.cs)、[播放条](../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml) |
-| C02 / P1 | §5.2 区分“加入队列”和“将在当前歌曲后播放”的反馈 | 播放行为正确，但短提示只根据队列总数增长生成“已加入队列 · 共 N 首”；不能区分两种意图，也不报告本次新增数量 | [播放条模型](../../src/MusicNetEasePlugin.Plugin/Features/Music/PlayerBarWorkspace.cs) |
-| C03 / P1 | §5.5 缓冲时主按钮位置显示明确加载态；不可定位有具体原因 | 目前 Loading 时仍显示禁用的暂停图标，旁边另有加载文字与缓冲数据；Slider 只有 CanSeek 禁用，缺少相邻、键盘可读的不可定位原因 | [播放条](../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml)、[定位模型](../../src/MusicNetEasePlugin.Plugin/Features/Music/TimelineWorkspace.cs) |
-| C04 / P1 | §4.2 低矮布局压缩附加信息；大歌词封面按剩余内容宽度收纳 | 窄播放条的提示/缓冲占额外一行，已有 520×420 截图的提示态超过 96–112 DIP 建议高度；大封面开关按整个 MusicView 宽度判断，没有随右侧队列压缩后的实际歌词宽度退为单列 | [播放条布局](../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml.cs)、[音乐页布局](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml.cs)、[520 截图](../archive/records/netease-v5/gate-20260923/v5-detail-dark-520.png) |
-| C05 / P2 | §5.4 宽屏歌单详情的小封面、数量、按需描述区域 | 歌单列表有 40 DIP 缩略图；详情仍为文字标题/操作/完整性提示，未增加详情封面及描述展开。窄屏省略封面是允许的，宽屏也省略需明确接受取舍 | [歌单 View](../../src/MusicNetEasePlugin.Plugin/Features/Library/PlaylistView.axaml) |
-| C06 / P2 | §8 约 150 ms 后呈现辅助加载态；空态有图标、原因和就近下一步 | 搜索和登录忙碌指示直接绑定状态，未实现延迟防闪；空队列/歌单/历史有文字与原有导航，尚未统一为方案中的图标和就近动作组合 | [音乐页](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml)、[主页面](../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml)、[队列](../../src/MusicNetEasePlugin.Plugin/Features/Music/QueueView.axaml) |
-| C07 / P2 | §4.1 / §8 导航选中语义与进入页面时的焦点目标 | 当前三导航为 Button + selected 样式，未提供 Tab/选择项语义；返回浏览和设置/歌单有局部焦点恢复，进入歌词/队列后未统一把焦点送到标题或首个内容操作。菜单完整焦点路径和读屏还需实机验证，不断言框架默认行为一定错误 | [音乐页](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml)、[输入后台](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml.cs) |
-| C08 / P2 | §5.5 / U02 曲目信息完整可读，长歌手/专辑有完整入口 | 播放条主信息显示歌名和播放状态，未显示已有 Artists 字段；宽歌曲行歌手/专辑列只有省略，没有完整文本提示，窄搜索/历史行也未提供专辑展开。歌曲标题本身已有提示，不列为缺失 | [歌曲行](../../src/MusicNetEasePlugin.Plugin/Features/Music/SongRowView.axaml)、[播放条](../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml) |
+| C01 / P1 | §5.8 可收起的恢复提示，显示恢复首数、停留位置、就近继续 | 静默恢复已实现；目前只有“已恢复上次队列，点击继续播放”的播放消息，经“查看提示”弹层查看，没有独立的数量/时间/继续/收起提示条 | [恢复协调器](../../../../src/MusicNetEasePlugin.Plugin/Application/Playback/PlaybackQueueCoordinator.cs)、[播放条](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml) |
+| C02 / P1 | §5.2 区分“加入队列”和“将在当前歌曲后播放”的反馈 | 播放行为正确，但短提示只根据队列总数增长生成“已加入队列 · 共 N 首”；不能区分两种意图，也不报告本次新增数量 | [播放条模型](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/PlayerBarWorkspace.cs) |
+| C03 / P1 | §5.5 缓冲时主按钮位置显示明确加载态；不可定位有具体原因 | 目前 Loading 时仍显示禁用的暂停图标，旁边另有加载文字与缓冲数据；Slider 只有 CanSeek 禁用，缺少相邻、键盘可读的不可定位原因 | [播放条](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml)、[定位模型](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/TimelineWorkspace.cs) |
+| C04 / P1 | §4.2 低矮布局压缩附加信息；大歌词封面按剩余内容宽度收纳 | 窄播放条的提示/缓冲占额外一行，已有 520×420 截图的提示态超过 96–112 DIP 建议高度；大封面开关按整个 MusicView 宽度判断，没有随右侧队列压缩后的实际歌词宽度退为单列 | [播放条布局](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml.cs)、[音乐页布局](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml.cs)、[520 截图](gate-20260923/v5-detail-dark-520.png) |
+| C05 / P2 | §5.4 宽屏歌单详情的小封面、数量、按需描述区域 | 歌单列表有 40 DIP 缩略图；详情仍为文字标题/操作/完整性提示，未增加详情封面及描述展开。窄屏省略封面是允许的，宽屏也省略需明确接受取舍 | [歌单 View](../../../../src/MusicNetEasePlugin.Plugin/Features/Library/PlaylistView.axaml) |
+| C06 / P2 | §8 约 150 ms 后呈现辅助加载态；空态有图标、原因和就近下一步 | 搜索和登录忙碌指示直接绑定状态，未实现延迟防闪；空队列/歌单/历史有文字与原有导航，尚未统一为方案中的图标和就近动作组合 | [音乐页](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml)、[主页面](../../../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml)、[队列](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/QueueView.axaml) |
+| C07 / P2 | §4.1 / §8 导航选中语义与进入页面时的焦点目标 | 当前三导航为 Button + selected 样式，未提供 Tab/选择项语义；返回浏览和设置/歌单有局部焦点恢复，进入歌词/队列后未统一把焦点送到标题或首个内容操作。菜单完整焦点路径和读屏还需实机验证，不断言框架默认行为一定错误 | [音乐页](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml)、[输入后台](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml.cs) |
+| C08 / P2 | §5.5 / U02 曲目信息完整可读，长歌手/专辑有完整入口 | 播放条主信息显示歌名和播放状态，未显示已有 Artists 字段；宽歌曲行歌手/专辑列只有省略，没有完整文本提示，窄搜索/历史行也未提供专辑展开。歌曲标题本身已有提示，不列为缺失 | [歌曲行](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/SongRowView.axaml)、[播放条](../../../../src/MusicNetEasePlugin.Plugin/Features/Music/PlaybackBarView.axaml) |
 
 播放失败已有持续“播放失败/查看提示”和重试入口，歌词失败也有重试；这些不能笼统写成未实现。歌单不完整提示、队列操作的核心语义及隐藏资源回收同样已有实现，剩余的是上述具体差项和验收证据。
 
@@ -43,7 +45,7 @@
 | D04 | 待实机验证 | 100%/125%/150%/200% DPI、长中文、深浅主题切换、各 Tool 尺寸；物理中文输入法、仅键盘完整任务和屏幕阅读器状态/焦点/名称；最终主题下对比度及核心命中区域 |
 | D05 | 待真实业务与用户确认 | V5 实际账号搜索→播放→下一首→歌单返回→恢复播放，以及真实设备出声和故障恢复；仍需用户对易用性与视觉进行验收确认 |
 
-资源硬预算的自动检查（下载并发、压缩/解码缓存、图片引用、静态资产）已通过。上表不能被解释为它们完全没有验证；缺口在测量覆盖与实机确认。[原始性能与限制](netease-v5-ui-interaction-implementation.md)保留不改写。
+资源硬预算的自动检查（下载并发、压缩/解码缓存、图片引用、静态资产）已通过。上表不能被解释为它们完全没有验证；缺口在测量覆盖与实机确认。[原始性能与限制](ui-interaction-implementation-20260923.md)保留不改写。
 
 ## 5. 已记录取舍与可选项
 

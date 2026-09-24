@@ -1,6 +1,7 @@
 # V5 · MusicNetEasePlugin 轻量交互与 UI 优化方案
 
-> 日期：2026-09-23。状态：V5 主体已接入生产代码，**整体尚未正式完成**；启动故障已修复，但交互差项与 D 阶段验收未收口，见 [完成度复核](../maintenance/netease-v5-completion-audit-20260923.md)。阶段 E 保留为可选增强。
+> 方案日期：2026-09-23；状态更新：2026-09-24。V5 主体已接入，**整体验收尚未收口**；[历史复核](../records/netease-v5/completion-audit-20260923.md)中的 C01–C08 已由 [V6](../records/netease-v6/drawer-and-interaction-implementation-20260923.md)接续实现，D01–D05 性能及实机待验仍保留。原 E 阶段的歌词居中、队列拖动与撤销也已由 V6 实现，封面取色仍为可选未实施项。当前汇总见[文档导航](../../README.md#当前状态与待验范围)。
+> 分类归档：2026-09-24。下文保留原设计、阶段和当时实施状态；当前布局、参数及交互以[界面契约](../../reference/netease-desktop-ui.md)为准。性能与实机事项继续由[待验清单](../../maintenance/netease-v5-v6-acceptance.md)跟踪，封面取色由[后续候选](../../roadmap/netease-capability-roadmap.md#现有界面的可选增强)承接；归档不表示 V5 整体验收完成。
 > 基线：已验收的 V1–V4 / M0–M2；源码 HEAD `5ab947037476fef7d779b9f16868fc8083f0f4b5`，结合当前工作区文档与已有验收截图审阅。
 > V5 是方案序号，不是插件包版本，也不代表 M3–M5 已启动。
 > 优先级：**资源可控、操作顺手 → 信息清楚 → 视觉现代 → 适量动效**。
@@ -18,11 +19,11 @@
 4. 深浅主题有一致的视觉语言；重点突出，信息量适合桌面和 Dock 小面板。
 5. 不新增装饰图片包、背景视频、持续频谱或 WebView。隐藏界面时停止新增的视觉工作。
 
-本期针对现有登录、搜索、只读歌单、队列、定位、歌词、本机历史、恢复及设置做体验改造。喜欢/收藏写入、推荐、歌手/专辑详情、下载管理、桌面歌词和系统媒体键继续属于[能力路线图](netease-capability-roadmap.md)的后续范围。界面不摆放尚不可用的爱心、下载、音质切换或“发现”入口。
+本期针对现有登录、搜索、只读歌单、队列、定位、歌词、本机历史、恢复及设置做体验改造。喜欢/收藏写入、推荐、歌手/专辑详情、下载管理、桌面歌词和系统媒体键继续属于[能力路线图](../../roadmap/netease-capability-roadmap.md)的后续范围。界面不摆放尚不可用的爱心、下载、音质切换或“发现”入口。
 
 **推荐交付到第 10 节的阶段 D。** 封面取色、歌词平滑居中和队列拖拽作为增强项单列；核心体验不依赖它们。
 
-阅读建议：产品决策看第 2–5 节，视觉和资源取舍看第 6–8 节，开发落地看第 9–11 节。详细测试范围单列为 [V5 专用验证计划](../maintenance/netease-v5-ui-interaction-verification-plan.md)，实际自动验证与实机边界单独记录。
+阅读建议：产品决策看第 2–5 节，视觉和资源取舍看第 6–8 节，开发落地看第 9–11 节。详细测试范围单列为 [V5 专用验证计划](../../maintenance/netease-v5-ui-interaction-verification-plan.md)，实际自动验证与实机边界单独记录。
 
 ## 2. 调研对象、事实与取舍
 
@@ -64,18 +65,18 @@
 
 | 位置与依据 | 现状 | 使用影响 | V5 调整 |
 | --- | --- | --- | --- |
-| [主页面](../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml) | 顶栏标题、头像、账号按钮；登录页并列多个动作 | 登录阶段的主动作与状态仍可更聚焦 | 扫码方式切换 + 单一当前动作；已登录时头像菜单合并账号操作 |
-| [音乐页](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) | 五个普通按钮切换页面；导航未绑定显式选中外观 | 不容易扫一眼确认所在页面；浏览入口与播放辅助入口混合 | 三个选中态导航；歌词与队列进入固定播放区 |
+| [主页面](../../../src/MusicNetEasePlugin.Plugin/Features/Main/MainView.axaml) | 顶栏标题、头像、账号按钮；登录页并列多个动作 | 登录阶段的主动作与状态仍可更聚焦 | 扫码方式切换 + 单一当前动作；已登录时头像菜单合并账号操作 |
+| [音乐页](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml) | 五个普通按钮切换页面；导航未绑定显式选中外观 | 不容易扫一眼确认所在页面；浏览入口与播放辅助入口混合 | 三个选中态导航；歌词与队列进入固定播放区 |
 | 搜索结果 | 单击选择，播放/下一首/追加在表格底部 | 视线往返，首次使用需要理解“所选” | 就地播放按钮、双击/Enter、更多菜单；选中态与播放态分开 |
-| [歌单页](../../src/MusicNetEasePlugin.Plugin/Features/Library/PlaylistView.axaml) | 选歌单后点“打开所选”；内部再分歌单/曲目 Tab | 层级冗余，返回上下文不直观 | 歌单名称可直接打开；详情有返回路径；保留原列表位置 |
-| [队列页](../../src/MusicNetEasePlugin.Plugin/Features/Music/QueueView.axaml) | 模式在该页 ComboBox；移除/上下移等底部并列 | 切模式需离开内容；队列整理有额外视线移动 | 模式常驻播放条；队列行菜单、当前项标记与定位 |
-| [歌词页](../../src/MusicNetEasePlugin.Plugin/Features/Music/LyricsView.axaml) | 字号接近普通列表，跟随与重试按钮常显 | 功能已丰富，但没有足够的观看重点 | 正常歌词放大；当前句突出；跟随暂停或失败时才显示对应动作 |
+| [歌单页](../../../src/MusicNetEasePlugin.Plugin/Features/Library/PlaylistView.axaml) | 选歌单后点“打开所选”；内部再分歌单/曲目 Tab | 层级冗余，返回上下文不直观 | 歌单名称可直接打开；详情有返回路径；保留原列表位置 |
+| [队列页](../../../src/MusicNetEasePlugin.Plugin/Features/Music/QueueView.axaml) | 模式在该页 ComboBox；移除/上下移等底部并列 | 切模式需离开内容；队列整理有额外视线移动 | 模式常驻播放条；队列行菜单、当前项标记与定位 |
+| [歌词页](../../../src/MusicNetEasePlugin.Plugin/Features/Music/LyricsView.axaml) | 字号接近普通列表，跟随与重试按钮常显 | 功能已丰富，但没有足够的观看重点 | 正常歌词放大；当前句突出；跟随暂停或失败时才显示对应动作 |
 | 播放条 | 多个文字控制同权；窄屏音量另占一排；停止与暂停并列 | 高频操作辨识度和内容面积可改善 | 播放/暂停唯一主按钮；停止归入更多；音量窄屏弹出 |
-| [历史页](../../src/MusicNetEasePlugin.Plugin/Features/Music/HistoryView.axaml) | 简单两行曲目，底部动作 | 与搜索/歌单操作不一致，历史时间价值未体现 | 复用歌曲行；展示本机时间分组与恢复提示 |
-| [设置 Tool](../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsView.axaml) | 运行库草稿、保存值、候选和实际状态同时展示 | 正常听歌用户也会看到很多技术信息 | 正常态只露“播放组件正常”；按需展开高级信息；故障自动展开 |
-| [图片加载](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/AccountImageSource.cs)、[页面图片所有权](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml.cs) | 图片请求 160×160、上限 2 MiB、10 秒；封面由各 View 解码/释放 | 直接扩展歌单缩略图或大封面可能放大多页面开销 | 增加明确的图片尺寸档、去重缓存和引用寿命，再逐步启用 |
+| [历史页](../../../src/MusicNetEasePlugin.Plugin/Features/Music/HistoryView.axaml) | 简单两行曲目，底部动作 | 与搜索/歌单操作不一致，历史时间价值未体现 | 复用歌曲行；展示本机时间分组与恢复提示 |
+| [设置 Tool](../../../src/MusicNetEasePlugin.Plugin/Features/Settings/MusicSettingsView.axaml) | 运行库草稿、保存值、候选和实际状态同时展示 | 正常听歌用户也会看到很多技术信息 | 正常态只露“播放组件正常”；按需展开高级信息；故障自动展开 |
+| [图片加载](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/AccountImageSource.cs)、[页面图片所有权](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicView.axaml.cs) | 图片请求 160×160、上限 2 MiB、10 秒；封面由各 View 解码/释放 | 直接扩展歌单缩略图或大封面可能放大多页面开销 | 增加明确的图片尺寸档、去重缓存和引用寿命，再逐步启用 |
 
-现有虚拟化、主题局部作用域、减少动态效果、共享播放器、静默恢复及退出清理属于应保留的设计基础。完整基线见[当前界面契约](../reference/netease-desktop-ui.md)和[日常播放器契约](../reference/netease-daily-player.md)。
+现有虚拟化、主题局部作用域、减少动态效果、共享播放器、静默恢复及退出清理属于应保留的设计基础。完整基线见[当前界面契约](../../reference/netease-desktop-ui.md)和[日常播放器契约](../../reference/netease-daily-player.md)。
 
 ## 4. 页面结构与自适应布局
 
@@ -306,7 +307,7 @@ V5 正式验收下限继续为 **520×420**；低于下限只提供合理降级�
 | 加入队列反馈 | 固定位置短提示约 2–3 秒 | 无重复计时器堆积，重要失败不自动消失 |
 | 加载 | 仅在实际忙碌且可见时显示局部指示 | 减少动态效果开启时保留静态状态文字 |
 
-沿用 [ViewMotion](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Ui/ViewMotion.cs) 的偏好、主题切换和可见性控制。隐藏、最小化、脱离视觉树、减少动态效果时撤销新增动画；重新显示只投影最新状态。不开启旋转封面、频谱、呼吸灯、闪动 skeleton 或动态背景。
+沿用 [ViewMotion](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Ui/ViewMotion.cs) 的偏好、主题切换和可见性控制。隐藏、最小化、脱离视觉树、减少动态效果时撤销新增动画；重新显示只投影最新状态。不开启旋转封面、频谱、呼吸灯、闪动 skeleton 或动态背景。
 
 ## 7. 资源预算与 Avalonia 实现约束
 
@@ -382,7 +383,7 @@ V5 正式验收下限继续为 **520×420**；低于下限只提供合理降级�
 | 歌词呈现 | LyricsView/LyricsWorkspace/ViewMotion | 保留解析与真实进度；不在 View 内启动新的歌词时钟 |
 | 有界图片服务 | AccountImageSource + 新增小型 ArtworkCache 边界 | 分清网络缓存、解码对象、View 引用和退出清理；必要时后台解码，先核验框架线程要求 |
 | 用户偏好 | UiPreferences/UiPreferencesStore | 扩展为明确版本；旧 reduceMotion 迁移保留；继续原子保存与失败重试，不保存浏览账号数据到通用偏好 |
-| 图标与入口 | PluginModule、现有矢量资源能力 | 当前入口使用 TextCheck，改为自有音乐几何；参考[图标契约](../reference/plugin-icons.md) |
+| 图标与入口 | PluginModule、现有矢量资源能力 | 当前入口使用 TextCheck，改为自有音乐几何；参考[图标契约](../../reference/plugin-icons.md) |
 
 不修改登录协议、音频输出后端或媒体缓冲算法作为视觉工作的前提。若暴露出对应缺陷，单独记录修复，避免 V5 范围不断扩大。
 
@@ -480,12 +481,12 @@ A–D 建议投入约 **9–13 人日**。若需要缩减范围，先去掉 E，
 - 组件级：焦点/键盘/菜单动作不重复；图标可访问名称；布局断点；seek 草稿取消；不完整歌单禁用反馈。
 - 资源级：缓存合并、取消、预算、引用计数；隐藏页无新增动画/图片工作；退出释放和迟到结果隔离。
 - 截图：1200×720、800×600、520×420 的深浅主题；另核对真实 Host 的 Dock、浮窗、回停和 Tool 尺寸。Standalone 通过不代替 Host 通过。
-- 回归：继续执行现有 [V4 日常播放器验证](../maintenance/netease-v4-m2-daily-player-verification.md)与 [V3 界面验证](../maintenance/netease-v3-ui-verification.md)，只对 V5 **明确变更的播放语义**更新旧预期。
+- 回归：继续执行现有 [V4 日常播放器验证](../../maintenance/netease-v4-m2-daily-player-verification.md)与 [V3 界面验证](../../maintenance/netease-v3-ui-verification.md)，只对 V5 **明确变更的播放语义**更新旧预期。
 - 文档：实现后同步 `reference`、`quick-start` 和验证矩阵；保留“实现完成 / 自动验证 / 用户验收”三个独立结论。V5 真正验收后再将此计划归档。
 
 ### 11.4 本地开发门禁与完整性
 
-详细场景与失败注入规则见 [V5 专用验证计划](../maintenance/netease-v5-ui-interaction-verification-plan.md)。沿用仓库的本地 PowerShell 入口；V5 实现已扩展里程碑参数、真实场景映射及独立资源证据，不以已有 V4 的测试数量代替新行为验证。
+详细场景与失败注入规则见 [V5 专用验证计划](../../maintenance/netease-v5-ui-interaction-verification-plan.md)。沿用仓库的本地 PowerShell 入口；V5 实现已扩展里程碑参数、真实场景映射及独立资源证据，不以已有 V4 的测试数量代替新行为验证。
 
 完整门禁应覆盖锁定依赖恢复、警告视为错误的 Debug 构建、全部适用单元/组件/集成测试、V5 场景到真实测试方法的映射、当前轮证据、文档链接及补丁格式。必需测试不得跳过；测试失败、报告缺失、旧报告复用、映射缺项、关键资源证据缺失时均失败退出，并对这些失败路径做门禁自测。
 
@@ -520,13 +521,13 @@ A–D 建议投入约 **9–13 人日**。若需要缩减范围，先去掉 E，
 
 ### 本地资料
 
-- [V1–V4 验收收口](../archive/records/netease-v1-v4-acceptance-20260923.md)、[V4 1200 宽深色基线截图](../archive/records/netease-v4/assets/final/m2-document-dark-1200.png)、[V4 520×420 浅色歌词截图](../archive/records/netease-v4/assets/final/m2-document-light-520.png)。
-- [界面契约](../reference/netease-desktop-ui.md)、[日常播放器契约](../reference/netease-daily-player.md)、[播放与运行库契约](../reference/netease-music-playback.md)。
-- [能力路线图](netease-capability-roadmap.md)、[项目与窗口职责](../reference/project-and-window-responsibilities.md)、[公共图标接入](../reference/plugin-icons.md)。
+- [V1–V4 验收收口](../records/netease-v1-v4-acceptance-20260923.md)、[V4 1200 宽深色基线截图](../records/netease-v4/assets/final/m2-document-dark-1200.png)、[V4 520×420 浅色歌词截图](../records/netease-v4/assets/final/m2-document-light-520.png)。
+- [界面契约](../../reference/netease-desktop-ui.md)、[日常播放器契约](../../reference/netease-daily-player.md)、[播放与运行库契约](../../reference/netease-music-playback.md)。
+- [能力路线图](../../roadmap/netease-capability-roadmap.md)、[项目与窗口职责](../../reference/project-and-window-responsibilities.md)、[公共图标接入](../../reference/plugin-icons.md)。
 
 ## 14. 方案阶段的文档交付记录（历史）
 
-本节仅保留开始开发前的记录，不代表当前 V5 代码状态。后续核心实现、自动门禁与性能测量见 [V5 专用实施记录](../maintenance/netease-v5-ui-interaction-implementation.md)。
+本节仅保留开始开发前的记录，不代表当前 V5 代码状态。后续核心实现、自动门禁与性能测量见 [V5 专用实施记录](../records/netease-v5/ui-interaction-implementation-20260923.md)。
 
 | 项目 | 结果与边界 |
 | --- | --- |

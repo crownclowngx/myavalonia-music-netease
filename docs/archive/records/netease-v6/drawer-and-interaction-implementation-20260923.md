@@ -1,7 +1,9 @@
 # V6 · 歌词抽屉与交互专用实施记录
 
-> 2026-09-23：V6-01～18 已实现，本地开发验证通过。范围依据用户批准的 [专用修改方案](../roadmap/netease-v6-drawer-and-interaction-change-plan.md)；场景依据 [验证矩阵](netease-v6-drawer-and-interaction-verification-plan.md)。
-> 实施阶段未使用 AIFLOW、Windows CI 或发布门禁，未推送、部署或发布；后续按用户要求完成 [V6 指定 Controls 部署与启动复测](../archive/records/netease-v6/deployment-20260923.md)。物理输入设备、Dock 和声卡完整验收单独保留，不由启动与自动结果替代。
+> 文档归位（2026-09-24）：本记录按实施日期归档，原始验证与实机边界保留。后续状态统一见[文档导航](../../../README.md#当前状态与待验范围)；归档不代表完整实机验收通过。
+
+> 2026-09-23：V6-01～18 已实现，本地开发验证通过。范围依据用户批准的 [专用修改方案](../../plans/netease-v6-drawer-and-interaction-change-plan.md)；场景依据 [验证矩阵](../../../maintenance/netease-v6-drawer-and-interaction-verification-plan.md)。
+> 实施阶段未使用 AIFLOW、Windows CI 或发布门禁，未推送、部署或发布；后续按用户要求完成 [V6 指定 Controls 部署与启动复测](deployment-20260923.md)。物理输入设备、Dock 和声卡完整验收单独保留，不由启动与自动结果替代。
 
 ## 1. 全量范围与落地
 
@@ -26,7 +28,7 @@
 | V6-17 | 最近移除/移动的单步撤销；唯一写入者原子校验，不回退媒体和当前播放 | Q02 |
 | V6-18 | 紧凑/舒适共享偏好；统一列表间距、歌词 20/22 DIP；schema 1/2 迁移到 3 | U01 |
 
-编号在 [方法映射](../../tools/v6-test-map.json)中对应真实执行方法，不把所有边界都声明为实机验证。基础服务的账号隔离、IO 预算、错误处理和资源寿命沿用适用回归。
+编号在 [方法映射](../../../../tools/v6-test-map.json)中对应真实执行方法，不把所有边界都声明为实机验证。基础服务的账号隔离、IO 预算、错误处理和资源寿命沿用适用回归。
 
 ## 2. 设计思路与边界
 
@@ -66,9 +68,9 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V6
 | 静态资源 | 3 个样式/资源文件，共 9,004 字节；无内置位图、字体或视频 |
 | 文档与空白检查 | 本地门禁及最后文档提交前检查均执行 |
 
-最终报告及原始产物归档在 [本轮验证报告](../archive/records/netease-v6/gate-20260923/verification.json)；[原始 TRX](../archive/records/netease-v6/gate-20260923/netease-login-development.trx)、[布局证据](../archive/records/netease-v6/gate-20260923/v6-interaction-ui.json)、[拖动证据](../archive/records/netease-v6/gate-20260923/v6-queue-gesture.json)及截图来源均保留原字节。99 个文件共 2,788,861 字节；归档摘要已逐项对照报告。`.gitattributes` 禁止归档换行转换，避免检出后 SHA256 变化。
+最终报告及原始产物归档在 [本轮验证报告](gate-20260923/verification.json)；[原始 TRX](gate-20260923/netease-login-development.trx)、[布局证据](gate-20260923/v6-interaction-ui.json)、[拖动证据](gate-20260923/v6-queue-gesture.json)及截图来源均保留原字节。99 个文件共 2,788,861 字节；归档摘要已逐项对照报告。`.gitattributes` 禁止归档换行转换，避免检出后 SHA256 变化。
 
-代表截图：[宽屏队列](../archive/records/netease-v6/gate-20260923/v6-queue-light-1200.png)、[中尺寸歌词](../archive/records/netease-v6/gate-20260923/v6-lyrics-light-800.png)、[窄屏歌词](../archive/records/netease-v6/gate-20260923/v6-lyrics-dark-520.png)。截图为生产 View 的 Headless / Skia 渲染，不能冒充真实 Host 截图。
+代表截图：[宽屏队列](gate-20260923/v6-queue-light-1200.png)、[中尺寸歌词](gate-20260923/v6-lyrics-light-800.png)、[窄屏歌词](gate-20260923/v6-lyrics-dark-520.png)。截图为生产 View 的 Headless / Skia 渲染，不能冒充真实 Host 截图。
 
 首轮门禁后继续进行图像复核，发现并修复文字列重叠及歌词临时容器重叠；最终门禁重新运行，不沿用首轮失败图像。真实鼠标检查还修复了抽屉宽度松手未保存和连续拖动误触双击播放。最终归档只保留修复后的本轮证据。
 
@@ -86,8 +88,8 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V6
 
 ## 5. 实机验收及历史问题
 
-V6 的实现与本地自动验证完成；实际 Host 的 Dock 拖离/重挂、跨显示器 DPI、物理中文输入法、读屏顺序、真实声卡和用户体验验收在实施阶段未执行。实施阶段没有启动 Host、部署插件或输出系统音频；后续部署及有限启动验证见[独立记录](../archive/records/netease-v6/deployment-20260923.md)，不修改本节原始自动报告。既有 V1–V4 用户验收不自动覆盖 V6。
+V6 的实现与本地自动验证完成；实际 Host 的 Dock 拖离/重挂、跨显示器 DPI、物理中文输入法、读屏顺序、真实声卡和用户体验验收在实施阶段未执行。实施阶段没有启动 Host、部署插件或输出系统音频；后续部署及有限启动验证见[独立记录](deployment-20260923.md)，不修改本节原始自动报告。既有 V1–V4 用户验收不自动覆盖 V6。
 
-V5 的 C01～C08 由 V6 恢复提示、精确反馈、忙碌态、紧凑布局、歌单头、空态延迟、焦点与完整资料承接。原 [V5 复核](netease-v5-completion-audit-20260923.md)是历史证据，不重写当时结论。D01 的暂停可见 CPU 差值超目标与 D02～D05 实机待验仍保留；本轮有界缓存、隐藏寿命、静态资源及 Headless 采样通过，不等于已证明实机性能目标达标。
+V5 的 C01～C08 由 V6 恢复提示、精确反馈、忙碌态、紧凑布局、歌单头、空态延迟、焦点与完整资料承接。原 [V5 复核](../netease-v5/completion-audit-20260923.md)是历史证据，不重写当时结论。D01 的暂停可见 CPU 差值超目标与 D02～D05 实机待验仍保留；本轮有界缓存、隐藏寿命、静态资源及 Headless 采样通过，不等于已证明实机性能目标达标。
 
 最终用户验收可按验证矩阵依次检查：真实窗口三尺寸和 DPI、输入法/菜单/焦点、连续抽屉拖动与密度切换、队列并发拖动/撤销、重启静默恢复和真实出声。发布时再按既有发布流程执行 Windows CI 与发布门禁。
