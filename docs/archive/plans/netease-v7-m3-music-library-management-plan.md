@@ -1,7 +1,9 @@
 # V7 · M3 管理自己的音乐专用实施方案
 
+> 归档说明（2026-09-24）：V7-01～10 已实现；本地验证见[实施记录](../records/netease-v7/m3-implementation-20260924.md)，当前行为见[音乐库契约](../../reference/netease-music-library-management.md)。真实账号与 Host 尚待验收。下文保留原方案编写时的状态和计划语气，不作为当前未实现清单。
+
 > 编写日期：2026-09-24。状态：**实施方案已编写，业务代码、V7 门禁与真实账号验收均未实施**。
-> 本文承接[能力路线图的 M3](netease-capability-roadmap.md#m3管理自己的音乐)，V7 是方案 / 实施序号，不是插件包版本。开发按本文分阶段执行，测试要求见[V7 专用验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)。
+> 本文承接[能力路线图的 M3](../../roadmap/netease-capability-roadmap.md#m3管理自己的音乐)，V7 是方案 / 实施序号，不是插件包版本。开发按本文分阶段执行，测试要求见[V7 专用验证矩阵](../../maintenance/netease-v7-m3-music-library-verification-plan.md)。
 > 首要约束：SOLID；朴素使用设计模式；新增及修改的关键代码使用详细中文注释，解释设计思路。本轮不使用 AIFLOW、Windows CI 或发布门禁。
 
 ## 1. 目标、交付边界与完成标准
@@ -14,23 +16,23 @@
 2. 保持现有 C# + Flurl 直连方式，普通 MVVM、构造注入、端口与适配器、类型化结果和普通事件足够；不增加 Node 服务、通用命令总线、事件溯源、工作流引擎、通用仓储或新的状态管理框架。
 3. 写入成功必须有服务端依据，超时不能当作失败后随意重发；远端结果与本地显示状态分别建模。
 4. 单元测试、协议测试、生产控件交互测试、门禁自身失败注入和文档检查同步交付，不在功能完成后补一份仅列名的测试清单。
-5. 只使用**本地开发门禁**。Windows x64 本机运行测试仍然允许；不新增或运行 Windows CI，不执行发布构建、ZIP 发布、签名、上传、部署门禁。正式发布时再按[发布流程](../maintenance/deployment-and-release.md)执行。
+5. 只使用**本地开发门禁**。Windows x64 本机运行测试仍然允许；不新增或运行 Windows CI，不执行发布构建、ZIP 发布、签名、上传、部署门禁。正式发布时再按[发布流程](../../maintenance/deployment-and-release.md)执行。
 6. 只修改本任务所需文件，保留已有工作区改动；不因 V7 文档存在就更改包版本、伪造测试记录或自动提交、推送、发布。
 
-V7 开发完成要求：所有范围项实现、自动门禁通过、当前契约和使用文档同步。M3 验收完成还要求真实账号写后回查、真实 Host 交互和用户确认。只完成其中一层时按实际层级记录，不勾选整个 M3。V5 / V6 的[既有待验事项](../maintenance/netease-v5-v6-acceptance.md)继续独立跟踪。
+V7 开发完成要求：所有范围项实现、自动门禁通过、当前契约和使用文档同步。M3 验收完成还要求真实账号写后回查、真实 Host 交互和用户确认。只完成其中一层时按实际层级记录，不勾选整个 M3。V5 / V6 的[既有待验事项](../../maintenance/netease-v5-v6-acceptance.md)继续独立跟踪。
 
 ## 2. 已核对的代码基线
 
 | 当前入口 | 当前事实 | V7 接入原则 |
 | --- | --- | --- |
-| [PlaylistContracts](../../src/MusicNetEasePlugin.Plugin/Application/Library/PlaylistContracts.cs) | `IPlaylistCatalogApi` 只有歌单列表、详情和歌曲资料读取；`IsOwned` 仅来自 creator 比较 | 保留只读端口；增加可信详情元数据与独立写入端口，不把 `IsOwned` 直接升级为全部编辑权限 |
-| [NeteasePlaylistApi](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/NeteasePlaylistApi.cs) | 用户歌单分页 30 项、显示上限 1,000；曲目 ID 上限 10,000，资料每批 50 | 保留边界、完整性标志和缺资料占位；截断结果不得用于否定收藏或确认曲目不存在 |
-| [PlaylistBrowser](../../src/MusicNetEasePlugin.Plugin/Features/Library/PlaylistBrowser.cs) | 每个 Document 独立浏览，缓存最多 500 条资料，导航有代次保护 | 保留选择、分页、筛选；写入委托应用层，按失效通知刷新当前可见内容 |
-| [MusicSession / IMusicSessionAccessor](../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicContracts.cs) | 会话有账号、Epoch、CredentialVersion、撤销令牌及 `IsCurrent` 检查 | 直接复用；账号身份用 AccountId + Epoch，凭据提交继续走现有受控入口 |
-| [MusicRequestExecutor](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/MusicRequestExecutor.cs) | 歌单 / 歌词共用的只读保护层，统一要求业务 code=200 | 不直接套用于所有写响应；新增薄写请求执行器，保留端点自己的业务码和部分结果解析 |
-| [NeteaseTransport](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/NeteaseTransport.cs) | 固定端点、15 秒单请求超时、1 MiB 响应上限、POST 不自动重试 | 继续复用；不为 M3 全局放宽预算或开启 POST 重试 |
-| [服务注册](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs)、[生命周期](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginLifecycle.cs) | 播放与账号服务共享，浏览模型 Scoped；关闭页面继续播放 | 音乐库状态在插件容器中共享，编辑草稿按 Document 隔离；关闭账号 / 插件才撤销共享写任务 |
-| [开发脚本](../../tools/verify-development.ps1) | 当前只支持 Login / M1 / V3 / V4 / V5 / V6，默认 V6 | `-Milestone V7` 是本方案要求新增的能力，本文编写时不可执行 |
+| [PlaylistContracts](../../../src/MusicNetEasePlugin.Plugin/Application/Library/PlaylistContracts.cs) | `IPlaylistCatalogApi` 只有歌单列表、详情和歌曲资料读取；`IsOwned` 仅来自 creator 比较 | 保留只读端口；增加可信详情元数据与独立写入端口，不把 `IsOwned` 直接升级为全部编辑权限 |
+| [NeteasePlaylistApi](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/NeteasePlaylistApi.cs) | 用户歌单分页 30 项、显示上限 1,000；曲目 ID 上限 10,000，资料每批 50 | 保留边界、完整性标志和缺资料占位；截断结果不得用于否定收藏或确认曲目不存在 |
+| [PlaylistBrowser](../../../src/MusicNetEasePlugin.Plugin/Features/Library/PlaylistBrowser.cs) | 每个 Document 独立浏览，缓存最多 500 条资料，导航有代次保护 | 保留选择、分页、筛选；写入委托应用层，按失效通知刷新当前可见内容 |
+| [MusicSession / IMusicSessionAccessor](../../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicContracts.cs) | 会话有账号、Epoch、CredentialVersion、撤销令牌及 `IsCurrent` 检查 | 直接复用；账号身份用 AccountId + Epoch，凭据提交继续走现有受控入口 |
+| [MusicRequestExecutor](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/MusicRequestExecutor.cs) | 歌单 / 歌词共用的只读保护层，统一要求业务 code=200 | 不直接套用于所有写响应；新增薄写请求执行器，保留端点自己的业务码和部分结果解析 |
+| [NeteaseTransport](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/NeteaseTransport.cs) | 固定端点、15 秒单请求超时、1 MiB 响应上限、POST 不自动重试 | 继续复用；不为 M3 全局放宽预算或开启 POST 重试 |
+| [服务注册](../../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs)、[生命周期](../../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginLifecycle.cs) | 播放与账号服务共享，浏览模型 Scoped；关闭页面继续播放 | 音乐库状态在插件容器中共享，编辑草稿按 Document 隔离；关闭账号 / 插件才撤销共享写任务 |
+| [开发脚本](../../../tools/verify-development.ps1) | 当前只支持 Login / M1 / V3 / V4 / V5 / V6，默认 V6 | `-Milestone V7` 是本方案要求新增的能力，本文编写时不可执行 |
 
 本次源码和上游检查仅形成设计依据，没有调用真实网易写接口。
 
@@ -100,7 +102,7 @@ V7 开发完成要求：所有范围项实现、自动门禁通过、当前契�
 
 ## 5. 接口核对与协议边界
 
-沿用[上游清单的固定提交](../reference/netease-api-enhanced-capabilities.md)，本次于 2026-09-24 查看该提交源码。下表是**实现起点，不是接口真实可用的证明**；返回字段、错误码和账号限制由阶段 A 固化，真实可用性由后续实测确认。
+沿用[上游清单的固定提交](../../reference/netease-api-enhanced-capabilities.md)，本次于 2026-09-24 查看该提交源码。下表是**实现起点，不是接口真实可用的证明**；返回字段、错误码和账号限制由阶段 A 固化，真实可用性由后续实测确认。
 
 | 用途 | 固定上游源码 | 已核对的逻辑端点与参数 | 实施注意事项 |
 | --- | --- | --- | --- |
@@ -265,7 +267,7 @@ Task<LibraryMutationResult> SetLikedAsync(long trackId, bool desiredValue, Cance
 
 ## 10. 本地测试门禁与文档交付
 
-完整场景和产物规范以[V7 专用验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)为准，最低要求如下：
+完整场景和产物规范以[V7 专用验证矩阵](../../maintenance/netease-v7-m3-music-library-verification-plan.md)为准，最低要求如下：
 
 - 离线自动测试不登录真实账号、不读保存的会话、不请求网易写接口；复用 xUnit、现有 Fake、可控时钟、Flurl 夹具和 Avalonia Headless / Skia。
 - 场景映射关联真实完全限定测试方法和参数化数量，由本轮 TRX 验证；失败、跳过、零测试、缺场景、旧证据、缺文件或门禁异常均失败退出。
@@ -274,14 +276,14 @@ Task<LibraryMutationResult> SetLikedAsync(long trackId, bool desiredValue, Cance
 
 | 文档 | 本轮 / 开发期动作 |
 | --- | --- |
-| 本文及[V7 验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md) | 本轮新增，作为开发依据；开发时同步实际取舍与用例，不把计划写成已完成 |
-| [总导航](../README.md)、[根 README](../../README.md)、[能力路线图](netease-capability-roadmap.md)、[验证指南](../maintenance/verification.md) | 本轮补 V7 入口和待开发状态；脚本真正落地后才调整默认门禁说明 |
+| 本文及[V7 验证矩阵](../../maintenance/netease-v7-m3-music-library-verification-plan.md) | 本轮新增，作为开发依据；开发时同步实际取舍与用例，不把计划写成已完成 |
+| [总导航](../../README.md)、[根 README](../../../README.md)、[能力路线图](../../roadmap/netease-capability-roadmap.md)、[验证指南](../../maintenance/verification.md) | 本轮补 V7 入口和待开发状态；脚本真正落地后才调整默认门禁说明 |
 | `docs/reference/netease-music-library-management.md` | 实施时新增专用当前契约：端点、权限、状态、回查、预算、寿命和真实限制；逐项标明已实现部分 |
-| [日常播放器](../reference/netease-daily-player.md)、[界面契约](../reference/netease-desktop-ui.md)、[HTTP 与会话](../reference/netease-http-session.md) | 相应功能实现时同步共享状态、界面、协议和失败语义 |
-| [播放器快速开始](../quick-start/netease-playback.md)、[上游清单](../reference/netease-api-enhanced-capabilities.md) | 增加可操作的喜欢 / 收藏 / 编辑步骤及错误处理；只有实际接入的端点才改变接入状态 |
+| [日常播放器](../../reference/netease-daily-player.md)、[界面契约](../../reference/netease-desktop-ui.md)、[HTTP 与会话](../../reference/netease-http-session.md) | 相应功能实现时同步共享状态、界面、协议和失败语义 |
+| [播放器快速开始](../../quick-start/netease-playback.md)、[上游清单](../../reference/netease-api-enhanced-capabilities.md) | 增加可操作的喜欢 / 收藏 / 编辑步骤及错误处理；只有实际接入的端点才改变接入状态 |
 | `docs/archive/records/netease-v7/m3-implementation-YYYYMMDD.md` | 实施开始时新增带真实日期的专用记录，分列实现、自动检查、真实账号和人工验收 |
 | `docs/archive/records/netease-v7/acceptance-YYYYMMDD.md` | 真实验收发生时新增，引用原始脱敏证据并更新待验项；不提前生成假结果 |
-| [归档索引](../archive/README.md) | 有实施 / 验收记录时加入；V7 实施方案完成用途后按维护约定归档并同步全部链接 |
+| [归档索引](../README.md) | 有实施 / 验收记录时加入；V7 实施方案完成用途后按维护约定归档并同步全部链接 |
 
 新文件尚未生成的路径用代码标记列出，不添加失效 Markdown 链接。只写本文期间运行文档检查即可，不执行尚不存在的 V7 命令，也无需全量业务门禁。
 

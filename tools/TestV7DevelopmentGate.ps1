@@ -102,6 +102,12 @@ $entry=Get-Content -LiteralPath (Join-Path $PSScriptRoot 'verify-development.ps1
 foreach ($match in [regex]::Matches($entry, '\$Milestone -in @\(([^)]*)\)')) {
     if (!$match.Groups[1].Value.Contains("'V7'")) { throw 'V7 遗漏前置检查分支。' }; $checks++
 }
-foreach ($required in @('Assert-MarkdownLinks $root','Get-DevelopmentSourceStamp $root','Assert-V7TestMap','Assert-V7Artifacts')) {
+foreach ($required in @('Assert-MarkdownLinks $root','Get-DevelopmentSourceStamp $root','Assert-DevelopmentSourceUnchanged $source $after','Assert-V7TestMap','Assert-V7Artifacts')) {
     if (!$entry.Contains($required)) { throw "V7 入口丢失检查：$required" }; $checks++
+}
+$sourceBefore=@{revision='commit';sourceSha256='source'}
+Assert-DevelopmentSourceUnchanged $sourceBefore $sourceBefore.Clone(); $checks++
+foreach ($field in @('revision','sourceSha256')) {
+    $sourceAfter=$sourceBefore.Clone(); $sourceAfter[$field]='changed'
+    Expect-Rejection { Assert-DevelopmentSourceUnchanged $sourceBefore $sourceAfter }; $checks++
 }

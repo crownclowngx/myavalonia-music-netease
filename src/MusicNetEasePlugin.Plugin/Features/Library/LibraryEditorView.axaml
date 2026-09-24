@@ -33,6 +33,7 @@
       <StackPanel IsVisible="{Binding IsConfirmation}" Spacing="12"><TextBlock x:Name="ConfirmationTarget" Text="{Binding ConfirmationText}" TextWrapping="Wrap" /><Button x:Name="ConfirmLibraryButton" Content="确认执行" Command="{Binding ConfirmCommand}" AutomationProperties.Name="确认对上述歌单执行操作" /></StackPanel>
       <StackPanel IsVisible="{Binding IsDiscardPage}" Spacing="8"><TextBlock Text="尚有未保存的内容。继续编辑，或放弃草稿后关闭。" TextWrapping="Wrap" /><Button x:Name="KeepEditingButton" Content="继续编辑" Command="{Binding KeepEditingCommand}" /><Button Content="放弃草稿并关闭" Command="{Binding DiscardCommand}" /></StackPanel>
       <TextBlock Text="{Binding Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+      <TextBlock Text="{Binding LastResultMessage}" TextWrapping="Wrap" />
       <TextBlock Text="{Binding ResultItemsText}" TextWrapping="Wrap" />
       <TextBlock Text="正在处理，请稍候…" IsVisible="{Binding IsBusy}" />
       <ComboBox ItemsSource="{Binding PendingKeys}" SelectedItem="{Binding SelectedPending, Mode=TwoWay}" IsVisible="{Binding HasPending}" AutomationProperties.Name="选择待核实操作" HorizontalAlignment="Stretch" />

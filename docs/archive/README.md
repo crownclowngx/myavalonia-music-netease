@@ -6,6 +6,7 @@
 
 | 记录 | 范围 |
 | --- | --- |
+| [2026-09-24 V7 / M3 实施](records/netease-v7/m3-implementation-20260924.md) | 音乐库管理、完整本地验证与专用证据；[真实验收待办](records/netease-v7/acceptance-20260924.md)单列 |
 | [2026-09-24 V5 / V6 分类整理](records/documentation/classification-20260924.md) | 原方案与候选评估归档，性能 / 实机待验集中到维护清单 |
 | [2026-09-24 文档整理](records/documentation/reorganization-20260924.md) | 入口简化、记录归位、当前状态承接、链接与证据检查 |
 | [V6 最近部署与清理](records/netease-v6/deployment-20260923.md) | 2026-09-23 指定 Controls 部署、不携带原生 libVLC、实际 Host 启动复测 |
@@ -13,7 +14,7 @@
 | [V5 历史完成度复核](records/netease-v5/completion-audit-20260923.md) | 当时 C / D / E 范围；后续 C 项由 V6 承接，D 待验保留 |
 | [V1–V4 验收收口](records/netease-v1-v4-acceptance-20260923.md) | 用户已确认的手工验收范围 |
 
-V1–V6 原方案均按历史设计归档；其中 V1–V4 已验收，V5 / V6 完整验收仍未收口，剩余事项见[待验清单](../maintenance/netease-v5-v6-acceptance.md)。以下实施记录只证明当次操作，原始测试、截图与部署摘要不随后续状态更新而改写。
+V1–V7 原方案均按历史设计归档；其中 V1–V4 已验收，V5 / V6 / V7 完整验收仍未收口，剩余事项见[V5 / V6 待验清单](../maintenance/netease-v5-v6-acceptance.md)和[V7 待验记录](records/netease-v7/acceptance-20260924.md)。以下实施记录只证明当次操作，原始测试、截图与部署摘要不随后续状态更新而改写。
 
 ## 历史方案与当前承接
 
@@ -27,6 +28,7 @@ V1–V6 原方案均按历史设计归档；其中 V1–V4 已验收，V5 / V6 �
 | [V5：轻量交互与 UI](plans/netease-v5-lightweight-interaction-and-ui-plan.md) | 主体已实现，C01–C08 由 V6 承接；性能及实机验收未完成 | [界面契约](../reference/netease-desktop-ui.md)、[V5 矩阵](../maintenance/netease-v5-ui-interaction-verification-plan.md)、[待验清单](../maintenance/netease-v5-v6-acceptance.md) |
 | [V6：抽屉与交互修改方案](plans/netease-v6-drawer-and-interaction-change-plan.md) | 18 项已实现并通过本地检查；完整实机验收未完成 | [界面契约](../reference/netease-desktop-ui.md)、[V6 矩阵](../maintenance/netease-v6-drawer-and-interaction-verification-plan.md)、[待验清单](../maintenance/netease-v5-v6-acceptance.md) |
 | [V6：交互候选评估](plans/netease-v6-interaction-candidates-evaluation.md) | 18 项均已选定并实施；保留提案时的评估与取舍 | [冻结方案](plans/netease-v6-drawer-and-interaction-change-plan.md)、[实施记录](records/netease-v6/drawer-and-interaction-implementation-20260923.md) |
+| [V7：M3 音乐库管理](plans/netease-v7-m3-music-library-management-plan.md) | V7-01～10 已实现，自动验证通过；真实账号 / Host 待验 | [音乐库契约](../reference/netease-music-library-management.md)、[V7 矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)、[真实验收待办](records/netease-v7/acceptance-20260924.md) |
 
 方案正文保留设计时的约束、阶段标识和待办快照，不作为新的执行指令；旧页面所有者规则以 V4 当前契约为准。原 V1 的播放器扩展已由 V2–V4 落地，其余候选统一由路线图承接。
 
@@ -37,6 +39,7 @@ V1–V6 原方案均按历史设计归档；其中 V1–V4 已验收，V5 / V6 �
 | 2026-09-23 | [V1–V4 验收收口与文档整理](records/netease-v1-v4-acceptance-20260923.md) | 用户确认现有 V 编号内容已实现并完成手工验收；方案归档、当前契约和维护矩阵去漂移 |
 
 以下实施记录的证明范围均指当次操作。V1–V4 旧记录中的“待验收”“未启动 Host”由上述后续用户确认承接；该确认不延伸到 V5 / V6。原始 TRX、截图、探针与部署摘要保持原样，正式发布、跨平台适配和 M3–M5 不包含在已完成结论中。
+
 
 ## 实施与验证记录
 
@@ -99,3 +102,7 @@ V5 初轮证据见 [gate 报告](records/netease-v5/gate-20260923/verification.j
 | 2026-09-23 | [V1–V4 验收与整理](records/netease-v1-v4-acceptance-20260923.md) | 早期方案归档、契约与维护矩阵同步 |
 | 2026-09-24 | [文档入口与 V5 / V6 记录归位](records/documentation/reorganization-20260924.md) | 当前说明与历史快照分工、状态承接和导航检查 |
 | 2026-09-24 | [V5 / V6 方案分类与验收承接](records/documentation/classification-20260924.md) | 已实施方案和评估归档、维护清单集中跟踪待验、可选项保留在路线图 |
+
+## V7 音乐库管理实施
+
+[专用实施记录](records/netease-v7/m3-implementation-20260924.md)保存代码提交、完整门禁及原始证据；[H01–H05 待验记录](records/netease-v7/acceptance-20260924.md)说明真实账号、官方令牌、Host 和物理交互的缺口。本轮没有部署、Windows CI 或发布。

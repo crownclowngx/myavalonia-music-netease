@@ -13,6 +13,13 @@ namespace MusicNetEasePlugin.Tests;
 
 public sealed class LibraryProtocolTests
 {
+    [Theory, InlineData(301), InlineData(401), InlineData(429), InlineData(460)]
+    public async Task 明确拒绝码保留分类且只有会话失效撤销账号(int code)
+    {
+        using var http = new HttpTest(); http.RespondWithJson(new { code }); using var clients = new NeteaseFlurlClients(new FlurlClientCache()); using var sessions = new MusicSessions();
+        var result = await new NeteaseLikedSongsApi(new(new(clients, TimeProvider.System), sessions, new LibraryTokenFake())).SetAsync(1, true, sessions.Capture(), default);
+        Assert.Equal(LibraryReceiptState.Rejected, result.State); Assert.True(result.StopRecheck); Assert.Equal(code is not (301 or 401), sessions.SignedIn); Assert.Single(http.CallLog);
+    }
     [Theory, InlineData(false), InlineData(true)]
     public async Task Fake和真实适配共用喜欢确认无变化及取消契约(bool real)
     {

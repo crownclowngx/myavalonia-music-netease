@@ -119,6 +119,12 @@ function Get-M2Screenshots {
         @{ name="m2-restored-paused-$theme.png"; width=800; height=600 }
     }
 }
+function Assert-DevelopmentSourceUnchanged {
+    param([hashtable]$Before, [hashtable]$After)
+    foreach ($field in @('revision','sourceSha256')) {
+        if (!$Before[$field] -or !$After[$field] -or $Before[$field] -cne $After[$field]) { throw '验证期间源码变化，请对最终代码重新运行。' }
+    }
+}
 function Read-RunEvidence {
     param([string]$Path, [hashtable]$Context)
     $value = Get-Content -LiteralPath $Path -Raw | ConvertFrom-Json -AsHashtable

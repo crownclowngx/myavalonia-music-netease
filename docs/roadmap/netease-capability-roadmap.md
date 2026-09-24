@@ -2,7 +2,7 @@
 
 > 对象：`myavalonia-music-netease` / `myavalonia.plugin.music.netease`。更新日期：2026-09-24。
 > 当前状态：V1–V4 已实现并完成手工验收，对应 M0–M2 已完成；依据为[用户验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。
-> M3–M5 业务均尚未实施；M3 已形成 [V7 专用实施方案](netease-v7-m3-music-library-management-plan.md)和[验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)，供后续开发执行。M4 / M5 继续保留候选范围与依赖。
+> M3 / V7-01～10 已实现并通过本地开发验证，当前行为见[音乐库契约](../reference/netease-music-library-management.md)，依据见[实施记录](../archive/records/netease-v7/m3-implementation-20260924.md)。真实账号与 Host 验收待完成；M4 / M5 继续保留候选范围与依赖。
 
 V 编号是实施文档序号，M 编号是能力里程碑，均不表示插件包版本或交付日期。V1–V6 历史方案统一见[归档索引](../archive/README.md)，各自验收状态单独标明；当前行为由 `reference` 维护，V5 / V6 剩余工作见[待验清单](../maintenance/netease-v5-v6-acceptance.md)。
 
@@ -22,25 +22,25 @@ V 编号是实施文档序号，M 编号是能力里程碑，均不表示插件�
 - 当前支持 Windows x64；Linux/macOS 原生目录加载、受保护存储及 Host 适配尚未实现。
 - 媒体使用 Flurl 有界完整临时缓冲；下载到本地缓冲不等于支持离线下载管理。
 - 播放资源按账号返回值区分可播、试听与无地址；当前请求 standard 音质，不凭元数据承诺完整播放权限。
-- 上游清单固定提交下的 440 个模块是实现参考，不等于已接入功能数量；当前仍无音乐库写操作、发现入口、Workbench Command 或 Workflow Action 注册。
+- 上游清单固定提交下的 440 个模块是实现参考，不等于已接入功能数量；音乐库写入子集由 V7 接入；当前仍无发现入口、Workbench Command 或 Workflow Action 注册。
 - V1–V4 验收已收口；正式发布仍属独立工作，历史自动报告的证明范围不因用户验收而改变。
 
 ```mermaid
 flowchart LR
     M0["M0 登录 · 已完成"] --> M1["M1 搜索与单曲播放 · 已完成"]
     M1 --> M2["M2 日常播放器 · 已完成"]
-    M2 --> M3["M3 音乐库管理 · V7 方案已编写，待开发"]
+    M2 --> M3["M3 音乐库管理 · V7 已实现，真实验收待完成"]
     M3 --> M4["M4 推荐发现 · 候选"]
     M2 --> M5["M5 场景扩展 · 按需候选"]
 ```
 
-## 2. 后续主线（尚未实施）
+## 2. M3 已实施与 M4 后续主线
 
-M3 按 V7 专用方案分阶段开发，M4 的选择与交付顺序仍待后续确定。新功能继续复用现有登录、队列、播放器和 UI；不以移植全部上游模块为目标。
+M3 已按 V7 专用方案实施，M4 的选择与交付顺序仍待后续确定。新功能继续复用现有登录、队列、播放器和 UI；不以移植全部上游模块为目标。
 
 ### M3：管理自己的音乐
 
-**开发入口：** [V7 · M3 管理自己的音乐专用实施方案](netease-v7-m3-music-library-management-plan.md)。已明确 V7-01～10 范围、SOLID 职责、中文注释、页面交互、接口核对、写后回查、账号隔离及阶段交付；[V7 专用验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)覆盖单元 / 协议 / UI 测试、本地门禁失败注入和人工验收。当前仅完成文档，不表示业务或 V7 门禁已实现。
+**开发入口：** [V7 · M3 管理自己的音乐专用实施方案](../archive/plans/netease-v7-m3-music-library-management-plan.md)。已明确 V7-01～10 范围、SOLID 职责、中文注释、页面交互、接口核对、写后回查、账号隔离及阶段交付；[V7 专用验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)覆盖单元 / 协议 / UI 测试、本地门禁失败注入和人工验收。V7 业务与本地门禁已实现；最终行为和差异见[当前契约](../reference/netease-music-library-management.md)，真实验收见[H01–H05 待验记录](../archive/records/netease-v7/acceptance-20260924.md)。
 
 **用户流程：** 听到喜欢的歌曲 → 标记喜欢 → 收藏歌单 → 建立自己的歌单并整理曲目。
 
@@ -52,7 +52,7 @@ M3 按 V7 专用方案分阶段开发，M4 的选择与交付顺序仍待后续�
 | 添加 / 移除曲目 | `playlist_tracks` 或核对后的增删接口 | 检查所有权，处理重复曲目和部分失败，更新计数与详情 |
 | 删除自有歌单 | `playlist_delete` | 单独操作并明确目标；完成后同步导航与正在查看的列表 |
 
-优先交付喜欢和收藏，再交付歌单编辑；补充“按 ID 打开歌单”作为尚未收藏歌单的访问入口。头像、账号资料修改、批量导入和封面上传不合并进此阶段。接口候选需核对固定上游与实际返回，收藏令牌依赖、特殊歌单权限及可靠回查路径在 V7 阶段 A 收口。
+已交付喜欢、收藏及歌单编辑，并补充“按 ID 打开歌单”作为尚未收藏歌单的访问入口。头像、账号资料修改、批量导入和封面上传不合并进此阶段。端点按固定上游接入，令牌依赖使用官方 SDK / WebView2；真实账号返回和特殊歌单组合仍需实测，不从合成夹具外推。
 
 **验收：** 写入后重新读取能确认实际状态；失败保留或恢复原状态；在途写入时退出账号，旧结果不能污染后续账号。超时可能意味着服务端已执行，优先查询确认，不盲目重放创建、添加或删除请求。
 
@@ -105,13 +105,13 @@ V5 E 阶段的封面一次性取色尚未实施，保留为可选候选。若后
 - [x] M1：搜索与单曲播放、LibVLC 设置及 Host/Dock 接入，用户确认手工验收完成。
 - [x] V3：紧凑桌面界面、主题与动效，用户确认手工验收完成。
 - [x] M2：歌单、队列、连续播放、歌词与恢复，用户确认手工验收完成。
-- [ ] M3：喜欢、收藏与歌单管理，V7 实施方案及专用验证矩阵已编写，业务尚未实施。
+- [ ] M3：喜欢、收藏与歌单管理已实现并通过 V7 本地验证；真实账号 / Host / 用户总验收尚未完成。
 - [ ] M4：推荐、榜单、歌手/专辑与私人 FM，尚未实施。
 - [ ] M5：按需选择扩展分支，尚未启动。
 
-默认本地开发检查为 V6，保留适用的 M1/V3/M2/V5 回归，方法见[V6 专用验证矩阵](../maintenance/netease-v6-drawer-and-interaction-verification-plan.md)。后续改动分别更新当前契约、快速开始、回归矩阵和专用记录；实现、自动检查和人工验收分别记录依据。
+默认本地开发检查为 V7，保留适用的 M1/V3/M2/V5/V6 回归，方法见[V7 专用验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)。后续改动分别更新当前契约、快速开始、回归矩阵和专用记录；实现、自动检查和人工验收分别记录依据。
 
-V7 开发时按[专用门禁要求](../maintenance/netease-v7-m3-music-library-verification-plan.md)扩展脚本和场景映射，完成后才切换默认检查；当前脚本尚不支持 `-Milestone V7`。不使用 AIFLOW、Windows CI 或发布门禁，正式发布另行执行。
+V7 本地门禁已支持并默认执行 `-Milestone V7`，46 场景及失败注入见[专用验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)。不使用 AIFLOW、Windows CI 或发布门禁，正式发布另行执行。
 
 ## 5. 依据与关联文档
 

@@ -119,6 +119,7 @@ public sealed class LibraryUiTests
                     var writeCount = f.Api.Writes.Count; PressKey(window, Key.Enter); Assert.Equal(writeCount, f.Api.Writes.Count); Assert.False(page.Editor.IsOpen);
                     f.Api.Write = (_, _) => Task.FromResult(new LibraryWriteReceipt(LibraryReceiptState.Uncertain, "操作可能已生效，请重新读取结果。", StopRecheck: true));
                     await f.Library.ExecuteAsync(new(LibraryOperationKind.AddTracks, 7, TrackIds: [3])); Pump(window);
+                    await f.Library.RefreshLikesAsync(); Pump(window); Assert.Contains("重新读取结果", page.Editor.LastResultMessage);
                     await Click(Button(page.View, "LibraryResultsButton")); Pump(window); Assert.True(Button(page.View, "RecheckLibraryButton").IsEffectivelyEnabled);
                     Assert.Contains("playlist:7", page.Editor.PendingKeys); Save(window, $"v7-recheck-{(dark ? "dark" : "light")}.png");
                     PressKey(window, Key.Escape); Assert.False(page.Editor.IsOpen);
@@ -208,6 +209,19 @@ public sealed class LibraryUiTests
                 Assert.Equal(queue.Entries, f.Player.Player.Queue.Snapshot.Entries); Assert.Equal(position, f.Player.Player.Queue.Snapshot.Playback.PositionMs); Assert.Equal(opened, f.Player.Player.Audio.Opened.Count);
             }
             finally { wa.Close(); wb.Close(); }
+            return true;
+        }, default);
+    }
+
+    [Fact]
+    public async Task 页面关闭取消刷新等待但不把取消异常投递到UI()
+    {
+        await HeadlessSessions.Get(typeof(UiCompositionTests)).Dispatch(async () =>
+        {
+            await using var f = new Fixture(); await f.Initialize(); using var p = f.Page();
+            var read = new TaskCompletionSource<System.Collections.Immutable.ImmutableHashSet<long>>(TaskCreationOptions.RunContinuationsAsynchronously); f.Api.ReadLikes = _ => read.Task;
+            var refresh = p.Editor.RefreshAsync(); p.Dispose(); await refresh;
+            read.SetResult(System.Collections.Immutable.ImmutableHashSet<long>.Empty); await f.Library.RefreshLikesAsync(); Assert.Equal(0, f.Library.SubscriberCount);
             return true;
         }, default);
     }

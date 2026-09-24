@@ -1,4 +1,4 @@
-# V6 · Document / Tool 当前界面契约
+# V7 · Document / Tool 当前界面契约
 
 > 更新：2026-09-23。V6-01～18 已接入，设计与证据见 [V6 专用实施记录](../archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)。原有实机及性能待验不由自动测试替代。
 
@@ -75,3 +75,7 @@ Enter 处理发生在曲目列表的隧道路由，行内按钮先选中再执�
 | `UiPreferences` / `UiPreferencesStore` | 偏好与反馈 / 版本迁移和原子文件 |
 
 采用构造注入、普通 MVVM、资源字典、缓存装饰器和引用租约，没有引入通用事件总线、插件内服务定位器或新 UI 框架。生命周期与竞态原因使用中文注释。Standalone 和真实 Host 复用生产实现，但 Headless/Standalone 截图不代表真实 Dock、DPI 或声卡验收。
+
+## V7 音乐库编辑层
+
+页面上方保留操作结果入口，歌曲行和播放条提供喜欢 / 添加。LibraryEditorView 负责模态编辑、确认、纵向滚动和焦点，PlaylistEditor 保存每个 Document 的独立草稿；关闭 / 重开使用表单版本屏障。删除 / 移除默认焦点取消，输入法预编辑时 Esc 不关闭，未保存草稿需选择继续或放弃。520×420 紧凑歌单减少重复提示以保留歌曲视口。详见[音乐库契约](netease-music-library-management.md)及[V7 验证](../maintenance/netease-v7-m3-music-library-verification-plan.md)。

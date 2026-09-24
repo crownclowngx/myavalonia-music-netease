@@ -127,3 +127,7 @@ Standalone 可用 `--data-dir` 指定独立开发目录；不要与正在运行�
 取消、切换方式、关闭页面或超时使旧代次失效；旧回调即使迟到也不能提交账号。
 
 协议依据：[网易 SNS 登录入口](https://music.163.com/api/sns/authorize?snsType=10&clientType=web2&callbackType=Login&forcelogin=true)与该入口当次返回的微信网站授权页（2026-09-22 观察）。不把易变页面协议宣称为官方 SDK 契约。
+
+## V7 音乐库写回执
+
+LibraryRequestExecutor 继续复用唯一 NeteaseTransport 的编码、15 秒 / 1 MiB 预算和受控 Cookie 提交，但将 mutation 回执与只读结果分开。成功回执后的会话保存失败仍保留远端已受理事实；未知结果只回查，不自动重发。收藏额外令牌由隔离的 WebView2 官方 SDK 适配提供，失败为零 mutation。协议、权限及线上待验边界见[音乐库契约](netease-music-library-management.md)。

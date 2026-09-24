@@ -83,6 +83,7 @@ public sealed class PlaylistEditor : ObservableObject, IDisposable
     public IReadOnlyList<string> PendingKeys => _snapshot.Pending?.Keys.Order().ToArray() ?? [];
     private string? _selectedPending;
     public string? SelectedPending { get => _selectedPending; set => SetProperty(ref _selectedPending, value); }
+    public string LastResultMessage => _snapshot.LastResult?.Message ?? "尚无音乐库修改记录。";
     public string ResultItemsText => string.Join('\n', (_snapshot.LastResult?.Items ?? []).Select(i => $"歌曲 {i.TrackId}：" + (i.State switch
     { LibraryItemState.Added => "已添加", LibraryItemState.AlreadyPresent => "原本已存在", LibraryItemState.Removed => "已移除", LibraryItemState.AlreadyAbsent => "原本不存在", LibraryItemState.Rejected => "被拒绝", _ => "待核实" })));
     public string Title => Page switch { LibraryEditorPage.Open => "打开歌单", LibraryEditorPage.Create => "创建普通歌单", LibraryEditorPage.Edit => "编辑歌单", LibraryEditorPage.Add => "添加到我的歌单", LibraryEditorPage.Remove => "确认从歌单移除", LibraryEditorPage.Delete => "确认删除歌单", LibraryEditorPage.Discard => "有未保存的内容", _ => "音乐库" };
@@ -126,7 +127,7 @@ public sealed class PlaylistEditor : ObservableObject, IDisposable
     private void Notify()
     {
         if (_selectedPending is null || !PendingKeys.Contains(_selectedPending)) SelectedPending = PendingKeys.FirstOrDefault();
-        OnPropertyChanged(nameof(PendingKeys)); OnPropertyChanged(nameof(ResultItemsText));
+        OnPropertyChanged(nameof(PendingKeys)); OnPropertyChanged(nameof(ResultItemsText)); OnPropertyChanged(nameof(LastResultMessage));
         foreach (var name in new[] { nameof(IsOpen), nameof(IsIdPage), nameof(IsCreatePage), nameof(IsEditPage), nameof(IsAddPage), nameof(IsConfirmation), nameof(IsDiscardPage), nameof(IsNamePage), nameof(IsBusy), nameof(CanEdit), nameof(HasPending), nameof(HasPendingCreate), nameof(Title), nameof(SubscribeText), nameof(NameError), nameof(DescriptionError), nameof(ConfirmationText), nameof(TrackLabel), nameof(Snapshot), nameof(Metadata) }) OnPropertyChanged(name);
         foreach (var command in new IRelayCommand[] { OpenCommand, CreateCommand, SaveNameCommand, SaveDescriptionCommand, SubscribeCommand, DeletePanelCommand, RemovePanelCommand, ConfirmCommand, AddCommand, MoreTargetsCommand, LikeCommand, AddPanelCommand, RefreshCommand, RecheckCommand, AcknowledgeCreateCommand, EditPanelCommand, ReloadDraftCommand }) command.NotifyCanExecuteChanged();
     }
@@ -218,15 +219,20 @@ public sealed class PlaylistEditor : ObservableObject, IDisposable
     { if (!_closed) await _browser.RefreshLibraryChangeAsync(affected, directory, deleted).ConfigureAwait(false); }
     public async Task RefreshAsync()
     {
-        await _library.RefreshLikesAsync(_closing.Token).ConfigureAwait(false);
-        // 浏览器和可观察集合必须从 UI 线程启动。HTTP 延续不会假定存在同步上下文。
-        var done = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
-        _ui.Post(async () =>
+        try
         {
-            try { if (!_closed) { await _browser.RefreshLibraryChangeAsync(_browser.Snapshot?.PlaylistId, true, false); await LoadMetadataAsync(); } done.TrySetResult(); }
-            catch (Exception ex) { done.TrySetException(ex); }
-        });
-        await done.Task.ConfigureAwait(false);
+            await _library.RefreshLikesAsync(_closing.Token).ConfigureAwait(false);
+            // 浏览器和可观察集合必须从 UI 线程启动。HTTP 延续不会假定存在同步上下文。
+            var done = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+            _ui.Post(async () =>
+            {
+                try { if (!_closed) { await _browser.RefreshLibraryChangeAsync(_browser.Snapshot?.PlaylistId, true, false); await LoadMetadataAsync(); } done.TrySetResult(); }
+                catch (Exception ex) { done.TrySetException(ex); }
+            });
+            await done.Task.ConfigureAwait(false);
+        }
+        catch (OperationCanceledException) { /* 页面结束只停止等待，共享读取仍由库服务拥有，不向 UI 抛异步异常。 */ }
+        catch (ObjectDisposedException) when (_closed) { }
     }
     private async Task OpenByIdAsync()
     {

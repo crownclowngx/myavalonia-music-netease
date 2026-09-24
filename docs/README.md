@@ -14,7 +14,7 @@
 | 完成 V5 / V6 剩余验收 | [性能与实机待验清单](maintenance/netease-v5-v6-acceptance.md) |
 | 部署、打包和检查真实 Host | [部署与发布](maintenance/deployment-and-release.md) |
 | 查看下一步候选功能 | [能力路线图](roadmap/netease-capability-roadmap.md) |
-| 按计划开发 M3 音乐库管理 | [V7 专用实施方案](roadmap/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
+| 使用 / 维护 M3 音乐库管理 | [V7 专用实施方案](archive/plans/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
 | 查找过去的设计、实施与部署 | [归档索引](archive/README.md) |
 | 新增、更新或迁移文档 | [文档维护约定](maintenance/documentation.md) |
 
@@ -28,7 +28,7 @@ V 表示方案 / 实施序号，M 表示能力里程碑，均不是插件包版�
 | V5 轻量交互与 UI | 主体已实现，整体验收未收口；旧复核 C01–C08 已由 V6 接续实现，D01–D05 仍待验证 | [V5 历史复核](archive/records/netease-v5/completion-audit-20260923.md)、[V6 承接说明](archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md#5-实机验收及历史问题) |
 | V6 抽屉与交互 | V6-01～18 已实现、本地开发验证通过；完整实机验收未完成 | [实施与自动证据](archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)、[验证矩阵](maintenance/netease-v6-drawer-and-interaction-verification-plan.md) |
 | 最近开发部署 | 2026-09-23 部署到指定 Controls，共用 LibVLC；实际 Host 启动复测通过 | [V6 部署记录](archive/records/netease-v6/deployment-20260923.md) |
-| V7 / M3 音乐库管理 | 实施方案与专用验证矩阵已编写；业务代码、V7 门禁和真实验收均待实施 | [V7 方案](roadmap/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
+| V7 / M3 音乐库管理 | V7-01～10 已实现并通过本地验证；真实账号、官方令牌链与 Host 待验收 | [V7 方案](archive/plans/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
 | M4–M5 / 正式发布 | 后续功能尚未实施；正式 ZIP 发布、跨平台适配不在已完成结论内 | [能力路线图](roadmap/netease-capability-roadmap.md)、[发布流程](maintenance/deployment-and-release.md) |
 
 剩余的 D01–D05 性能 / 实机项目与 V6 新增交互验收统一维护在[待验清单](maintenance/netease-v5-v6-acceptance.md)，其中列出已有证据、缺口和关闭条件。V5 的封面取色仍为可选未实施项，见[后续候选](roadmap/netease-capability-roadmap.md#现有界面的可选增强)。方案归档不改变这些状态；后续验证新增带日期记录，再更新清单与本表。
@@ -37,6 +37,7 @@ V 表示方案 / 实施序号，M 表示能力里程碑，均不是插件包版�
 
 | 文档 | 内容 |
 | --- | --- |
+| [音乐库管理](reference/netease-music-library-management.md) | V7 喜欢、收藏、歌单编辑、写后回查、权限、账号与 WebView2 依赖 |
 | [HTTP 与会话](reference/netease-http-session.md) | 微信 / App 登录、Flurl、端点、受保护会话、取消与生命周期 |
 | [音乐与播放](reference/netease-music-playback.md) | 搜索与单曲执行、账号隔离、媒体预算、LibVLC 来源及设置 |
 | [日常播放器](reference/netease-daily-player.md) | 歌单、共享队列、四模式、定位、歌词、历史和静默恢复 |
@@ -49,7 +50,7 @@ V 表示方案 / 实施序号，M 表示能力里程碑，均不是插件包版�
 
 ## 方案归档与回归验证
 
-V1–V6 原方案及已完成决策的 V6 候选评估统一放在 `archive/plans`；当前行为查 `reference`，剩余验收查 `maintenance`，后续功能查 `roadmap`。V1–V4 已验收，V5 / V6 仍待完整验收，详见[归档索引](archive/README.md)。
+V1–V7 原方案及已完成决策的 V6 候选评估统一放在 `archive/plans`；当前行为查 `reference`，剩余验收查 `maintenance`，后续功能查 `roadmap`。V1–V4 已验收，V5 / V6 仍待完整验收，详见[归档索引](archive/README.md)。
 
 | 范围 | 方案 | 可复用验证 |
 | --- | --- | --- |
@@ -59,11 +60,11 @@ V1–V6 原方案及已完成决策的 V6 候选评估统一放在 `archive/plan
 | 日常播放器 | [V4 历史方案](archive/plans/netease-v4-m2-daily-player-plan.md) | [M2 矩阵](maintenance/netease-v4-m2-daily-player-verification.md) |
 | 轻量交互与 UI | [V5 方案](archive/plans/netease-v5-lightweight-interaction-and-ui-plan.md) | [V5 矩阵](maintenance/netease-v5-ui-interaction-verification-plan.md) |
 | 抽屉与交互 | [V6 方案](archive/plans/netease-v6-drawer-and-interaction-change-plan.md)、[候选评估依据](archive/plans/netease-v6-interaction-candidates-evaluation.md) | [V6 矩阵](maintenance/netease-v6-drawer-and-interaction-verification-plan.md) |
-| 音乐库管理（待开发） | [V7 实施方案](roadmap/netease-v7-m3-music-library-management-plan.md) | [V7 验证规范（待实施）](maintenance/netease-v7-m3-music-library-verification-plan.md) |
+| 音乐库管理 | [V7 实施方案](archive/plans/netease-v7-m3-music-library-management-plan.md) | [V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
 
-默认完整开发检查为 V6，包含适用的 M1 / V3 / M2 / V5 回归。命令、产物、手工验证与发布边界统一见[验证指南](maintenance/verification.md)。当前本地开发不使用 AIFLOW、Windows CI 或发布门禁。
+默认完整开发检查为 V7，包含适用的 M1 / V3 / M2 / V5 / V6 回归。命令、产物、手工验证与发布边界统一见[验证指南](maintenance/verification.md)。当前本地开发不使用 AIFLOW、Windows CI 或发布门禁。
 
-V7 是下一阶段开发依据，方案保留在 `roadmap`；V7 场景映射及门禁脚本尚未创建，不能执行 `-Milestone V7`，也不改变 V5 / V6 的既有待验结论。
+V7 方案已归档，[实施及自动证据](archive/records/netease-v7/m3-implementation-20260924.md)与[真实验收待办](archive/records/netease-v7/acceptance-20260924.md)分别记录。V7 不改变 V5 / V6 的既有待验结论。
 
 ## 文档目录
 

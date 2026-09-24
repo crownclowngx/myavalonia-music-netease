@@ -8,6 +8,17 @@ namespace MusicNetEasePlugin.Tests;
 public sealed class LibraryCoordinatorTests
 {
     [Fact]
+    public async Task 收藏与取消的无变化以及权限中途改变不重复发送()
+    {
+        await using var f = new LibraryFixture();
+        Assert.Equal(LibraryOutcome.Confirmed, (await f.Library.ExecuteAsync(new(LibraryOperationKind.Subscribe, 8, true))).Outcome);
+        Assert.True((await f.Library.ExecuteAsync(new(LibraryOperationKind.Subscribe, 8, true))).NoChange);
+        Assert.Equal(LibraryOutcome.Confirmed, (await f.Library.ExecuteAsync(new(LibraryOperationKind.Subscribe, 8, false))).Outcome);
+        Assert.True((await f.Library.ExecuteAsync(new(LibraryOperationKind.Subscribe, 8, false))).NoChange);
+        Assert.Equal(2, f.Api.Writes.Count); var baseline = f.Api.Playlists[7]; f.Api.Playlists[7] = baseline with { CreatorId = 456 };
+        Assert.Equal(LibraryOutcome.NotSent, (await f.Library.ExecuteAsync(new(LibraryOperationKind.Delete, 7, Baseline: baseline))).Outcome); Assert.Equal(2, f.Api.Writes.Count);
+    }
+    [Fact]
     public async Task 初始未知与真实空喜欢集不同且多个读取共用在途任务()
     {
         await using var f = new LibraryFixture(); var pending = new TaskCompletionSource<ImmutableHashSet<long>>(TaskCreationOptions.RunContinuationsAsynchronously);

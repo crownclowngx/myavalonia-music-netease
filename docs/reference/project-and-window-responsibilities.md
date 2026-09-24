@@ -1,6 +1,6 @@
 # 项目、Host 与 Standalone 窗口职责
 
-> 用途：本插件的项目结构与宿主接入参考。当前注册音乐主 Document 与右侧账号设置 Tool（Hide）；账号和播放协调器在插件容器中共享。
+> 用途：本插件的项目结构与宿主接入参考。当前注册音乐主 Document 与右侧账号设置 Tool（Hide）；账号、播放和 V7 音乐库协调器在插件容器中共享。
 > 当前实现：[播放契约](netease-music-playback.md)。设计依据：[V2 / M1](../archive/plans/netease-v2-m1-playback-plan.md)及[目录配置与 Dock 约定](../archive/plans/netease-v2-libvlc-tool-and-dock-design.md)；现有范围已完成手工验收，依据见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。
 
 ## 项目结构
@@ -43,7 +43,7 @@ Host 容器，或保存 `IPluginRegistration` 供运行时使用。
 
 ## Standalone/MainWindow 应当做什么
 
-V4 的队列、歌词与持久化协调属于插件容器；每个 Document 只拥有搜索、歌单浏览和 UI 投影。关闭发起页或最后一页均继续播放，重开直接订阅当前快照。Host Shutdown 先停止接纳账号恢复，再收口队列/音频并保存停止前位置，最后释放依赖。Standalone 主窗关闭释放 scope 和根容器，等待同一保存/停止任务；同步容器释放已有组合测试，但不能替代真实 Host/Dock 或主窗交互验收。
+V4 的队列、歌词与持久化协调属于插件容器；每个 Document 只拥有搜索、歌单浏览和 UI 投影。关闭发起页或最后一页均继续播放，重开直接订阅当前快照。V7 的 PlaylistEditor 按 Document 保存草稿，MusicLibraryCoordinator 在插件容器共享；关闭页取消草稿读取，已接纳写入由协调器收口。Host Shutdown 先关闭库任务，再停止接纳账号恢复，再收口队列/音频并保存停止前位置，最后释放依赖。Standalone 主窗关闭释放 scope 和根容器，等待同一保存/停止任务；同步容器释放已有组合测试，但不能替代真实 Host/Dock 或主窗交互验收。
 
 当前 [MainWindow](../../src/MusicNetEasePlugin.Standalone/MainWindow.axaml.cs)使用同一服务注册入口、真实 `MainDocument`/`MusicWorkspace` 和 `MusicSettingsTool`，以可切换的并排工作区、窄 Document、窄 Tool 和底部 Tool 布局承载，提供独立数据目录与 `IDocumentLifetime`。账号取消见[HTTP 与会话契约](netease-http-session.md)，共享播放与页面寿命规则见[播放契约](netease-music-playback.md)。当前 SDK 没有 Tool 主动打开 Document 的公开端口，Tool 提示使用 Host“新建”入口。
 

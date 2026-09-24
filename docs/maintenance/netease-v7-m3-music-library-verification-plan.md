@@ -1,14 +1,14 @@
 # V7 · M3 音乐库管理专用验证矩阵
 
-> 编写日期：2026-09-24。状态：**待实施的验证规范；以下用例、V7 脚本与产物均未生成或执行**。
-> 对应[V7 实施方案](../roadmap/netease-v7-m3-music-library-management-plan.md)，覆盖路线图 M3 的喜欢、收藏、歌单编辑及写入一致性。
+> 编写日期：2026-09-24。状态：**46 场景映射、V7 本地门禁及自动产物已实现；真实账号 / Host 验收待完成**。当次数量和证据见[实施记录](../archive/records/netease-v7/m3-implementation-20260924.md)。
+> 对应[V7 实施方案](../archive/plans/netease-v7-m3-music-library-management-plan.md)，覆盖路线图 M3 的喜欢、收藏、歌单编辑及写入一致性。
 > 只使用本地开发门禁，不使用 AIFLOW、Windows CI 或发布门禁。本地 Windows x64 测试与 Windows CI 是不同范围。
 
 ## 1. 验证分层与统一规则
 
 | 层次 | 验证对象 | 工具与边界 |
 | --- | --- | --- |
-| 单元测试 | 输入 / 权限规则、差集、结果分类、回查预算、账号与并发 | 现有 xUnit、Fake、`FakeTimeProvider`、受控任务完成顺序；不使用真实网络或 sleep 等待猜时序 |
+| 单元测试 | 输入 / 权限规则、差集、结果分类、回查预算、账号与并发 | 现有 xUnit、Fake、`FakeTimeProvider`、受控任务完成顺序；不使用真实网络；业务时间由可控时钟推进，短暂调度让步不代替断言 |
 | 协议 / HTTP 测试 | 固定端点、协议参数、令牌位置、业务码、响应完整性、Cookie 提交 | 现有协议向量与 Flurl 拦截夹具；合成会话 / 令牌，不读取用户保存会话 |
 | UI 自动测试 | 生产 View 绑定、菜单、确认、焦点、键盘、布局和生命周期 | Avalonia Headless / Skia；真实生产控件加 Fake 端口，不制作替代 UI 证明生产交互 |
 | 本地门禁自测 | 失败 / 跳过 / 缺场景 / 旧证据被拒绝 | PowerShell 失败注入；自测临时证据不能归档为业务验收 |
@@ -95,27 +95,27 @@
 
 不能用纯 ViewModel 属性断言代替所有交互测试。UI 测试至少经过生产按钮、菜单、焦点移动和确认路径，服务调用及媒体打开由 Fake 记录。自动组合输入状态仅验证代码防护，物理 IME 仍属于 H04。
 
-## 7. V7 本地门禁要做的改动
+## 7. V7 本地门禁实现
 
-以下均为实施任务，本文没有提前创建空脚本或空映射。
+下列脚本与真实方法映射均已接入；默认完整本地检查为 V7。新增源码 / 用例时继续维护该矩阵，不以 Trait 字符串代替执行。
 
-| 文件 | 必须新增 / 修改的行为 |
+| 文件 | 当前职责 |
 | --- | --- |
 | `tools/v7-test-map.json` | 沿用 schemaVersion、methods、scenarios；A01～R03 的全部 46 项映射到实际完全限定方法名和参数化最低数量 |
 | `tools/V7DevelopmentChecks.ps1` | 固定必测场景列表；复用通用 TRX / 映射检查，新增业务证据、截图、布局及身份检查 |
 | `tools/TestV7DevelopmentGate.ps1` | 合成正例与反例，证明 V7 各失败条件会拒绝；只在临时目录操作 |
 | `tools/DevelopmentChecks.ps1` | 加载 V7 检查模块，按需提取既有通用能力，不复制整套 V6 工具 |
 | `tools/test-development-gate.ps1` | 运行 V7 自测并传播非零退出；保留已有通用及 V5 / V6 自测 |
-| `tools/verify-development.ps1` | 支持 V7，扩展 M1 / V3 / M2 / V5 / V6 全部条件分支；V7 接续前置检查并输出 v7ScenarioCoverage；实现完成后才将默认值改为 V7 |
+| `tools/verify-development.ps1` | 支持 V7，扩展 M1 / V3 / M2 / V5 / V6 全部条件分支；V7 接续前置检查并输出 v7ScenarioCoverage；默认值为 V7 |
 | 测试项目及 `TestEvidence` | 在实际断言通过后生成专用产物，使用本轮身份，不硬编码成功报告；按需扩充元数据，保持旧证据兼容 |
 
-开发期间已有基线命令仍是：
+完整本地检查命令：
 
 ```powershell
-pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V6
+pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V7
 ```
 
-**下列 V7 命令仅在上述脚本完成后才可执行，当前不支持：**
+也可先单独运行门禁失败注入，再执行完整检查：
 
 ```powershell
 # 在 myavalonia-music-netease 仓库根目录执行。
@@ -125,7 +125,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V7
 
 完整入口内部顺序保持：门禁自测 → locked restore → Debug `-warnaserror` 构建 → 整个测试项目 → TRX → 场景映射 → 全部前置与 V7 证据 → 文档链接 → `git diff --check` → 源码身份一致性。每一步失败均非零退出。`-Milestone` 决定证据校验范围，不将全量测试改成只筛选 V7。
 
-V7 运行产物规划为 `TestResults/NetEaseV7/<runId>/`。`verification.json` 保留 runId、revision、sourceSha256、workingTreeDirty、起止时间、测试实际数量、各版本覆盖和产物摘要；自动运行继续标记 realAccountVerified / hostVerified / audibleOutputVerified / deployed / releaseGateExecuted 为 false。
+V7 运行产物位于 `TestResults/NetEaseV7/<runId>/`。`verification.json` 保留 runId、revision、sourceSha256、workingTreeDirty、起止时间、测试实际数量、各版本覆盖和产物摘要；自动运行继续标记 realAccountVerified / hostVerified / audibleOutputVerified / deployed / releaseGateExecuted 为 false。
 
 ## 8. 必需自动证据
 
@@ -177,11 +177,11 @@ Headless 不证明读屏 / 物理 IME / 声卡，Standalone 不证明真实 Host
 
 ## 11. 执行记录与文档检查
 
-实施时新增 `docs/archive/records/netease-v7/m3-implementation-YYYYMMDD.md`；真实验收另建 `acceptance-YYYYMMDD.md`，并加入[归档索引](../archive/README.md)。原始 TRX / JSON / PNG 按本轮目录归档，遵守[文档维护约定](documentation.md)及证据字节保护，不改写旧报告来匹配新代码。
+本轮见[专用实施记录](../archive/records/netease-v7/m3-implementation-20260924.md)和[真实验收待办](../archive/records/netease-v7/acceptance-20260924.md)，均加入[归档索引](../archive/README.md)。后续实测另建带日期记录。原始 TRX / JSON / PNG 按本轮目录归档，遵守[文档维护约定](documentation.md)及证据字节保护，不改写旧报告来匹配新代码。
 
 每条记录至少包含：日期、范围、源码身份、实际命令、返回结果、场景 / 测试数量、证据路径、未覆盖项、真实账号 / Host / 发布是否执行。通过数在实际运行后填写；“未执行”“受阻”“通过”明确区分。
 
-本次仅编写文档，执行以下检查，不运行业务测试：
+仅修改矩阵文字时执行以下文档检查；代码或门禁变更须运行完整 V7：
 
 ```powershell
 . ./tools/DevelopmentChecks.ps1
@@ -189,4 +189,10 @@ Assert-MarkdownLinks (Get-Location).Path
 git diff --check
 ```
 
-同步检查根 README、总导航、路线图和验证指南都能到达 V7；尚未创建的代码 / 脚本用代码路径说明，不能制造死链接。V7 脚本实现前，当前默认命令与指南仍保持 V6。
+同步检查根 README、总导航、路线图和验证指南都能到达 V7；当前行为由[音乐库契约](../reference/netease-music-library-management.md)维护，已实施方案按惯例归档。真实验收和旧 V5 / V6 待验不因自动门禁通过而关闭。
+
+## 12. 当前证据结构
+
+一致性证据记录最大并发写、重复写、旧账号应用、迟到覆盖及带 OperationId 的逐项结果，核验 ID 唯一与计数守恒。寿命证据记录 20 轮、订阅数、未完成任务数、媒体额外打开和重启重放。页面没有新增常驻业务计时器；回查等待通过协调器任务的取消和预算测试约束。布局记录 width / height / dark / comfortable 的完整 12 组、实际按钮命中、焦点归还和横向溢出数值；截图数量由实际文件计算。
+
+收藏令牌测试使用替身，WebView2 官方 SDK / Runtime 的真实初始化列在 H02。代码成功回执夹具和特殊字段组合只证明本地解析边界；没有逐项拒绝事实时分类为待核实，不编造线上成功或拒绝。

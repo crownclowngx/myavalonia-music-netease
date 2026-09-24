@@ -58,7 +58,7 @@ try {
     Assert-MarkdownLinks $root
     Invoke-CheckedProcess 'git' @('diff', '--check') $root
     $after = Get-DevelopmentSourceStamp $root
-    if ($after.revision -ne $source.revision -or $after.sourceSha256 -ne $source.sourceSha256) { throw '验证期间源码变化，请对最终代码重新运行。' }
+    Assert-DevelopmentSourceUnchanged $source $after
     $artifacts = @(Get-ChildItem -LiteralPath $results -File | Sort-Object Name | ForEach-Object { @{ name=$_.Name; bytes=$_.Length; sha256=(Get-FileHash -LiteralPath $_.FullName -Algorithm SHA256).Hash } })
     $native = if ($Milestone -in @('M1','V3','V4','V5','V6','V7')) { Get-Content -LiteralPath (Join-Path $results 'libvlc-offline.json') -Raw | ConvertFrom-Json } else { $null }
     @{ runId = $runId; revision = $source.revision; workingTreeDirty = $source.workingTreeDirty; sourceSha256=$source.sourceSha256; testsPassed = $passed;
