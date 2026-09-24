@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "realHost": false,
+  "maximumConcurrentWrites": 1,
+  "duplicateWrites": 0,
+  "oldAccountApplied": 0,
+  "lateOverwrites": 0,
+  "operations": [
+    {
+      "operationId": "eb229bbc-d853-4ba9-9bd7-254ebaae5851",
+      "targetId": 7,
+      "writes": 1,
+      "recheckRounds": 3,
+      "elapsedMs": 2000,
+      "inputUnique": 3,
+      "items": [
+        {
+          "trackId": 1,
+          "state": "AlreadyPresent"
+        },
+        {
+          "trackId": 3,
+          "state": "Added"
+        },
+        {
+          "trackId": 4,
+          "state": "NeedsRecheck"
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "runId": "20260924-140929-678afba7",
+    "revision": "d8dbcb53b16872fc8e0fc5e95e969a63a2046f52",
+    "sourceSha256": "7CDD778FC626B79F0E4AABCD7F07D0027D37411931257D13FCB145F7481CF5B0"
+  }
+}

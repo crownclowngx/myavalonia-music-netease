@@ -1,0 +1,86 @@
+{
+  "sample": {
+    "kind": "generated-440Hz-PCM16-WAV",
+    "sampleRate": 48000,
+    "channels": 1,
+    "seconds": 0.4,
+    "sha256": "A828F64EA8C8CD3EBE5C82F9D37A898A5D95044E6A4D8B6B98B193CD61168827"
+  },
+  "ActiveDirectory": "D:\\code\\local\\avalonia_dock_plug_test\\myavalonia-music-netease\\tests\\MusicNetEasePlugin.Tests\\bin\\Debug\\net10.0\\native\\win-x64\\libvlc",
+  "ActiveVersion": "3.0.23 Vetinari",
+  "measurements": [
+    {
+      "cycle": 0,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 1,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 2,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 3,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 4,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 5,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 6,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 7,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 8,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 9,
+      "decodedFrames": 19200,
+      "handles": 764,
+      "threads": 36
+    },
+    {
+      "cycle": 10,
+      "decodedFrames": 19200,
+      "handles": 766,
+      "threads": 36
+    },
+    {
+      "cycle": 11,
+      "decodedFrames": 19200,
+      "handles": 766,
+      "threads": 36
+    }
+  ],
+  "actualDeviceOutput": false
+}

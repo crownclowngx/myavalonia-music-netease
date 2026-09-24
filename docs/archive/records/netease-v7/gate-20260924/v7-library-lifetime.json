@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "realHost": false,
+  "rounds": 20,
+  "subscribers": 0,
+  "pendingTasks": 0,
+  "extraMediaOpens": 0,
+  "shutdownDrained": true,
+  "replayWrites": 0,
+  "provenance": {
+    "runId": "20260924-140929-678afba7",
+    "revision": "d8dbcb53b16872fc8e0fc5e95e969a63a2046f52",
+    "sourceSha256": "7CDD778FC626B79F0E4AABCD7F07D0027D37411931257D13FCB145F7481CF5B0"
+  }
+}

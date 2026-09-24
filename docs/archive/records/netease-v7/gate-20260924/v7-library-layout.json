@@ -1,0 +1,120 @@
+{
+  "schemaVersion": 1,
+  "realHost": false,
+  "combinations": [
+    {
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": false,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": true,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": false,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": true,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": false,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": true,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": false,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": true,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": false,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": true,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": false,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    },
+    {
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": true,
+      "submitReachable": true,
+      "focusReturned": true,
+      "horizontalOverflow": 0
+    }
+  ],
+  "screenshots": 16,
+  "provenance": {
+    "runId": "20260924-140929-678afba7",
+    "revision": "d8dbcb53b16872fc8e0fc5e95e969a63a2046f52",
+    "sourceSha256": "7CDD778FC626B79F0E4AABCD7F07D0027D37411931257D13FCB145F7481CF5B0"
+  }
+}
