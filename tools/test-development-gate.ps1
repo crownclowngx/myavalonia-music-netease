@@ -129,6 +129,7 @@ try {
     . (Join-Path $PSScriptRoot 'TestM2DevelopmentGate.ps1')
     . (Join-Path $PSScriptRoot 'TestV5DevelopmentGate.ps1')
     . (Join-Path $PSScriptRoot 'TestV6DevelopmentGate.ps1')
+    . (Join-Path $PSScriptRoot 'TestV7DevelopmentGate.ps1')
     Write-Host "门禁自测通过：$checks 项判定。"
 }
 finally {

@@ -102,7 +102,7 @@ function Get-DevelopmentSourceStamp {
     $dirty = [bool](& git -C $Root status --porcelain)
     if ($LASTEXITCODE -ne 0) { throw '无法读取工作树状态。' }
     # 纳入未跟踪实现/测试/工具，排除本轮报告和文档归档自身，避免摘要形成自引用哈希。
-    $paths = & git -C $Root ls-files --cached --others --exclude-standard -- src tests tools Directory.Build.props Directory.Packages.props global.json MusicNetEasePlugin.slnx
+    $paths = & git -C $Root ls-files --cached --others --exclude-standard -- src tests tools Directory.Build.props Directory.Build.targets Directory.Packages.props global.json MusicNetEasePlugin.slnx
     if ($LASTEXITCODE -ne 0) { throw '无法枚举验证源码。' }
     $manifest = foreach ($path in ($paths | Sort-Object -Unique)) {
         $full = Join-Path $Root $path
@@ -280,3 +280,5 @@ function Assert-MarkdownLinks {
 
 . (Join-Path $PSScriptRoot 'V5DevelopmentChecks.ps1')
 . (Join-Path $PSScriptRoot 'V6DevelopmentChecks.ps1')
+
+. (Join-Path $PSScriptRoot 'V7DevelopmentChecks.ps1')

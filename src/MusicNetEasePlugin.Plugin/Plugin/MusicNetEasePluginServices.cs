@@ -58,6 +58,13 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<MusicRequestExecutor>();
         services.TryAddSingleton<IPlaylistCatalogApi, NeteasePlaylistApi>();
         services.TryAddScoped<PlaylistBrowser>();
+        services.TryAddSingleton<ILibraryCheckTokenProvider>(_ => new WebViewLibraryCheckTokenProvider(Path.GetFullPath(root)));
+        services.TryAddSingleton<LibraryRequestExecutor>();
+        services.TryAddSingleton<ILikedSongsApi, NeteaseLikedSongsApi>();
+        services.TryAddSingleton<ILibraryPlaylistQuery, NeteaseLibraryPlaylistQuery>();
+        services.TryAddSingleton<IPlaylistMutationApi, NeteasePlaylistMutationApi>();
+        services.TryAddSingleton<MusicLibraryCoordinator>();
+        services.TryAddScoped<PlaylistEditor>();
         services.TryAddSingleton<IMusicCatalogApi>(provider => provider.GetRequiredService<NeteaseMusicApi>());
         services.TryAddSingleton<IPlaybackResourceResolver>(provider => provider.GetRequiredService<NeteaseMusicApi>());
         services.TryAddSingleton<IMediaBuffer>(provider => new FlurlMediaBuffer(provider.GetRequiredService<NeteaseFlurlClients>(), Path.Combine(root, "media-buffer"), MediaLimits.Default));
@@ -78,7 +85,7 @@ public static class MusicNetEasePluginServices
             provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<IPlayerSession>(),
             provider.GetRequiredService<LoginCoordinator>(), provider.GetRequiredService<ILoginUiDispatcher>(),
             provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>(),
-            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>(), provider.GetRequiredService<LyricsCoordinator>(), provider.GetRequiredService<PlaybackPersistence>());
+            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>(), provider.GetRequiredService<LyricsCoordinator>(), provider.GetRequiredService<PlaybackPersistence>(), library: provider.GetRequiredService<PlaylistEditor>());
         });
         return services;
     }

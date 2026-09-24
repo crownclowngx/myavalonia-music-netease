@@ -18,6 +18,8 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Microsoft.Web.WebView2" GeneratePathProperty="true" />
+    <ManagedPluginPrivatePackage Include="Microsoft.Web.WebView2" />
     <PackageReference Include="LibVLCSharp" />
     <PackageReference Include="BouncyCastle.Cryptography" />
     <PackageReference Include="VideoLAN.LibVLC.Windows" PrivateAssets="all" />
@@ -35,6 +37,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- WebView2 Core 由包的 targets 引用，不在 RuntimeCopyLocalItems 中，必须显式纳入插件私有资产。 -->
+    <ManagedPluginAsset Include="$(PkgMicrosoft_Web_WebView2)/lib_manual/netcoreapp3.0/Microsoft.Web.WebView2.Core.dll" TargetPath="Microsoft.Web.WebView2.Core.dll" />
+    <ManagedPluginAsset Include="$(PkgMicrosoft_Web_WebView2)/LICENSE.txt" TargetPath="third-party/webview2/LICENSE.txt" />
     <None Include="../../THIRD-PARTY-NOTICES.md" Link="THIRD-PARTY-NOTICES.md"
           CopyToOutputDirectory="PreserveNewest" CopyToPublishDirectory="PreserveNewest" />
     <!-- 普通输出复制不会自动进入干净插件目录；显式声明部署资产，确保上游许可随插件交付。 -->

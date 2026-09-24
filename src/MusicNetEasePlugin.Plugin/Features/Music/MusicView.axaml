@@ -5,7 +5,7 @@
  Background="{DynamicResource NeteaseDocumentBackgroundBrush}" Foreground="{DynamicResource NeteaseTextBrush}" FontSize="13" Classes.netease-comfortable="{Binding Preferences.ComfortableDensity}">
  <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseThemeResources.axaml" /></ResourceDictionary.MergedDictionaries><vm:TrackDurationConverter x:Key="TrackDuration" /></ResourceDictionary></UserControl.Resources>
  <UserControl.Styles><StyleInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseControlStyles.axaml" /></UserControl.Styles>
- <Grid RowDefinitions="Auto,Auto,*,Auto">
+ <Grid RowDefinitions="Auto,Auto,Auto,*,Auto">
   <Grid ColumnDefinitions="*,Auto,Auto" Margin="12,8,12,6" ColumnSpacing="8">
    <TextBox x:Name="SearchInput" Classes="netease-input" Text="{Binding Keyword, Mode=TwoWay}" PlaceholderText="搜索歌名或歌手 · Enter" KeyDown="SearchKeyDown" AutomationProperties.Name="搜索歌名或歌手" />
    <Button Grid.Column="1" Classes="netease-button" Content="清空" IsVisible="{Binding Keyword, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" Click="ClearSearch" AutomationProperties.Name="清空搜索关键词" />
@@ -21,7 +21,11 @@
     <Button x:Name="RestoreCompact" Content="恢复提示" Classes="netease-button" AutomationProperties.Name="查看上次恢复的位置并继续播放"><Button.Flyout><Flyout><StackPanel Spacing="8" MaxWidth="300"><TextBlock Text="{Binding Player.RestorationText}" TextWrapping="Wrap" /><Button Content="继续播放" Command="{Binding Player.ResumeCommand}" /><Button Content="收起恢复提示" Command="{Binding Player.DismissRestorationCommand}" /></StackPanel></Flyout></Button.Flyout></Button>
    </Grid>
   </Grid>
-  <Grid x:Name="ContentStage" Grid.Row="2" Margin="12,0,12,8" ClipToBounds="True">
+  <Grid Grid.Row="2" ColumnDefinitions="*,Auto" Margin="12,0,12,4" IsVisible="{Binding Library, Converter={x:Static ObjectConverters.IsNotNull}}">
+   <TextBlock Text="{Binding Library.Message}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Library.Message}" VerticalAlignment="Center" AutomationProperties.LiveSetting="Polite" />
+   <Button x:Name="LibraryResultsButton" Grid.Column="1" Content="操作结果" MinHeight="22" Padding="6,1" Command="{Binding Library.ResultsPanelCommand}" AutomationProperties.Name="查看音乐库操作结果与重新读取" />
+  </Grid>
+  <Grid x:Name="ContentStage" Grid.Row="3" Margin="12,0,12,8" ClipToBounds="True">
    <Grid x:Name="ContentLayout">
    <Grid x:Name="SearchPane" RowDefinitions="Auto,*,Auto" IsVisible="{Binding Navigation.IsSearch}">
     <Grid RowDefinitions="Auto,Auto" Margin="4,0,4,6">
@@ -59,6 +63,7 @@
     </Grid>
    </Border>
   </Grid>
-  <vm:PlaybackBarView x:Name="PlayerBar" Grid.Row="3" />
+  <vm:PlaybackBarView x:Name="PlayerBar" Grid.Row="4" />
+  <library:LibraryEditorView x:Name="LibraryEditorPanel" Grid.RowSpan="5" ZIndex="20" DataContext="{Binding Library}" IsVisible="{Binding #MusicRoot.Model.Library.IsOpen, FallbackValue=False, TargetNullValue=False}" />
  </Grid>
 </UserControl>

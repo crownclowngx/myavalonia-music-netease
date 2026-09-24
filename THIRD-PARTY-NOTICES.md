@@ -16,6 +16,10 @@ V2 新增的锁定依赖及 NuGet 元数据声明：
 
 应用采用动态 LibVLC 适配；运行库可通过设置选用外部完整目录。源码与锁定版本信息随本说明保留，原生库没有改写。
 
+V7 新增 `Microsoft.Web.WebView2` **1.0.4191.47**，仅使用 Core 与原生 Loader，在用户收藏 / 取消收藏时加载网易官方 Watchman SDK 取得本次令牌。包采用 Microsoft 随包 `LICENSE.txt`，见 [NuGet 版本](https://www.nuget.org/packages/Microsoft.Web.WebView2/1.0.4191.47)；插件资产声明附带该许可。系统 WebView2 Runtime 需另行安装，本仓库不打包浏览器运行库。
+
+网易令牌衔接参考固定提交的 [register_checktoken_v2](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/blob/a8c781fd64faab17fedfd46e0615a2609307f163/module/register_checktoken_v2.js)。官方 SDK 从 `acstatic-dun.126.net` 按需加载，不复制进仓库；本适配不修改浏览器指纹、不读取用户浏览器 Cookie。运行机制及验证边界见音乐库管理契约。
+
 上游许可证原文：
 
 The MIT License (MIT)

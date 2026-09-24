@@ -2,6 +2,7 @@ using MusicNetEasePlugin.Application.Authentication;
 using MyAvaloniaManagement.PluginSdk;
 using MusicNetEasePlugin.Application.Playback;
 using MusicNetEasePlugin.Application.Lyrics;
+using MusicNetEasePlugin.Application.Library;
 
 namespace MusicNetEasePlugin.Plugin;
 
@@ -11,7 +12,7 @@ namespace MusicNetEasePlugin.Plugin;
 /// 初始化不等待网络或创建原生引擎；页面关闭不走此进程级关闭链。
 /// </summary>
 internal sealed class MusicNetEasePluginLifecycle(LoginCoordinator login, PlaybackCoordinator playback, PlaybackQueueCoordinator queue, LyricsCoordinator lyrics,
-    PlayerAccountCoordinator accounts, PlaybackPersistence persistence) : IPluginLifecycle
+    PlayerAccountCoordinator accounts, PlaybackPersistence persistence, MusicLibraryCoordinator library) : IPluginLifecycle
 {
     public Task InitializeAsync(CancellationToken cancellationToken)
     {
@@ -21,6 +22,8 @@ internal sealed class MusicNetEasePluginLifecycle(LoginCoordinator login, Playba
 
     public async Task ShutdownAsync(CancellationToken cancellationToken)
     {
+        // 先撤销音乐库请求与写后回查，再释放它们依赖的会话；Document 关闭不经过此共享关闭链。
+        await library.DisposeAsync().ConfigureAwait(false);
         await accounts.DisposeAsync().ConfigureAwait(false);
         await queue.DisposeAsync().ConfigureAwait(false);
         await lyrics.DisposeAsync().ConfigureAwait(false);

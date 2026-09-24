@@ -1,9 +1,15 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Library.PlaylistView" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:vm="using:MusicNetEasePlugin.Features.Library" xmlns:music="using:MusicNetEasePlugin.Features.Music" xmlns:model="using:MusicNetEasePlugin.Application.Library" x:DataType="vm:PlaylistBrowser">
  <UserControl.Resources><music:TrackDurationConverter x:Key="Duration" /></UserControl.Resources>
  <Grid RowDefinitions="Auto,*" RowSpacing="6">
-  <Grid ColumnDefinitions="*,Auto"><TextBlock Text="{Binding Message}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Message}" Classes="netease-secondary" AutomationProperties.LiveSetting="Polite" /><TextBlock Grid.Column="1" Text="正在读取歌单…" IsVisible="{Binding Busy.IsVisible}" Classes="netease-secondary" /></Grid>
+  <Grid x:Name="LibraryReadStatus" ColumnDefinitions="*,Auto"><TextBlock Text="{Binding Message}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Message}" Classes="netease-secondary" AutomationProperties.LiveSetting="Polite" /><TextBlock Grid.Column="1" Text="正在读取歌单…" IsVisible="{Binding Busy.IsVisible}" Classes="netease-secondary" /></Grid>
   <Grid Grid.Row="1" IsVisible="{Binding IsList}" RowDefinitions="Auto,*,Auto" RowSpacing="6">
-   <Grid ColumnDefinitions="*,Auto"><ComboBox Width="150" HorizontalAlignment="Left" ItemsSource="{Binding Filters}" SelectedIndex="{Binding FilterIndex, Mode=TwoWay}" AutomationProperties.Name="筛选已加载歌单" /><Button Grid.Column="1" Classes="netease-button" Content="刷新歌单" Command="{Binding RefreshCommand}" /></Grid>
+   <StackPanel Spacing="4"><Grid ColumnDefinitions="*,Auto"><ComboBox Width="150" HorizontalAlignment="Left" ItemsSource="{Binding Filters}" SelectedIndex="{Binding FilterIndex, Mode=TwoWay}" AutomationProperties.Name="筛选已加载歌单" /><Button Grid.Column="1" Classes="netease-button" Content="刷新歌单" Command="{Binding RefreshCommand}" /></Grid>
+    <WrapPanel IsVisible="{Binding $parent[music:MusicView].Model.Library, Converter={x:Static ObjectConverters.IsNotNull}}">
+     <Button x:Name="OpenByIdButton" Content="打开歌单 ID" Command="{Binding $parent[music:MusicView].Model.Library.OpenPanelCommand}" Margin="0,0,6,0" />
+     <Button x:Name="NewPlaylistButton" Content="创建歌单" Command="{Binding $parent[music:MusicView].Model.Library.CreatePanelCommand}" Margin="0,0,6,0" />
+     <Button Content="重新读取音乐库" Command="{Binding $parent[music:MusicView].Model.Library.RefreshCommand}" />
+    </WrapPanel>
+   </StackPanel>
    <Grid Grid.Row="1">
     <ListBox x:Name="PlaylistList" Classes="netease-results" ItemsSource="{Binding VisiblePlaylists}" SelectedItem="{Binding SelectedPlaylist, Mode=TwoWay}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" KeyDown="PlaylistKeyDown" AutomationProperties.Name="我的歌单">
      <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
@@ -20,12 +26,18 @@
   <Grid Grid.Row="1" IsVisible="{Binding IsDetail}" RowDefinitions="Auto,Auto,*,Auto" RowSpacing="4">
    <StackPanel Spacing="6">
     <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8"><Button Classes="netease-button" Content="‹ 我的歌单" Command="{Binding BackCommand}" Click="ReturnToPlaylists" /><TextBlock Grid.Column="1" Text="{Binding Title}" ToolTip.Tip="{Binding Title}" FontWeight="SemiBold" FontSize="16" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" /><Button Grid.Column="2" Content="播放全部" Classes="netease-button primary" Command="{Binding PlayAllCommand}" ToolTip.Tip="替换当前队列并从头播放" /></Grid>
+    <WrapPanel IsVisible="{Binding $parent[music:MusicView].Model.Library, Converter={x:Static ObjectConverters.IsNotNull}}">
+     <Button x:Name="SubscribePlaylistButton" Content="{Binding $parent[music:MusicView].Model.Library.SubscribeText}" Command="{Binding $parent[music:MusicView].Model.Library.SubscribeCommand}" Margin="0,0,6,4" />
+     <Button x:Name="EditPlaylistButton" Content="名称与描述" Command="{Binding $parent[music:MusicView].Model.Library.EditPanelCommand}" Margin="0,0,6,4" />
+     <Button x:Name="RemovePlaylistTrackButton" Content="从歌单移除选中歌曲" Command="{Binding $parent[music:MusicView].Model.Library.RemovePanelCommand}" Margin="0,0,6,4" />
+     <Button x:Name="DeletePlaylistButton" Content="删除歌单…" Command="{Binding $parent[music:MusicView].Model.Library.DeletePanelCommand}" Margin="0,0,0,4" />
+    </WrapPanel>
     <Grid x:Name="RichPlaylistHeader" ColumnDefinitions="64,*" ColumnSpacing="12">
      <Border Width="64" Height="64" VerticalAlignment="Top" Background="{DynamicResource NeteaseSelectionBrush}" CornerRadius="6"><Grid><PathIcon Width="24" Height="24" Data="{DynamicResource NeteaseMusicIcon}" /><ui:ArtworkImage Address="{Binding Cover}" Stretch="UniformToFill" /></Grid></Border>
      <StackPanel Grid.Column="1" Spacing="4"><TextBlock Text="{Binding CountText}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding CountText}" Classes="netease-secondary" /><Expander Header="歌单简介" IsExpanded="{Binding DescriptionExpanded, Mode=TwoWay}" HorizontalAlignment="Stretch"><ScrollViewer MaxHeight="80"><SelectableTextBlock Text="{Binding Description}" TextWrapping="Wrap" /></ScrollViewer></Expander></StackPanel>
     </Grid>
    </StackPanel>
-   <TextBlock Grid.Row="1" Text="{Binding ReplaceHint}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ReplaceHint}" />
+   <TextBlock x:Name="PlaylistReplaceHint" Grid.Row="1" Text="{Binding ReplaceHint}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding ReplaceHint}" />
    <music:SongListBox x:Name="PlaylistTrackList" Grid.Row="2" Classes="netease-results" ItemsSource="{Binding Tracks}" SelectedItem="{Binding SelectedTrack, Mode=TwoWay}" ActivateCommand="{Binding PlayNowCommand}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="歌单歌曲">
     <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
     <ListBox.ItemTemplate><DataTemplate x:DataType="vm:PlaylistTrackRow"><music:SongRowView Title="{Binding Name}" Subtitle="{Binding Detail}" Artist="{Binding Track.Artists}" Album="{Binding Track.Album}" TrackId="{Binding TrackId}" CurrentTrackId="{Binding $parent[vm:PlaylistView].Model.CurrentTrackId}" Duration="{Binding Track.DurationMs, Converter={StaticResource Duration}}" PlayCommand="{Binding $parent[vm:PlaylistView].Model.PlayNowCommand}" NextCommand="{Binding $parent[vm:PlaylistView].Model.PlayNextCommand}" AppendCommand="{Binding $parent[vm:PlaylistView].Model.AppendCommand}" FromHereCommand="{Binding $parent[vm:PlaylistView].Model.PlayFromHereCommand}" /></DataTemplate></ListBox.ItemTemplate>

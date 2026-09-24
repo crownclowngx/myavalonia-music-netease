@@ -1,0 +1,6 @@
+<UserControl x:Class="MusicNetEasePlugin.Features.Library.SongLibraryActionsView" x:Name="ActionsRoot" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+ <StackPanel x:Name="ActionsPanel" Orientation="Horizontal" Spacing="2" IsVisible="False">
+  <Button x:Name="LikeSongButton" Classes="netease-button icon" Content="♡" ToolTip.Tip="喜欢状态待加载" AutomationProperties.Name="喜欢状态待加载" />
+  <Button x:Name="AddSongButton" Classes="netease-button icon" Content="＋" ToolTip.Tip="添加到我的歌单" AutomationProperties.Name="添加到我的歌单" />
+ </StackPanel>
+</UserControl>

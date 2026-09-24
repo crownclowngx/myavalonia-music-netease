@@ -1,6 +1,6 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Music.PlaybackBarView" x:Name="BarRoot"
  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
- xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:MusicWorkspace">
+ xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:library="using:MusicNetEasePlugin.Features.Library" xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:MusicWorkspace">
  <Border x:Name="PlaybackBar" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="0,1,0,0" Padding="12,6">
   <Grid x:Name="PlaybackLayout" ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,26,Auto" ColumnSpacing="8" RowSpacing="2">
    <Grid ColumnDefinitions="40,*" ColumnSpacing="8">
@@ -39,6 +39,10 @@
     <Button x:Name="MorePlaybackButton" Classes="netease-button icon" ToolTip.Tip="更多播放操作与曲目信息" AutomationProperties.Name="更多播放操作"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseMoreIcon}" />
      <Button.Flyout><Flyout><StackPanel MaxWidth="320" Spacing="6">
       <SelectableTextBlock Text="{Binding Player.TrackName}" TextWrapping="Wrap" /><SelectableTextBlock Text="{Binding Player.Artists}" TextWrapping="Wrap" /><SelectableTextBlock Text="{Binding Player.Album}" TextWrapping="Wrap" />
+      <library:SongLibraryActionsView Editor="{Binding Library}" TrackId="{Binding Player.CurrentTrackId, TargetNullValue=0}" />
+      <Button Content="重新读取音乐库" Command="{Binding Library.RefreshCommand}" IsVisible="{Binding Library, Converter={x:Static ObjectConverters.IsNotNull}}" />
+      <TextBlock Text="{Binding Library.Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+      <Button Content="重新读取待核实结果" Command="{Binding Library.RecheckCommand}" IsVisible="{Binding Library.HasPending}" />
       <TextBlock Text="{Binding Player.Timeline.SeekReason}" TextWrapping="Wrap" IsVisible="{Binding Player.Timeline.SeekReason, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
       <TextBlock Text="{Binding Player.Timeline.BufferText}" TextWrapping="Wrap" IsVisible="{Binding Player.IsLoading}" />
       <TextBlock Text="{Binding Player.Notice.Text}" TextWrapping="Wrap" />

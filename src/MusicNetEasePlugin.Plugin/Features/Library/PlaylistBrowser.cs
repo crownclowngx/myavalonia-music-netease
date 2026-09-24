@@ -170,6 +170,42 @@ public sealed class PlaylistBrowser : ObservableObject, IDisposable
         var rows = await FetchRowsAsync(snapshot, 0, session, ct).ConfigureAwait(false);
         Apply(session, generation, () => { Snapshot = snapshot; SetRows(snapshot, 0, rows); TabIndex = 1; });
     });
+    /// <summary>
+    /// 库写入使远端目录或当前详情失效，刷新时保留浏览目标与分页，而不是复用会清空详情的用户刷新命令。
+    /// 网络结果仍经过原有导航代次屏障，用户在请求期间打开其他歌单时，旧刷新不能拉回旧页面。
+    /// </summary>
+    public Task RefreshLibraryChangeAsync(long? affectedId, bool directory, bool deleted) => RunAsync(async (session, generation, ct) =>
+    {
+        var current = Snapshot; var selected = SelectedTrack?.TrackId; var offset = _trackOffset;
+        var page = directory ? await _api.PlaylistsAsync(0, session, ct).ConfigureAwait(false) : null;
+        PlaylistTracks? detail = null; IReadOnlyDictionary<long, MusicTrack>? rows = null;
+        var unavailable = false;
+        if (current is not null && current.PlaylistId == affectedId && !deleted)
+        {
+            try
+            {
+                detail = await _api.PlaylistAsync(current.PlaylistId, session, ct).ConfigureAwait(false);
+                offset = detail.TrackIds.Count == 0 ? 0 : Math.Min(offset, (detail.TrackIds.Count - 1) / 50 * 50);
+                rows = await FetchRowsAsync(detail, offset, session, ct).ConfigureAwait(false);
+            }
+            catch (MusicException ex) when (ex.Kind != MusicError.SignedOut)
+            { unavailable = true; }
+        }
+        Apply(session, generation, () =>
+        {
+            if (page is not null)
+            {
+                var selectedPlaylistId = SelectedPlaylist?.Id;
+                Playlists.Clear(); foreach (var item in page.Items.DistinctBy(p => p.Id)) Playlists.Add(item);
+                _offset = page.NextOffset; HasMore = page.HasMore; Filter();
+                SelectedPlaylist = Playlists.FirstOrDefault(p => p.Id == selectedPlaylistId);
+            }
+            if (deleted && Snapshot?.PlaylistId == affectedId) { ClearTracks(); TabIndex = 0; Message = "歌单已删除，播放队列保留。"; }
+            else if (unavailable) { ClearTracks(); TabIndex = 0; Message = "歌单详情暂不可读取，目录已刷新；播放队列保留。"; }
+            else if (detail is not null && Snapshot?.PlaylistId == detail.PlaylistId)
+            { Snapshot = detail; SetRows(detail, offset, rows!); SelectedTrack = Tracks.FirstOrDefault(t => t.TrackId == selected) ?? Tracks.FirstOrDefault(); }
+        });
+    });
     public Task LoadTracksAsync(int offset, bool refresh = false)
     {
         var snapshot = Snapshot;

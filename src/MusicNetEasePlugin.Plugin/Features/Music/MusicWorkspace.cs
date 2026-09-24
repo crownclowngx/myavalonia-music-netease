@@ -43,13 +43,14 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     private int _offset;
     private MusicTrack? _selected;
     public MusicWorkspace(IMusicCatalogApi catalog, IMusicSessionAccessor sessions, IPlayerSession playback,
-        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null, PlaybackPersistence? persistence = null, TimeProvider? time = null)
+        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null, PlaybackPersistence? persistence = null, TimeProvider? time = null, PlaylistEditor? library = null)
     {
         (_catalog, _sessions, _playback, _login, _ui) = (catalog, sessions, playback, login, ui);
         SearchBusy = new(ui, time);
         Player = new(playback, ui, images, preferences);
         Preferences = preferences;
         Playlists = playlists;
+        Library = library;
         Queue = new(playback, ui);
         Lyrics = lyrics is null ? null : new(lyrics, ui, preferences, playback);
         if (Lyrics is not null) Player.Timeline.PreviewLyrics = Lyrics.PreviewTextAt;
@@ -73,6 +74,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     public ObservableCollection<MusicTrack> Tracks { get; } = [];
     public UiPreferences? Preferences { get; }
     public PlaylistBrowser? Playlists { get; }
+    public PlaylistEditor? Library { get; }
     public QueueWorkspace Queue { get; }
     public PlayerBarWorkspace Player { get; }
     public MusicNavigation Navigation { get; } = new();
@@ -197,6 +199,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
             _stopWork = completion.Task;
         }
         _closing.Cancel();
+        Library?.Dispose();
         Playlists?.Dispose();
         Queue.Dispose();
         Player.Dispose();

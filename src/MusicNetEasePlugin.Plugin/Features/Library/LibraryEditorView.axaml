@@ -1,0 +1,47 @@
+<UserControl x:Class="MusicNetEasePlugin.Features.Library.LibraryEditorView" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Library" xmlns:models="using:MusicNetEasePlugin.Application.Library" x:DataType="vm:PlaylistEditor">
+ <Border Background="#80000000" Padding="12" KeyboardNavigation.TabNavigation="Cycle">
+  <Border MaxWidth="520" HorizontalAlignment="Right" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="1" CornerRadius="8" Padding="16">
+   <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8"><TextBlock Text="{Binding Title}" FontSize="18" FontWeight="SemiBold" VerticalAlignment="Center" /><Button x:Name="CloseEditor" Grid.Column="1" Content="取消 / 关闭" Command="{Binding CloseCommand}" AutomationProperties.Name="取消或关闭音乐库编辑" /></Grid>
+    <ScrollViewer x:Name="EditorScroll" Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+     <StackPanel Spacing="12">
+      <StackPanel IsVisible="{Binding IsIdPage}" Spacing="8"><TextBlock Text="输入网易歌单 ID，打开后可收藏他人的歌单。" TextWrapping="Wrap" /><TextBox x:Name="PlaylistIdInput" Text="{Binding IdText, Mode=TwoWay}" PlaceholderText="正整数歌单 ID" AutomationProperties.Name="歌单 ID" /><Button x:Name="OpenPlaylistButton" Content="打开歌单" Command="{Binding OpenCommand}" /></StackPanel>
+      <StackPanel IsVisible="{Binding IsNamePage}" Spacing="8">
+       <TextBlock Text="普通歌单，非私密" IsVisible="{Binding IsCreatePage}" />
+       <TextBlock Text="歌单名称（最多 100 个 Unicode 字符）" TextWrapping="Wrap" />
+       <TextBox x:Name="PlaylistNameInput" Text="{Binding NameDraft, Mode=TwoWay}" AutomationProperties.Name="歌单名称" />
+       <TextBlock Text="{Binding NameError}" Foreground="{DynamicResource NeteaseWarningBrush}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+       <Button x:Name="CreatePlaylistButton" Content="创建普通歌单" Command="{Binding CreateCommand}" IsVisible="{Binding IsCreatePage}" />
+       <Button x:Name="SaveNameButton" Content="保存名称" Command="{Binding SaveNameCommand}" IsVisible="{Binding IsEditPage}" />
+      </StackPanel>
+      <StackPanel IsVisible="{Binding IsEditPage}" Spacing="8">
+       <TextBlock Text="描述（最多 1,000 个 Unicode 字符，留空可清空）" TextWrapping="Wrap" />
+       <TextBox x:Name="PlaylistDescriptionInput" Text="{Binding DescriptionDraft, Mode=TwoWay}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="88" MaxHeight="150" AutomationProperties.Name="歌单描述" />
+       <TextBlock Text="{Binding DescriptionError}" Foreground="{DynamicResource NeteaseWarningBrush}" TextWrapping="Wrap" />
+       <Button x:Name="SaveDescriptionButton" Content="保存描述" Command="{Binding SaveDescriptionCommand}" />
+       <TextBlock Text="名称与描述分别保存。重新载入会用远端内容替换当前草稿。" TextWrapping="Wrap" Classes="netease-secondary" />
+       <Button Content="重新载入并替换草稿" Command="{Binding ReloadDraftCommand}" />
+      </StackPanel>
+      <StackPanel IsVisible="{Binding IsAddPage}" Spacing="8">
+       <TextBlock Text="{Binding TrackLabel}" TextWrapping="Wrap" />
+       <ListBox x:Name="TargetPlaylistList" ItemsSource="{Binding Targets}" SelectedItem="{Binding SelectedTarget, Mode=TwoWay}" MinHeight="90" MaxHeight="180" AutomationProperties.Name="选择自有目标歌单">
+        <ListBox.ItemTemplate><DataTemplate x:DataType="models:LibraryPlaylist"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" ToolTip.Tip="{Binding Name}" /></DataTemplate></ListBox.ItemTemplate>
+       </ListBox>
+       <WrapPanel><Button Content="加载更多" Command="{Binding MoreTargetsCommand}" Margin="0,0,8,8" /><Button Content="创建歌单" Command="{Binding CreatePanelCommand}" Margin="0,0,8,8" /><Button x:Name="AddTrackButton" Content="添加到选中歌单" Command="{Binding AddCommand}" Margin="0,0,0,8" /></WrapPanel>
+      </StackPanel>
+      <StackPanel IsVisible="{Binding IsConfirmation}" Spacing="12"><TextBlock x:Name="ConfirmationTarget" Text="{Binding ConfirmationText}" TextWrapping="Wrap" /><Button x:Name="ConfirmLibraryButton" Content="确认执行" Command="{Binding ConfirmCommand}" AutomationProperties.Name="确认对上述歌单执行操作" /></StackPanel>
+      <StackPanel IsVisible="{Binding IsDiscardPage}" Spacing="8"><TextBlock Text="尚有未保存的内容。继续编辑，或放弃草稿后关闭。" TextWrapping="Wrap" /><Button x:Name="KeepEditingButton" Content="继续编辑" Command="{Binding KeepEditingCommand}" /><Button Content="放弃草稿并关闭" Command="{Binding DiscardCommand}" /></StackPanel>
+      <TextBlock Text="{Binding Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+      <TextBlock Text="{Binding ResultItemsText}" TextWrapping="Wrap" />
+      <TextBlock Text="正在处理，请稍候…" IsVisible="{Binding IsBusy}" />
+      <ComboBox ItemsSource="{Binding PendingKeys}" SelectedItem="{Binding SelectedPending, Mode=TwoWay}" IsVisible="{Binding HasPending}" AutomationProperties.Name="选择待核实操作" HorizontalAlignment="Stretch" />
+      <Button x:Name="RecheckLibraryButton" Content="重新读取结果" Command="{Binding RecheckCommand}" IsVisible="{Binding HasPending}" />
+      <Button Content="已核对歌单目录，结束创建结果提示" Command="{Binding AcknowledgeCreateCommand}" IsVisible="{Binding HasPendingCreate}" />
+     </StackPanel>
+    </ScrollViewer>
+    <TextBlock Grid.Row="2" Text="音乐库修改不改变当前播放队列。" Classes="netease-secondary" TextWrapping="Wrap" />
+   </Grid>
+  </Border>
+ </Border>
+</UserControl>

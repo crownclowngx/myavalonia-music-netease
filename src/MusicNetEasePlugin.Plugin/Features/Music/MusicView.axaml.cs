@@ -59,9 +59,10 @@ public partial class MusicView : UserControl
     {
         Unbind(); _model = Model; Motion.Bind(_model?.Preferences);
         if (_model is not null) { if (_model.Preferences is not null) _model.Preferences.PropertyChanged += PreferencesChanged; _model.Navigation.PropertyChanged += NavigationChanged; _model.Navigation.SetDesiredWidth(_model.Preferences?.DrawerWidth ?? 360); _model.Navigation.SetAvailableSize(ContentStage.Bounds.Width, ContentStage.Bounds.Height); }
+        _model?.Library?.SetVisible(Motion.IsActive);
         Layout();
     }
-    private void Unbind() { CancelResize(); if (_model is not null) { _model.SearchBusy.SetActive(false); _model.Playlists?.Busy.SetActive(false); _model.Navigation.PropertyChanged -= NavigationChanged; if (_model.Preferences is not null) _model.Preferences.PropertyChanged -= PreferencesChanged; } _model = null; _browseFocus = null; _shownPanel = MusicSidePanel.None; _drawerTransition.Reset(); Motion.Bind(null); }
+    private void Unbind() { CancelResize(); if (_model is not null) { _model.Library?.SetVisible(false); _model.SearchBusy.SetActive(false); _model.Playlists?.Busy.SetActive(false); _model.Navigation.PropertyChanged -= NavigationChanged; if (_model.Preferences is not null) _model.Preferences.PropertyChanged -= PreferencesChanged; } _model = null; _browseFocus = null; _shownPanel = MusicSidePanel.None; _drawerTransition.Reset(); Motion.Bind(null); }
     private void PreferencesChanged(object? sender, PropertyChangedEventArgs e) { if (e.PropertyName == "DrawerWidth") _model?.Navigation.SetDesiredWidth(_model.Preferences?.DrawerWidth ?? 360); }
     private void NavigationChanged(object? sender, PropertyChangedEventArgs e)
     {
@@ -85,6 +86,7 @@ public partial class MusicView : UserControl
     {
         if (Model?.Navigation is not { } navigation) return;
         Model.SearchBusy.SetActive(Motion.IsActive && navigation.IsSearch);
+        Model.Library?.SetVisible(Motion.IsActive);
         Model.Playlists?.Busy.SetActive(Motion.IsActive && navigation.IsLibrary);
         RestoreInline.IsVisible = Bounds.Width >= 1000;
         RestoreCompact.IsVisible = Bounds.Width < 1000;
@@ -111,6 +113,7 @@ public partial class MusicView : UserControl
     private void PageKeyDown(object? sender, KeyEventArgs e)
     {
         if (e.Handled || Model is not { } m) return;
+        if (m.Library?.IsOpen == true) { if (e.Key == Key.Escape) { m.Library.RequestClose(); e.Handled = true; } return; }
         if (e.Key == Key.Escape && _resizing) { CancelResize(); e.Handled = true; return; }
         if (e.Key == Key.F && e.KeyModifiers == KeyModifiers.Control) { SearchInput.Focus(); SearchInput.SelectAll(); e.Handled = true; return; }
         if (e.Key == Key.Escape && m.Navigation.CanBack) { m.Navigation.Back(); e.Handled = true; }

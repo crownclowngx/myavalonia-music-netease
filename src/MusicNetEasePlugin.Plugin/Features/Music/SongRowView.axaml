@@ -1,4 +1,4 @@
-<UserControl x:Class="MusicNetEasePlugin.Features.Music.SongRowView" x:Name="RowRoot" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<UserControl x:Class="MusicNetEasePlugin.Features.Music.SongRowView" x:Name="RowRoot" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:library="using:MusicNetEasePlugin.Features.Library" xmlns:music="using:MusicNetEasePlugin.Features.Music">
  <Grid x:Name="RowLayout" ColumnDefinitions="16,*,42,Auto" ColumnSpacing="6" MinHeight="48">
   <PathIcon x:Name="CurrentMarker" IsVisible="False" Width="12" Height="12" Data="{DynamicResource NeteasePlayIcon}" Foreground="{DynamicResource NeteaseAccentBrush}" AutomationProperties.Name="当前曲目" />
   <Grid x:Name="TextLayout" Grid.Column="1" ColumnDefinitions="*,0,0" ColumnSpacing="12" VerticalAlignment="Center">
@@ -8,6 +8,7 @@
   </Grid>
   <TextBlock Grid.Column="2" Text="{Binding #RowRoot.Duration}" Classes="netease-secondary" VerticalAlignment="Center" HorizontalAlignment="Right" />
   <StackPanel Grid.Column="3" Orientation="Horizontal" Spacing="2" VerticalAlignment="Center">
+   <library:SongLibraryActionsView Editor="{Binding $parent[music:MusicView].Model.Library}" TrackId="{Binding #RowRoot.TrackId}" />
    <Button Classes="netease-button icon" Command="{Binding #RowRoot.ActivateCommand}" ToolTip.Tip="播放这首歌" AutomationProperties.Name="立即播放"><PathIcon Width="16" Height="16" Data="{DynamicResource NeteasePlayIcon}" /></Button>
    <Button x:Name="MoreButton" Classes="netease-button icon" ToolTip.Tip="歌曲操作" AutomationProperties.Name="歌曲操作"><PathIcon Width="16" Height="16" Data="{DynamicResource NeteaseMoreIcon}" />
     <Button.Flyout><MenuFlyout>

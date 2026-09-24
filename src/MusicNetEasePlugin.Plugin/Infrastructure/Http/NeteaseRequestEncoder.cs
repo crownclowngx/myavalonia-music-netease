@@ -12,7 +12,7 @@ internal sealed record EncodedRequest(string Route, Dictionary<string, string> F
 internal static class NeteaseRequestEncoder
 {
     internal static EncodedRequest Encode(string path, Dictionary<string, object?> data,
-        NeteaseProtocol protocol, AuthContext context, DateTimeOffset now)
+        NeteaseProtocol protocol, AuthContext context, DateTimeOffset now, string? antiCheatToken = null)
     {
         if (!path.StartsWith("/api/", StringComparison.Ordinal) || path.Contains('?'))
             throw new ArgumentException("只接受固定的网易逻辑端点。", nameof(path));
@@ -39,6 +39,8 @@ internal static class NeteaseRequestEncoder
             };
             foreach (var name in new[] { "MUSIC_U", "MUSIC_A", "NMTID" })
                 if (cookies.TryGetValue(name, out var value)) meta[name] = value;
+            // 只有显式需要新鲜令牌的端点传入；令牌放进 eapi 元数据，不扩散到其他请求或会话 Cookie。
+            if (antiCheatToken is not null) meta["X-antiCheatToken"] = antiCheatToken;
             payload["header"] = meta;
             headers["Cookie"] = CookieHeader(meta);
             // 固定上游默认组合：pc 元数据搭配其 api/iphone UA，不自行猜测更新版本。
@@ -62,6 +64,7 @@ internal static class NeteaseRequestEncoder
         payload["csrf_token"] = csrf;
         headers["Cookie"] = CookieHeader(cookies);
         headers["Referer"] = "https://music.163.com";
+        if (antiCheatToken is not null) headers["X-antiCheatToken"] = antiCheatToken;
         headers["User-Agent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36 Edg/124.0.0.0";
         return new(path.Replace("/api/", "/weapi/", StringComparison.Ordinal),
             NeteaseCrypto.Weapi(NeteaseCrypto.Json(payload)), headers);

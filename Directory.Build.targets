@@ -1,0 +1,9 @@
+<Project>
+  <!-- WebView2 的 NuGet targets 默认同时引用 WPF / WinForms；本插件只使用 Core COM 适配。
+       在解析引用之前移除两个不使用的 UI 程序集，避免把 WindowsDesktop 和冲突的 WindowsBase 带入 Avalonia。 -->
+  <Target Name="NetEaseUseWebViewCoreOnly" BeforeTargets="ResolveAssemblyReferences">
+    <ItemGroup>
+      <Reference Remove="@(Reference)" Condition="'%(Reference.Filename)' == 'Microsoft.Web.WebView2.Wpf' Or '%(Reference.Filename)' == 'Microsoft.Web.WebView2.WinForms'" />
+    </ItemGroup>
+  </Target>
+</Project>

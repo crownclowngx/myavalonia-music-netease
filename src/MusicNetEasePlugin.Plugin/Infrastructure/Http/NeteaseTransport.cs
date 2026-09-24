@@ -22,10 +22,10 @@ internal sealed class NeteaseTransport(NeteaseFlurlClients clients, TimeProvider
     internal const int MaximumResponseBytes = 1024 * 1024;
 
     internal async Task<NeteaseResponse> SendAsync(string path, Dictionary<string, object?> data,
-        NeteaseProtocol protocol, AuthContext context, CancellationToken cancellationToken)
+        NeteaseProtocol protocol, AuthContext context, CancellationToken cancellationToken, string? antiCheatToken = null)
     {
         cancellationToken.ThrowIfCancellationRequested();
-        var encoded = NeteaseRequestEncoder.Encode(path, data, protocol, context, time.GetUtcNow());
+        var encoded = NeteaseRequestEncoder.Encode(path, data, protocol, context, time.GetUtcNow(), antiCheatToken);
         var client = protocol == NeteaseProtocol.Weapi ? clients.Web : clients.Eapi;
         return await SendEncodedAsync(client, encoded, protocol, context, cancellationToken).ConfigureAwait(false);
     }

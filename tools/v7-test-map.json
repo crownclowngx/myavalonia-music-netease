@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 1,
+  "methods": {
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.原生端点参数编码和临时收藏令牌一致且无包装服务回退": 1,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.每个写端点成功拒绝损坏和未知均只发一次且不泄露正文": 32,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.令牌失败或取得前取消不发收藏请求": 2,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.喜欢读取严格区分有效空重复和不完整响应": 6,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.喜欢数量和字节超预算不可当成全量集合": 1,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.收藏使用动态真实字段且缺失保持未知": 3,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.详情权限与全量快照必须来自明确字段": 5,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.成功回执后的凭据保存失败仍保留受理事实": 1,
+    "MusicNetEasePlugin.Tests.LibraryRulesTests.标识只接受正整数且拒绝溢出与任意网址": 7,
+    "MusicNetEasePlugin.Tests.LibraryRulesTests.名称按中文规则校验并去除首尾空白": 5,
+    "MusicNetEasePlugin.Tests.LibraryRulesTests.Unicode标量临界长度和无效代理项不能混淆": 1,
+    "MusicNetEasePlugin.Tests.LibraryRulesTests.权限只允许身份和类型均明确的自有普通歌单": 5,
+    "MusicNetEasePlugin.Tests.LibraryRulesTests.部分结果按唯一曲目逐项分类并保留原有成员": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.初始未知与真实空喜欢集不同且多个读取共用在途任务": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.喜欢取消及无变化均来自回查且错误读取不变成未喜欢": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.重复与反向点击直接忙碌不排队且两个目标也串行": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.旧账号迟到成功和清理不能污染新账号或相同账号新代次": 2,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.写前旧全量读取不能覆盖新的喜欢确认": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.收藏创建两字段与删除各自完成写后确认": 5,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.所有权系统类型缺字段不完整和过期确认均阻止写入": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.名称保存不重复提交描述且外部修改产生字段级冲突": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.曲目去重差集写入并按回查分类原有或原不存在": 2,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.创建丢失回执ID不按同名认领也不自动重放": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.发送前取消零请求发送后取消保留待核实而非再次发送": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.回查三轮有界且部分曲目不会触发补偿或复制ID重试": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.删除不可访问和超时不能伪装为明确删除": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.限流停止自动回查并在等待期后仅重新读取": 1,
+    "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.关闭取消并等待同一个尾任务且重建服务不会重放": 1,
+    "MusicNetEasePlugin.Tests.LibraryConsistencyTests.实测串行去重旧代次丢弃与部分回查计数生成一致性证据": 1,
+    "MusicNetEasePlugin.Tests.LibraryConsistencyTests.二十秒预算终止无响应回查且不重复写入": 1,
+    "MusicNetEasePlugin.Tests.LibraryConsistencyTests.回查限流验证或失效立即停止并保留回执": 3,
+    "MusicNetEasePlugin.Tests.LibraryConsistencyTests.忽略取消的外部读取或写入不阻塞Shutdown": 2,
+    "MusicNetEasePlugin.Tests.LibraryConsistencyTests.回执受理后等待点取消只保留待核实": 2,
+    "MusicNetEasePlugin.Tests.LibraryConsistencyTests.Host与Standalone共用注册入口且库共享草稿按Document隔离": 1,
+    "MusicNetEasePlugin.Tests.LibraryUiTests.三尺寸双色两密度的库编辑确认与结果可滚动可命中": 1,
+    "MusicNetEasePlugin.Tests.LibraryUiTests.ID表单新建独立字段草稿冲突与输入法键盘不会误提交": 1,
+    "MusicNetEasePlugin.Tests.LibraryUiTests.添加弹层创建只选择目标再次添加才写曲目且取消确认不删歌单": 1,
+    "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响": 1,
+    "MusicNetEasePlugin.Tests.LibraryUiTests.二十次页面挂卸独立草稿关闭在途再开和Shutdown无残留": 1,
+    "MusicNetEasePlugin.Tests.PluginRegistrationTests.真实模块只声明贡献根而不在私有服务中重复登记": 1,
+    "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体": 2,
+    "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试": 1,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.Fake和真实适配共用喜欢确认无变化及取消契约": 2,
+    "MusicNetEasePlugin.Tests.LibraryProtocolTests.HTTP限流保留RetryAfter且不会换端点重试": 1,
+    "MusicNetEasePlugin.Tests.LibraryUiTests.搜索歌单队列历史及播放菜单共享喜欢且换曲不误写新曲": 1,
+    "MusicNetEasePlugin.Tests.LibraryUiTests.保存回包不能覆盖关闭后重新打开的表单": 1
+  },
+  "scenarios": {
+    "A01": [
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.原生端点参数编码和临时收藏令牌一致且无包装服务回退",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.每个写端点成功拒绝损坏和未知均只发一次且不泄露正文"
+    ],
+    "A02": [
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.令牌失败或取得前取消不发收藏请求",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.原生端点参数编码和临时收藏令牌一致且无包装服务回退"
+    ],
+    "A03": [
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.每个写端点成功拒绝损坏和未知均只发一次且不泄露正文",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.详情权限与全量快照必须来自明确字段",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.成功回执后的凭据保存失败仍保留受理事实"
+    ],
+    "A04": [
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.二十秒预算终止无响应回查且不重复写入",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.回查限流验证或失效立即停止并保留回执",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.限流停止自动回查并在等待期后仅重新读取",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.回执受理后等待点取消只保留待核实",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.HTTP限流保留RetryAfter且不会换端点重试"
+    ],
+    "A05": [
+      "MusicNetEasePlugin.Tests.LibraryRulesTests.标识只接受正整数且拒绝溢出与任意网址",
+      "MusicNetEasePlugin.Tests.LibraryRulesTests.名称按中文规则校验并去除首尾空白",
+      "MusicNetEasePlugin.Tests.LibraryRulesTests.Unicode标量临界长度和无效代理项不能混淆",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.所有权系统类型缺字段不完整和过期确认均阻止写入"
+    ],
+    "A06": [
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.每个写端点成功拒绝损坏和未知均只发一次且不泄露正文",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.喜欢读取严格区分有效空重复和不完整响应",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.成功回执后的凭据保存失败仍保留受理事实",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.曲目去重差集写入并按回查分类原有或原不存在",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.Fake和真实适配共用喜欢确认无变化及取消契约"
+    ],
+    "L01": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.初始未知与真实空喜欢集不同且多个读取共用在途任务",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.喜欢读取严格区分有效空重复和不完整响应",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.喜欢数量和字节超预算不可当成全量集合"
+    ],
+    "L02": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.喜欢取消及无变化均来自回查且错误读取不变成未喜欢",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.每个写端点成功拒绝损坏和未知均只发一次且不泄露正文",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.Fake和真实适配共用喜欢确认无变化及取消契约"
+    ],
+    "L03": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.重复与反向点击直接忙碌不排队且两个目标也串行",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响"
+    ],
+    "L04": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.搜索歌单队列历史及播放菜单共享喜欢且换曲不误写新曲"
+    ],
+    "L05": [
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.实测串行去重旧代次丢弃与部分回查计数生成一致性证据",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.回查三轮有界且部分曲目不会触发补偿或复制ID重试",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.二十秒预算终止无响应回查且不重复写入"
+    ],
+    "S01": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.ID表单新建独立字段草稿冲突与输入法键盘不会误提交",
+      "MusicNetEasePlugin.Tests.LibraryRulesTests.标识只接受正整数且拒绝溢出与任意网址"
+    ],
+    "S02": [
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.收藏使用动态真实字段且缺失保持未知",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.详情权限与全量快照必须来自明确字段"
+    ],
+    "S03": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.收藏创建两字段与删除各自完成写后确认",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响"
+    ],
+    "S04": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响"
+    ],
+    "S05": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.所有权系统类型缺字段不完整和过期确认均阻止写入",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.重复与反向点击直接忙碌不排队且两个目标也串行",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.限流停止自动回查并在等待期后仅重新读取",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.二十秒预算终止无响应回查且不重复写入",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.令牌失败或取得前取消不发收藏请求",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.HTTP限流保留RetryAfter且不会换端点重试"
+    ],
+    "E01": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.收藏创建两字段与删除各自完成写后确认",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.每个写端点成功拒绝损坏和未知均只发一次且不泄露正文",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.创建丢失回执ID不按同名认领也不自动重放"
+    ],
+    "E02": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.创建丢失回执ID不按同名认领也不自动重放",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.二十秒预算终止无响应回查且不重复写入"
+    ],
+    "E03": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.ID表单新建独立字段草稿冲突与输入法键盘不会误提交",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.名称保存不重复提交描述且外部修改产生字段级冲突"
+    ],
+    "E04": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.ID表单新建独立字段草稿冲突与输入法键盘不会误提交",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.名称保存不重复提交描述且外部修改产生字段级冲突",
+      "MusicNetEasePlugin.Tests.LibraryRulesTests.Unicode标量临界长度和无效代理项不能混淆"
+    ],
+    "E05": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.ID表单新建独立字段草稿冲突与输入法键盘不会误提交",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.所有权系统类型缺字段不完整和过期确认均阻止写入",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.保存回包不能覆盖关闭后重新打开的表单"
+    ],
+    "E06": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.添加弹层创建只选择目标再次添加才写曲目且取消确认不删歌单"
+    ],
+    "T01": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.曲目去重差集写入并按回查分类原有或原不存在",
+      "MusicNetEasePlugin.Tests.LibraryRulesTests.Unicode标量临界长度和无效代理项不能混淆"
+    ],
+    "T02": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.曲目去重差集写入并按回查分类原有或原不存在",
+      "MusicNetEasePlugin.Tests.LibraryRulesTests.部分结果按唯一曲目逐项分类并保留原有成员"
+    ],
+    "T03": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.回查三轮有界且部分曲目不会触发补偿或复制ID重试",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.每个写端点成功拒绝损坏和未知均只发一次且不泄露正文",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.实测串行去重旧代次丢弃与部分回查计数生成一致性证据"
+    ],
+    "T04": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.所有权系统类型缺字段不完整和过期确认均阻止写入",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.详情权限与全量快照必须来自明确字段",
+      "MusicNetEasePlugin.Tests.PlaylistTests.大歌单只分页加载且缓存有界失败可重试"
+    ],
+    "T05": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.曲目去重差集写入并按回查分类原有或原不存在"
+    ],
+    "D01": [
+      "MusicNetEasePlugin.Tests.LibraryRulesTests.权限只允许身份和类型均明确的自有普通歌单",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.所有权系统类型缺字段不完整和过期确认均阻止写入",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.收藏创建两字段与删除各自完成写后确认"
+    ],
+    "D02": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.三尺寸双色两密度的库编辑确认与结果可滚动可命中",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.添加弹层创建只选择目标再次添加才写曲目且取消确认不删歌单"
+    ],
+    "D03": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.删除不可访问和超时不能伪装为明确删除",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.二十秒预算终止无响应回查且不重复写入",
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.每个写端点成功拒绝损坏和未知均只发一次且不泄露正文"
+    ],
+    "D04": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响"
+    ],
+    "C01": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.旧账号迟到成功和清理不能污染新账号或相同账号新代次",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.ID表单新建独立字段草稿冲突与输入法键盘不会误提交"
+    ],
+    "C02": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.发送前取消零请求发送后取消保留待核实而非再次发送",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.回执受理后等待点取消只保留待核实",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.保存回包不能覆盖关闭后重新打开的表单"
+    ],
+    "C03": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.旧账号迟到成功和清理不能污染新账号或相同账号新代次",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.重复与反向点击直接忙碌不排队且两个目标也串行",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.实测串行去重旧代次丢弃与部分回查计数生成一致性证据"
+    ],
+    "C04": [
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.写前旧全量读取不能覆盖新的喜欢确认",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.实测串行去重旧代次丢弃与部分回查计数生成一致性证据"
+    ],
+    "C05": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.二十次页面挂卸独立草稿关闭在途再开和Shutdown无残留"
+    ],
+    "C06": [
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.忽略取消的外部读取或写入不阻塞Shutdown",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.关闭取消并等待同一个尾任务且重建服务不会重放"
+    ],
+    "C07": [
+      "MusicNetEasePlugin.Tests.LibraryProtocolTests.成功回执后的凭据保存失败仍保留受理事实",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.回查限流验证或失效立即停止并保留回执",
+      "MusicNetEasePlugin.Tests.LibraryCoordinatorTests.关闭取消并等待同一个尾任务且重建服务不会重放"
+    ],
+    "U01": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.三尺寸双色两密度的库编辑确认与结果可滚动可命中",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.搜索歌单队列历史及播放菜单共享喜欢且换曲不误写新曲"
+    ],
+    "U02": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.ID表单新建独立字段草稿冲突与输入法键盘不会误提交",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.三尺寸双色两密度的库编辑确认与结果可滚动可命中"
+    ],
+    "U03": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.添加弹层创建只选择目标再次添加才写曲目且取消确认不删歌单",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.三尺寸双色两密度的库编辑确认与结果可滚动可命中",
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.实测串行去重旧代次丢弃与部分回查计数生成一致性证据"
+    ],
+    "U04": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.添加弹层创建只选择目标再次添加才写曲目且取消确认不删歌单",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.三尺寸双色两密度的库编辑确认与结果可滚动可命中"
+    ],
+    "U05": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.三尺寸双色两密度的库编辑确认与结果可滚动可命中",
+      "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体"
+    ],
+    "R01": [
+      "MusicNetEasePlugin.Tests.LibraryUiTests.二十次页面挂卸独立草稿关闭在途再开和Shutdown无残留"
+    ],
+    "R02": [
+      "MusicNetEasePlugin.Tests.V6ResponsiveUiTests.三尺寸双色双抽屉保留浏览且密度切换不重开媒体",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.双文档喜欢同步删除相关页和隐藏页恢复且播放队列不受影响",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.搜索歌单队列历史及播放菜单共享喜欢且换曲不误写新曲"
+    ],
+    "R03": [
+      "MusicNetEasePlugin.Tests.LibraryConsistencyTests.Host与Standalone共用注册入口且库共享草稿按Document隔离",
+      "MusicNetEasePlugin.Tests.PluginRegistrationTests.真实模块只声明贡献根而不在私有服务中重复登记",
+      "MusicNetEasePlugin.Tests.LibraryUiTests.二十次页面挂卸独立草稿关闭在途再开和Shutdown无残留"
+    ]
+  }
+}
