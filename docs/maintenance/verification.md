@@ -40,7 +40,6 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V7
 | `V4` | 再核验 M2 歌单、队列、歌词、定位、恢复与寿命；[M2 矩阵](netease-v4-m2-daily-player-verification.md) |
 | `V5` | 再核验交互、图片缓存 / 租约、静态资源与布局；[V5 矩阵](netease-v5-ui-interaction-verification-plan.md) |
 | `V6` | 再核验抽屉、手势、焦点、反馈、密度和单步撤销；[V6 矩阵](netease-v6-drawer-and-interaction-verification-plan.md) |
-
 | `V7`（默认） | 再核验音乐库管理、46 场景、16 张截图、一致性 / 寿命 / 12 布局组合；[V7 矩阵](netease-v7-m3-music-library-verification-plan.md) |
 
 场景到真实测试方法的映射见 [M1](../../tools/m1-test-map.json)、[V3](../../tools/v3-test-map.json)、[M2](../../tools/m2-test-map.json)、[V5](../../tools/v5-test-map.json)、[V6](../../tools/v6-test-map.json)、[V7](../../tools/v7-test-map.json)。映射及原始产物共同证明覆盖，不能仅以测试总数代替场景结果。

@@ -117,11 +117,17 @@ public sealed class LibraryUiTests
                     Assert.Contains("ID 7", Control<TextBlock>(page.View, "ConfirmationTarget").Text);
                     Save(window, $"v7-delete-{(dark ? "dark" : "light")}.png");
                     var writeCount = f.Api.Writes.Count; PressKey(window, Key.Enter); Assert.Equal(writeCount, f.Api.Writes.Count); Assert.False(page.Editor.IsOpen);
+                    f.Api.Playlists[7] = f.Api.Playlists[7] with { TrackIds = [1, 2], TrackCount = 2 };
                     f.Api.Write = (_, _) => Task.FromResult(new LibraryWriteReceipt(LibraryReceiptState.Uncertain, "操作可能已生效，请重新读取结果。", StopRecheck: true));
                     await f.Library.ExecuteAsync(new(LibraryOperationKind.AddTracks, 7, TrackIds: [3])); Pump(window);
                     await f.Library.RefreshLikesAsync(); Pump(window); Assert.Contains("重新读取结果", page.Editor.LastResultMessage);
                     await Click(Button(page.View, "LibraryResultsButton")); Pump(window); Assert.True(Button(page.View, "RecheckLibraryButton").IsEffectivelyEnabled);
                     Assert.Contains("playlist:7", page.Editor.PendingKeys); Save(window, $"v7-recheck-{(dark ? "dark" : "light")}.png");
+                    var selector = Control<LibraryEditorView>(page.View, "LibraryEditorPanel").GetVisualDescendants().OfType<ComboBox>().Single();
+                    Assert.Equal("playlist:7", selector.SelectedItem);
+                    f.Api.Playlists[7] = f.Api.Playlists[7] with { TrackIds = [1, 2, 3], TrackCount = 3 };
+                    var mutations = f.Api.Writes.Count; await Click(Button(page.View, "RecheckLibraryButton")); Pump(window);
+                    Assert.Equal(mutations, f.Api.Writes.Count); Assert.Empty(page.Editor.PendingKeys); Assert.Equal(LibraryOutcome.Confirmed, page.Editor.Snapshot.LastResult!.Outcome);
                     PressKey(window, Key.Escape); Assert.False(page.Editor.IsOpen);
                 }
                 Assert.Equal(12, measurements.Count); Assert.Empty(f.Player.Player.Audio.Opened);

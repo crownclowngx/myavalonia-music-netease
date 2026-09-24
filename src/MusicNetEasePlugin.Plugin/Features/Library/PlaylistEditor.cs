@@ -80,7 +80,7 @@ public sealed class PlaylistEditor : ObservableObject, IDisposable
     public bool CanEdit => _metadata?.CanEdit(_snapshot.AccountId) == true;
     public bool HasPending => _snapshot.Pending?.Count > 0;
     public bool HasPendingCreate => _snapshot.Pending?.ContainsKey("create") == true;
-    public IReadOnlyList<string> PendingKeys => _snapshot.Pending?.Keys.Order().ToArray() ?? [];
+    public ObservableCollection<string> PendingKeys { get; } = [];
     private string? _selectedPending;
     public string? SelectedPending { get => _selectedPending; set => SetProperty(ref _selectedPending, value); }
     public string LastResultMessage => _snapshot.LastResult?.Message ?? "尚无音乐库修改记录。";
@@ -126,8 +126,12 @@ public sealed class PlaylistEditor : ObservableObject, IDisposable
 
     private void Notify()
     {
-        if (_selectedPending is null || !PendingKeys.Contains(_selectedPending)) SelectedPending = PendingKeys.FirstOrDefault();
-        OnPropertyChanged(nameof(PendingKeys)); OnPropertyChanged(nameof(ResultItemsText)); OnPropertyChanged(nameof(LastResultMessage));
+        // ItemsSource 保持同一实例。先更新条目再恢复选择，避免 ComboBox 因换数组把刚设置的目标清空。
+        var selected = _selectedPending;
+        var keys = _snapshot.Pending?.Keys.Order().ToArray() ?? [];
+        if (!PendingKeys.SequenceEqual(keys)) { PendingKeys.Clear(); foreach (var key in keys) PendingKeys.Add(key); }
+        SelectedPending = selected is not null && PendingKeys.Contains(selected) ? selected : PendingKeys.FirstOrDefault();
+        OnPropertyChanged(nameof(ResultItemsText)); OnPropertyChanged(nameof(LastResultMessage));
         foreach (var name in new[] { nameof(IsOpen), nameof(IsIdPage), nameof(IsCreatePage), nameof(IsEditPage), nameof(IsAddPage), nameof(IsConfirmation), nameof(IsDiscardPage), nameof(IsNamePage), nameof(IsBusy), nameof(CanEdit), nameof(HasPending), nameof(HasPendingCreate), nameof(Title), nameof(SubscribeText), nameof(NameError), nameof(DescriptionError), nameof(ConfirmationText), nameof(TrackLabel), nameof(Snapshot), nameof(Metadata) }) OnPropertyChanged(name);
         foreach (var command in new IRelayCommand[] { OpenCommand, CreateCommand, SaveNameCommand, SaveDescriptionCommand, SubscribeCommand, DeletePanelCommand, RemovePanelCommand, ConfirmCommand, AddCommand, MoreTargetsCommand, LikeCommand, AddPanelCommand, RefreshCommand, RecheckCommand, AcknowledgeCreateCommand, EditPanelCommand, ReloadDraftCommand }) command.NotifyCanExecuteChanged();
     }

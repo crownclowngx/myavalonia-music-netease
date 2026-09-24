@@ -32,6 +32,16 @@ public partial class LibraryEditorView : UserControl
     private void Unbind() { if (_model is not null) _model.PropertyChanged -= ModelChanged; _model = null; }
     private void ModelChanged(object? sender, PropertyChangedEventArgs e)
     {
+        if (e.PropertyName is nameof(PlaylistEditor.HasPending) or nameof(PlaylistEditor.IsBusy))
+        {
+            // 回查成功会移除回查按钮；若焦点还挂在被隐藏 / 禁用的按钮，Esc 无法再沿编辑层路由。
+            Dispatcher.UIThread.Post(() =>
+            {
+                if (_model?.IsOpen != true || !IsEffectivelyVisible) return;
+                var focused = TopLevel.GetTopLevel(this)?.FocusManager?.GetFocusedElement();
+                if (focused is null || focused is Control control && (!control.IsEffectivelyVisible || !control.IsEffectivelyEnabled)) CloseEditor.Focus();
+            });
+        }
         if (e.PropertyName != nameof(PlaylistEditor.Page) || _model is null) return;
         if (_model.IsOpen)
         {
