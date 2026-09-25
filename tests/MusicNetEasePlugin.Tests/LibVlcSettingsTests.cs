@@ -19,6 +19,7 @@ internal sealed class DirectoryProbe(Func<string, RuntimeCheck> check) : ILibVlc
 internal sealed class RuntimeStatus : IPlaybackRuntimeStatus
 {
     public bool LoadAttempted { get; set; }
+    public bool IsEngineActive { get; set; }
     public string? ActiveDirectory { get; set; }
     public string? ActiveVersion { get; set; } = "3.0.fixture";
     public RuntimeSource ActiveSource => RuntimeSource.Configured;

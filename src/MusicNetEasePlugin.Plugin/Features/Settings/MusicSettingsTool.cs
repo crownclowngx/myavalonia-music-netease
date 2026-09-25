@@ -70,7 +70,7 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
     public string SessionText { get => _session; private set => SetProperty(ref _session, value); }
     public string CandidateRuntime { get => _candidate; private set => SetProperty(ref _candidate, value); }
     public string ActiveRuntime => _runtime.ActiveDirectory is { } path
-        ? $"当前运行库（{(_runtime.ActiveSource == RuntimeSource.BuiltIn ? "内置" : "配置")}）：{path}（{_runtime.ActiveVersion}）"
+        ? $"已绑定运行库（{(_runtime.ActiveSource == RuntimeSource.BuiltIn ? "内置" : "配置")}）：{path}（{_runtime.ActiveVersion}）\n{(_runtime.IsEngineActive ? "音频引擎正在运行。" : "音频引擎已释放，播放时重新创建。")}"
         : _runtime.LoadAttempted ? "原生加载已尝试；变更目录后需重启 Host。" : "尚未加载音频引擎；首次播放时内置目录优先。";
     public IAsyncRelayCommand CheckCommand { get; }
     public IAsyncRelayCommand SaveCommand { get; }
@@ -154,7 +154,7 @@ public sealed class MusicSettingsTool : ObservableObject, IDisposable
         finally { _writes.Release(); }
     }
     private void LoginChanged(object? sender, LoginSnapshot snapshot) => Post(() => ApplyLogin(snapshot));
-    private void RuntimeChanged(object? sender, EventArgs args) => Post(() => { OnPropertyChanged(nameof(ActiveRuntime)); RuntimeSummary = _runtime.ActiveDirectory is not null ? "播放库已就绪" : "播放库加载失败，请检查配置"; if (_runtime.ActiveDirectory is null) AdvancedExpanded = true; });
+    private void RuntimeChanged(object? sender, EventArgs args) => Post(() => { OnPropertyChanged(nameof(ActiveRuntime)); RuntimeSummary = _runtime.ActiveDirectory is not null ? _runtime.IsEngineActive ? "播放库已就绪" : "引擎已释放，播放时重新创建" : "播放库加载失败，请检查配置"; if (_runtime.ActiveDirectory is null) AdvancedExpanded = true; });
     private void ApplyLogin(LoginSnapshot snapshot)
     {
         if (snapshot.Revision <= _loginRevision) return;

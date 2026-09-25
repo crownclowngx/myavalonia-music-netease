@@ -21,6 +21,7 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     private readonly IPlayerSession _playback;
     private readonly LoginCoordinator _login;
     private readonly ILoginUiDispatcher _ui;
+    private readonly MusicPlaybackLease? _playbackLease;
     private int _disposed;
     private readonly CancellationTokenSource _closing = new();
     private readonly CancellationTokenRegistration _lifetime;
@@ -43,9 +44,10 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     private int _offset;
     private MusicTrack? _selected;
     public MusicWorkspace(IMusicCatalogApi catalog, IMusicSessionAccessor sessions, IPlayerSession playback,
-        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null, PlaybackPersistence? persistence = null, TimeProvider? time = null, PlaylistEditor? library = null)
+        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null, PlaybackPersistence? persistence = null, TimeProvider? time = null, PlaylistEditor? library = null, MusicPlaybackLease? playbackLease = null)
     {
         (_catalog, _sessions, _playback, _login, _ui) = (catalog, sessions, playback, login, ui);
+        _playbackLease = playbackLease;
         SearchBusy = new(ui, time);
         Player = new(playback, ui, images, preferences);
         Preferences = preferences;
@@ -207,16 +209,25 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         Lyrics?.Dispose();
         History?.Dispose();
         _login.Changed -= LoginChanged;
-        // V4 队列由插件容器拥有。页面只撤销自己的搜索、图片与订阅，不再停止已接纳的歌曲。
-        completion.TrySetResult();
+        // 归还最后一个 Document 租约时释放原生资源；Dispose 必须等待同一关闭任务。
+        var release = _playbackLease?.Close() ?? Task.CompletedTask;
+        _ = FinishCloseAsync();
+        async Task FinishCloseAsync()
+        {
+            try { await release.ConfigureAwait(false); completion.TrySetResult(); }
+            catch (Exception ex) { completion.TrySetException(ex); }
+        }
     }
     public void Dispose()
     {
         if (Interlocked.Exchange(ref _disposed, 1) != 0) return;
         Close();
-        Task.WhenAll(_searchWork, _stopWork).GetAwaiter().GetResult();
-        _lifetime.Dispose();
-        _search?.Dispose();
-        _closing.Dispose();
+        try { Task.WhenAll(_searchWork, _stopWork).GetAwaiter().GetResult(); }
+        finally
+        {
+            _lifetime.Dispose();
+            _search?.Dispose();
+            _closing.Dispose();
+        }
     }
 }

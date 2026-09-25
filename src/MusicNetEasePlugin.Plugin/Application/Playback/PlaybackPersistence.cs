@@ -205,8 +205,9 @@ public sealed class PlaybackPersistence(IPlaybackStateStore store, TimeProvider 
     private Task<T> Enqueue<T>(Func<Task<T>> action)
     {
         // 调用点已在短锁内；先发布尾任务再让执行体离开锁，保证激活、保存、最终清理的登记顺序。
-        var previous = _tail; var next = Run(); _tail = next; return next;
-        async Task<T> Run() { await Task.Yield(); try { await previous.ConfigureAwait(false); } catch (Exception) { } return await action().ConfigureAwait(false); }
+        // Document Scope 在 UI 线程同步释放；这里不能用捕获 UI 上下文的 Task.Yield。
+        var previous = _tail; var next = Task.Run(Run); _tail = next; return next;
+        async Task<T> Run() { try { await previous.ConfigureAwait(false); } catch (Exception) { } return await action().ConfigureAwait(false); }
     }
     private void CancelDelay() { try { _delay?.Cancel(); } catch (ObjectDisposedException) { } }
     private void Publish(string message) => _snapshot = new(_snapshot.Revision + 1, _state.AccountId, _state.Recent,
@@ -222,9 +223,9 @@ public sealed class PlaybackPersistence(IPlaybackStateStore store, TimeProvider 
         lock (_sync)
         {
             if (_shutdown is not null) return new(_shutdown);
-            _stopping = true; CancelDelay(); return new(_shutdown = Finish());
+            _stopping = true; CancelDelay(); return new(_shutdown = Task.Run(Finish));
         }
-        async Task Finish() { await Task.Yield(); await FlushAsync().ConfigureAwait(false); await Pending.ConfigureAwait(false); Changed = null; }
+        async Task Finish() { await FlushAsync().ConfigureAwait(false); await Pending.ConfigureAwait(false); Changed = null; }
     }
     public void Dispose() => DisposeAsync().AsTask().GetAwaiter().GetResult();
 }

@@ -5,7 +5,7 @@ using MusicNetEasePlugin.Application.Playback;
 namespace MusicNetEasePlugin.Infrastructure.Audio;
 
 /// <summary>
-/// 所有原生控制在后台单一异步门中执行，UI 不同步等待 Stop。一个容器复用引擎，
+/// 所有原生控制在后台单一异步门中执行；同一音乐 Document 会话复用引擎，
 /// 每首歌独占 MediaPlayer/Media，旧播放器事件携带旧代次，不能冒充新歌曲事件。
 /// </summary>
 internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlayer>? configureOutput = null) : IAudioOutput, IDisposable
@@ -133,6 +133,12 @@ internal sealed class LibVlcAudioOutput(LibVlcRuntime runtime, Action<MediaPlaye
         return RunAsync(() => { _volume = volume; if (_player is not null) _player.Volume = volume; return Task.CompletedTask; }, ct);
     }
     public Task StopAsync() => RunAsync(() => { StopCore(); return Task.CompletedTask; }, CancellationToken.None);
+    public Task ReleaseSessionAsync() => RunAsync(() =>
+    {
+        StopCore();
+        runtime.ReleaseEngine();
+        return Task.CompletedTask;
+    }, CancellationToken.None);
     private async Task RunAsync(Func<Task> action, CancellationToken ct)
     {
         await _gate.WaitAsync(ct).ConfigureAwait(false);

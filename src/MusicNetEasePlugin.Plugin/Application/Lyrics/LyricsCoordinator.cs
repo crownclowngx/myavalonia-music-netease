@@ -18,18 +18,39 @@ public sealed class LyricsCoordinator : IDisposable, IAsyncDisposable
     private long _generation;
     private long _playerRevision = -1;
     private bool _closed;
+    private bool _suspended;
     private Task _pending = Task.CompletedTask;
     private Task? _shutdown;
     private LyricsSnapshot _snapshot = new(0, 0, 0, LyricDocument.Empty, -1, 0);
-    public LyricsCoordinator(IPlayerSession player, IMusicSessionAccessor sessions, ILyricsApi api)
-    { (_player, _sessions, _api) = (player, sessions, api); player.Changed += PlayerChanged; PlayerChanged(null, player.Snapshot); }
+    public LyricsCoordinator(IPlayerSession player, IMusicSessionAccessor sessions, ILyricsApi api, bool startSuspended = false)
+    { (_player, _sessions, _api) = (player, sessions, api); _suspended = startSuspended; player.Changed += PlayerChanged; PlayerChanged(null, player.Snapshot); }
     public LyricsSnapshot Snapshot { get { lock (_sync) return _snapshot; } }
     public event EventHandler<LyricsSnapshot>? Changed;
     internal int CachedCount { get { lock (_sync) return _cache.Count; } }
     public Task Pending { get { lock (_sync) return _pending; } }
     public Task RetryAsync()
     {
-        lock (_sync) { if (_closed || _snapshot.TrackId == 0) return Task.CompletedTask; _cache.Remove(_snapshot.TrackId); Start(); return _pending; }
+        lock (_sync) { if (_closed || _suspended || _snapshot.TrackId == 0) return Task.CompletedTask; _cache.Remove(_snapshot.TrackId); Start(); return _pending; }
+    }
+    internal Task Suspend()
+    {
+        lock (_sync)
+        {
+            _suspended = true;
+            _generation++;
+            _request?.Cancel();
+            _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Loading = false };
+            return _pending;
+        }
+    }
+    internal void Resume()
+    {
+        lock (_sync)
+        {
+            if (_closed || !_suspended) return;
+            _suspended = false;
+            if (_snapshot.TrackId > 0 && !_cache.ContainsKey(_snapshot.TrackId)) Start();
+        }
     }
     private void PlayerChanged(object? sender, PlayerSessionSnapshot player)
     {
@@ -47,7 +68,7 @@ public sealed class LyricsCoordinator : IDisposable, IAsyncDisposable
             }
             _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, PositionMs = player.Playback.PositionMs, SyncLimited = player.Playback.IsTrial };
             Synchronize();
-            if (changed && id > 0 && !_cache.ContainsKey(id)) Start();
+            if (!_suspended && changed && id > 0 && !_cache.ContainsKey(id)) Start();
         }
         Notify();
     }
@@ -56,7 +77,7 @@ public sealed class LyricsCoordinator : IDisposable, IAsyncDisposable
         var generation = ++_generation; var id = _snapshot.TrackId; var epoch = _snapshot.AccountEpoch;
         _request?.Cancel(); var request = CancellationTokenSource.CreateLinkedTokenSource(_closing.Token); _request = request;
         _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Loading = true, Failed = false, Message = "正在加载歌词…" };
-        var next = LoadAsync(); _pending = _pending.IsCompleted ? next : Task.WhenAll(_pending, next);
+        var next = Task.Run(LoadAsync); _pending = _pending.IsCompleted ? next : Task.WhenAll(_pending, next);
         async Task LoadAsync()
         {
             await Task.Yield(); Notify();

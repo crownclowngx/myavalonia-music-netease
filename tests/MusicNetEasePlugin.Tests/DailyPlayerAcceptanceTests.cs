@@ -87,7 +87,8 @@ public sealed class DailyPlayerAcceptanceTests
                 Assert.True(combo.Focus()); second.KeyPress(Key.Down, RawInputModifiers.None, default, null); second.KeyRelease(Key.Down, RawInputModifiers.None, default, null); Pump(second); Pump(first);
                 Assert.Equal(1, b.Music.Queue.ModeIndex); Assert.Equal(b.Music.Queue.ModeIndex, a.Music.Queue.ModeIndex);
                 await Click(a.View, "继续"); first.Close(); a.Dispose(); second.Close(); b.Dispose();
-                Assert.Equal(PlaybackState.Playing, f.Player.Queue.Snapshot.Playback.State); Assert.Single(f.Player.Audio.Opened);
+                Assert.Equal(PlaybackState.Stopped, f.Player.Queue.Snapshot.Playback.State); Assert.Single(f.Player.Audio.Opened);
+                Assert.Null(f.Player.Audio.Current); Assert.Equal(1, f.Player.Audio.SessionReleases);
                 var host = new Window { Width = 800, Height = 600 }; host.Show();
                 try { for (var i = 0; i < 20; i++) weak.Add(MountAndClose(host, f)); }
                 finally { host.Close(); }
@@ -97,7 +98,7 @@ public sealed class DailyPlayerAcceptanceTests
                 Assert.Null(f.Player.Audio.Current);
                 WriteJson("m2-lifetime.json", new { schemaVersion = 1, environment = "Avalonia Headless / Skia, production Document and application services", realHost = false,
                     mountedDocuments = 22, detachedViews = weak.Count, retainedViews = weak.Count(w => w.IsAlive), audioOpens = f.Player.Audio.Opened.Count,
-                    stoppedAfterShutdown = f.Player.Audio.Current is null, noAutomaticResume = true });
+                    stoppedAfterLastDocument = true, stoppedAfterShutdown = f.Player.Audio.Current is null, noAutomaticResume = true });
             }
             finally { first.Close(); second.Close(); }
             return true;
@@ -107,7 +108,7 @@ public sealed class DailyPlayerAcceptanceTests
     private static WeakReference MountAndClose(Window window, Fixture fixture)
     {
         using var page = fixture.Page(); window.Content = page.View; Pump(window);
-        Assert.Equal("播放中", page.Music.Player.StateText); Assert.Single(fixture.Player.Audio.Opened);
+        Assert.Equal(PlaybackState.Stopped, fixture.Player.Queue.Snapshot.Playback.State); Assert.Single(fixture.Player.Audio.Opened);
         window.Content = null; Pump(window); return new(page.View);
     }
     private static void Pump(Window window) => DesktopUiTests.Pump(window);
@@ -140,30 +141,34 @@ public sealed class DailyPlayerAcceptanceTests
         internal readonly PlaybackPersistenceTests.Fixture Player;
         internal readonly LoginCoordinator Login = TestLogin.Create(new(), new MemorySessionStore { Saved = FakeAuthApi.Authorized(AuthContext.Create()) }, TimeProvider.System, LoginOptions.Default);
         internal readonly LyricsCoordinator Lyrics;
+        internal readonly MusicPlaybackLifetime PlaybackLifetime;
         internal readonly PlaylistTests.PlaylistFake Playlists = new();
         internal Fixture()
         {
             var store = new PlaybackPersistenceTests.MemoryStore(); store.Data[123] = PlaybackPersistenceTests.State(123, 1, 3000); Player = new(store);
             Lyrics = new(Player.Queue, Player.Sessions, new LyricsTests.LyricsFake { Get = (_, _) => Task.FromResult(new RawLyrics(string.Join('\n', Enumerable.Range(0, 1000).Select(i => $"[{i / 60:00}:{i % 60:00}]晨光里的旋律 · 第 {i + 1} 行")))) });
+            PlaybackLifetime = new(Player.Queue, Lyrics);
             Playlists.Pages = (_, _) => Task.FromResult(new PlaylistPage([new(7, "日常聆听 · 一千首测试曲目", null, 1000, true)], 1, false));
             Playlists.Detail = (id, _) => Task.FromResult(new PlaylistTracks(id, "日常聆听", Enumerable.Range(1, 1000).Select(i => (long)i).ToArray(), true, ""));
         }
         internal async Task Initialize() { await Login.RestoreAsync(Guid.NewGuid(), default); await Player.Activate(); }
         internal Page Page() => new(this);
-        public async ValueTask DisposeAsync() { await Lyrics.DisposeAsync(); await Player.DisposeAsync(); await Login.DisposeAsync(); }
+        public async ValueTask DisposeAsync() { await PlaybackLifetime.DisposeAsync(); await Lyrics.DisposeAsync(); await Player.DisposeAsync(); await Login.DisposeAsync(); }
     }
     internal sealed class Page : IDisposable
     {
         private readonly MusicLifetime _life = new();
+        private readonly MusicPlaybackLease _playbackLease;
         internal MusicWorkspace Music { get; } internal MainDocument Document { get; } internal MainView View { get; }
         internal Page(Fixture f)
         {
+            _playbackLease = new(f.PlaybackLifetime, _life);
             var ui = new LoginUiDispatcher(); var browser = new PlaylistBrowser(f.Playlists, f.Player.Sessions, ui, f.Player.Queue);
-            Music = new(f.Player.Catalog, f.Player.Sessions, f.Player.Queue, f.Login, ui, _life, playlists: browser, lyrics: f.Lyrics, persistence: f.Player.Persistence);
+            Music = new(f.Player.Catalog, f.Player.Sessions, f.Player.Queue, f.Login, ui, _life, playlists: browser, lyrics: f.Lyrics, persistence: f.Player.Persistence, playbackLease: _playbackLease);
             Document = new(f.Login, ui, new NoImages(), _life, Music); View = new() { DataContext = Document };
         }
         private bool _closed;
-        public void Dispose() { if (_closed) return; _closed = true; Document.Dispose(); Music.Dispose(); _life.Dispose(); }
+        public void Dispose() { if (_closed) return; _closed = true; _life.Close(); Document.Dispose(); Music.Dispose(); _playbackLease.Dispose(); _life.Dispose(); }
     }
     private sealed class NoImages : IAccountImageSource
     { public Task<byte[]?> LoadAsync(string? address, CancellationToken ct) => Task.FromResult<byte[]?>(null); }

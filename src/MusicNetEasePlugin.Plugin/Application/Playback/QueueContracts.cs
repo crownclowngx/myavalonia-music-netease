@@ -23,7 +23,7 @@ public sealed record PlayerSessionSnapshot(long Revision, long QueueRevision, lo
     public static PlayerSessionSnapshot Empty { get; } = new(0, 0, 0, 0, Array.Empty<QueueEntry>(), null, PlaybackMode.Sequential, new(0, PlaybackState.Idle));
 }
 
-/// <summary>页面可用的最小共享播放器端口。接纳前观察页面取消，接纳后由账号和插件寿命拥有；不暴露媒体路径和凭据。</summary>
+/// <summary>页面可用的最小共享播放器端口。接纳后由账号和音乐 Document 共享租约拥有；最后租约归还时释放播放资源，不暴露媒体路径和凭据。</summary>
 public interface IPlayerSession
 {
     PlayerSessionSnapshot Snapshot { get; }

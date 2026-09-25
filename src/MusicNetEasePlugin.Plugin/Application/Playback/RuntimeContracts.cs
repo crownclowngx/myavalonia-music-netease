@@ -35,6 +35,7 @@ public interface IPlaybackRuntimeStatus
 {
     event EventHandler? Changed;
     bool LoadAttempted { get; }
+    bool IsEngineActive { get; }
     string? ActiveDirectory { get; }
     string? ActiveVersion { get; }
     RuntimeSource ActiveSource { get; }

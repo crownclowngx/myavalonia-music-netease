@@ -74,7 +74,7 @@
     "MusicNetEasePlugin.Tests.DesktopUiTests.宿主同款主题组合下菜单绑定和局部资源独立": 1,
     "MusicNetEasePlugin.Tests.PlaybackCoordinatorTests.旧暂停排队期间切歌会撤销旧控制意图": 1,
     "MusicNetEasePlugin.Tests.HttpTests.超大响应拒绝且读取取消生效": 1,
-    "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放": 1
+    "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且只有最后页面关闭才释放播放资源": 1
   },
   "scenarios": {
     "P06": [
@@ -121,14 +121,14 @@
     ],
     "U02": [
       "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
-      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放"
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且只有最后页面关闭才释放播放资源"
     ],
     "A03": [
       "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",
       "MusicNetEasePlugin.Tests.NativeSeekTests.原生三曲自然结束连续交接且最后释放所有文件",
       "MusicNetEasePlugin.Tests.QueueTests.连续播放去重终态且修改队列不重启当前曲",
       "MusicNetEasePlugin.Tests.SearchDocumentTests.迟到封面不能覆盖新歌曲且失败保留占位",
-      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且关闭任意页面不会取消播放"
+      "MusicNetEasePlugin.Tests.SearchDocumentTests.多文档共用队列且只有最后页面关闭才释放播放资源"
     ],
     "A04": [
       "MusicNetEasePlugin.Tests.DailyPlayerAcceptanceTests.双Document独立浏览共享控制关闭再开及二十轮重挂无残留",

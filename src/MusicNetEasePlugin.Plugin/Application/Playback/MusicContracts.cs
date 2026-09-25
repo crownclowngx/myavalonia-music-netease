@@ -60,6 +60,8 @@ public interface IAudioOutput : IAsyncDisposable
     /// <summary>只控制指定代次的当前媒体；在原生控制门内重新检查代次，保留暂停状态，位置以事实回报为准。</summary>
     Task SeekAsync(long generation, long positionMs, CancellationToken ct);
     Task StopAsync();
+    /// <summary>释放本次会话的全部原生资源；完成后仍可再次 Open，插件最终退出才 Dispose。</summary>
+    Task ReleaseSessionAsync();
     Task SetVolumeAsync(int volume, CancellationToken ct);
 }
 public sealed record PlaybackSnapshot(long Revision, PlaybackState State, MusicTrack? Track = null,

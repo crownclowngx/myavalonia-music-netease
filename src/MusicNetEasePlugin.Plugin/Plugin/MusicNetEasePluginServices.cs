@@ -72,11 +72,16 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<PlaybackCoordinator>();
         services.TryAddSingleton<IPlaybackStateStore>(_ => new PlaybackStateStore(Path.GetFullPath(root)));
         services.TryAddSingleton<PlaybackPersistence>();
-        services.TryAddSingleton<PlaybackQueueCoordinator>();
+        services.TryAddSingleton(provider => new PlaybackQueueCoordinator(provider.GetRequiredService<IMusicSessionAccessor>(),
+            provider.GetRequiredService<PlaybackCoordinator>(), provider.GetRequiredService<PlaybackPersistence>(), requireDocument: true));
         services.TryAddSingleton<PlayerAccountCoordinator>();
         services.TryAddSingleton<IPlayerSession>(provider => provider.GetRequiredService<PlaybackQueueCoordinator>());
         services.TryAddSingleton<ILyricsApi, NeteaseLyricsApi>();
-        services.TryAddSingleton<LyricsCoordinator>();
+        services.TryAddSingleton(provider => new LyricsCoordinator(provider.GetRequiredService<IPlayerSession>(),
+            provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<ILyricsApi>(), startSuspended: true));
+        services.TryAddSingleton<MusicPlaybackLifetime>();
+        services.TryAddScoped(provider => new MusicPlaybackLease(provider.GetRequiredService<MusicPlaybackLifetime>(),
+            provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>()));
         // Host 在 Document Scope 中提供 Lifetime；工厂避免普通服务容器预检被要求创建一个虚假的 Document。
         services.TryAddScoped(provider =>
         {
@@ -85,7 +90,7 @@ public static class MusicNetEasePluginServices
             provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<IPlayerSession>(),
             provider.GetRequiredService<LoginCoordinator>(), provider.GetRequiredService<ILoginUiDispatcher>(),
             provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>(),
-            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>(), provider.GetRequiredService<LyricsCoordinator>(), provider.GetRequiredService<PlaybackPersistence>(), library: provider.GetRequiredService<PlaylistEditor>());
+            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>(), provider.GetRequiredService<LyricsCoordinator>(), provider.GetRequiredService<PlaybackPersistence>(), library: provider.GetRequiredService<PlaylistEditor>(), playbackLease: provider.GetRequiredService<MusicPlaybackLease>());
         });
         return services;
     }

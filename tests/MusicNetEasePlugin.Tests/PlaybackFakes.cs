@@ -48,6 +48,8 @@ internal sealed class MusicAudio : IAudioOutput
     public string? Current { get; private set; }
     public int Volume { get; private set; }
     public int Stops { get; private set; }
+    public int SessionReleases { get; private set; }
+    public Func<Task>? ReleasingSession { get; set; }
     public bool AutoStart { get; set; } = true;
     public bool CanSeek { get; set; } = true;
     public long DurationMs { get; set; } = 120000;
@@ -71,6 +73,7 @@ internal sealed class MusicAudio : IAudioOutput
     public async Task SeekAsync(long generation, long positionMs, CancellationToken ct)
     { if (Seeking is not null) await Seeking(ct); ct.ThrowIfCancellationRequested(); if (generation != _generation) return; SeekPositions.Enqueue(positionMs); Emit(generation, _state, positionMs); }
     public async Task StopAsync() { if (Stopping is not null) await Stopping(); Current = null; Stops++; }
+    public async Task ReleaseSessionAsync() { if (ReleasingSession is not null) await ReleasingSession(); Current = null; SessionReleases++; }
     public Task SetVolumeAsync(int volume, CancellationToken ct) { ct.ThrowIfCancellationRequested(); Volume = volume; return Task.CompletedTask; }
     public void Emit(long generation, PlaybackState state, long position = 0)
     { if (generation == _generation) _state = state; Changed?.Invoke(this, new(generation, state, position, DurationMs, state == PlaybackState.Failed ? "设备失败" : null, CanSeek)); }

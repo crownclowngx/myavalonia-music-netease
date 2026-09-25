@@ -23,19 +23,82 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     private long _lastSingleRevision = -1;
     private Task _background = Task.CompletedTask;
     private Task? _shutdown;
+    private bool _sessionOpen;
+    private Task _sessionReady = Task.CompletedTask;
+    private Task? _sessionStop;
     // 单步逆操作仅存必要结构；不保存整个播放器快照，也不引入命令栈或多级撤销框架。
     private sealed record QueueUndo(QueueUndoInfo Info, long Epoch, long Revision, Guid EntryId, int Index, QueueNavigator.RemovedEntry? Removed);
     private QueueUndo? _undo;
-    public PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, PlaybackPersistence? persistence = null)
-        : this(sessions, single, new QueueNavigator(), persistence) { }
-    internal PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, QueueNavigator order, PlaybackPersistence? persistence = null)
+    public PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, PlaybackPersistence? persistence = null, bool requireDocument = false)
+        : this(sessions, single, new QueueNavigator(), persistence, requireDocument) { }
+    internal PlaybackQueueCoordinator(IMusicSessionAccessor sessions, PlaybackCoordinator single, QueueNavigator order, PlaybackPersistence? persistence = null, bool requireDocument = false)
     {
         (_sessions, _single, _order) = (sessions, single, order);
         _persistence = persistence;
+        _sessionOpen = !requireDocument;
         _single.Changed += SingleChanged;
     }
     public PlayerSessionSnapshot Snapshot { get { lock (_sync) return _snapshot; } }
     public event EventHandler<PlayerSessionSnapshot>? Changed;
+
+    internal void ResumeDocumentSession(Task previousClose)
+    {
+        lock (_sync)
+        {
+            ObjectDisposedException.ThrowIf(_closed, this);
+            _sessionReady = previousClose;
+            _sessionStop = null;
+            _sessionOpen = true;
+        }
+    }
+
+    internal Task SuspendDocumentSessionAsync()
+    {
+        lock (_sync)
+        {
+            if (_sessionStop is not null) return _sessionStop;
+            _sessionOpen = false;
+            _attempt = Guid.Empty;
+            _terminalConsumed = true;
+            _failedCandidates.Clear();
+            _resumePosition = _snapshot.Playback.PositionMs;
+            _snapshot = _snapshot with
+            {
+                Revision = _snapshot.Revision + 1,
+                Playback = _snapshot.Playback with { State = PlaybackState.Stopped, CanSeek = false,
+                    IsSeeking = false, Buffer = null, AttemptId = Guid.Empty, Message = "播放已停止，点击继续播放。" }
+            };
+            // 先保留位置，再撤销原生播放。旧事件因 attempt 已失效，不能用 Stop 的零位置覆盖快照。
+            _persistence?.Observe(_snapshot);
+            var release = _single.ReleaseSessionAsync();
+            var background = _background;
+            var previous = _sessionReady;
+            var revision = _snapshot.Revision;
+            return _sessionStop = Task.Run(async () =>
+            {
+                try
+                {
+                    await Task.WhenAll(previous, release, background).ConfigureAwait(false);
+                }
+                catch
+                {
+                    lock (_sync)
+                    {
+                        if (_snapshot.Revision == revision)
+                            _snapshot = _snapshot with { Revision = revision + 1,
+                                Playback = _snapshot.Playback with { State = PlaybackState.Failed, Error = MusicError.Device,
+                                    Message = "音频资源释放失败，请重启 Host 后重试。" } };
+                    }
+                    Notify(save: false);
+                    throw;
+                }
+                finally
+                {
+                    if (_persistence is not null) await _persistence.FlushAsync().ConfigureAwait(false);
+                }
+            });
+        }
+    }
     public Task PlaySingleAsync(MusicTrack track, CancellationToken ct) => ReplaceAsync([QueueEntry.FromTrack(track)], 0, ct);
     /// <summary>
     /// “插入、选中、启动”在唯一写入者的同一短锁中接纳，页面不能自行拼接三个异步命令。
@@ -50,7 +113,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         var inserted = false;
         lock (_sync)
         {
-            BindAccount(session);
+            BindAccountForIntent(session, ct);
             if (_order.Current?.TrackId == entry.TrackId)
             {
                 work = _snapshot.Playback.State is PlaybackState.Playing or PlaybackState.Loading
@@ -77,7 +140,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         var session = Capture(ct); Task work;
         lock (_sync)
         {
-            BindAccount(session); _order.Replace(entries, startIndex); _failedCandidates.Clear();
+            BindAccountForIntent(session, ct); _order.Replace(entries, startIndex); _failedCandidates.Clear();
             PublishOrder(); work = StartCurrent();
         }
         Notify(explicitReplacement: true); return work;
@@ -87,7 +150,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         Validate(entries); var session = Capture(ct);
         lock (_sync)
         {
-            BindAccount(session);
+            BindAccountForIntent(session, ct);
             if (entries.Count == 0) return Task.FromResult(new QueueAdditionResult(0, playNext, session.Epoch));
             var existingIds = _order.Entries.Select(entry => entry.EntryId).ToHashSet();
             if (_order.Entries.Count + entries.Count > 10000 || entries.Any(e => existingIds.Contains(e.EntryId)))
@@ -103,7 +166,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         var session = Capture(ct); Task work = Task.CompletedTask;
         lock (_sync)
         {
-            BindAccount(session);
+            BindAccountForIntent(session, ct);
             if (_order.Select(entryId)) { _failedCandidates.Clear(); PublishOrder(); work = StartCurrent(); }
         }
         Notify(); return work;
@@ -113,7 +176,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         var session = Capture(ct); Task work = Task.CompletedTask;
         lock (_sync)
         {
-            BindAccount(session);
+            BindAccountForIntent(session, ct);
             if (previous ? !_order.CanPrevious : !_order.CanNext) return work;
             var state = _snapshot.Playback.State;
             if ((previous ? _order.Previous() : _order.Next(false)) is not null)
@@ -129,7 +192,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         var session = Capture(ct); Task work = Task.CompletedTask;
         lock (_sync)
         {
-            BindAccount(session);
+            BindAccountForIntent(session, ct);
             if (_order.CaptureRemoval(entryId) is not { } removed) return work;
             var current = _order.CurrentId == entryId; var state = _snapshot.Playback.State;
             if (current) _order.Next(false, [entryId]);
@@ -149,7 +212,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     {
         lock (_sync)
         {
-            if (_closed || _accountToken.IsCancellationRequested || intent.AccountEpoch != _snapshot.AccountEpoch || intent.QueueRevision != _snapshot.QueueRevision) return false;
+            if (_closed || !_sessionOpen || _accountToken.IsCancellationRequested || intent.AccountEpoch != _snapshot.AccountEpoch || intent.QueueRevision != _snapshot.QueueRevision) return false;
             var index = _order.IndexOf(intent.EntryId);
             if (!_order.MoveTo(intent.EntryId, intent.TargetIndex)) return false;
             PublishOrder(); RememberUndo(intent.EntryId, index, null, "撤销移动");
@@ -160,7 +223,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     {
         lock (_sync)
         {
-            if (_closed || _accountToken.IsCancellationRequested || _undo is not { } undo || undo.Info.Id != undoId ||
+            if (_closed || !_sessionOpen || _accountToken.IsCancellationRequested || _undo is not { } undo || undo.Info.Id != undoId ||
                 undo.Epoch != accountEpoch || accountEpoch != _snapshot.AccountEpoch || undo.Revision != _snapshot.QueueRevision) return false;
             if (undo.Removed is { } removed)
             {
@@ -181,7 +244,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     public void SetMode(PlaybackMode mode)
     {
         if (!Enum.IsDefined(mode)) throw new ArgumentOutOfRangeException(nameof(mode));
-        lock (_sync) { if (_closed) return; _order.SetMode(mode); PublishOrder(); }
+        lock (_sync) { if (_closed || !_sessionOpen) return; _order.SetMode(mode); PublishOrder(); }
         Notify();
     }
     public Task ClearAsync() => ClearCore(null);
@@ -191,6 +254,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         Task work;
         lock (_sync)
         {
+            if (_closed || !_sessionOpen) return Task.CompletedTask;
             if (expectedQueueRevision is { } expected && expected != _snapshot.QueueRevision)
                 throw new MusicException(MusicError.Storage, "队列已经变化，请重新确认。");
             _attempt = Guid.Empty; _terminalConsumed = true; _failedCandidates.Clear(); _order.Replace([], 0);
@@ -201,7 +265,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     public Task StopAsync()
     {
         Task work;
-        lock (_sync) { _failedCandidates.Clear(); _snapshot = _snapshot with { Restoration = null }; work = StopToPending(PlaybackState.Stopped); }
+        lock (_sync) { if (_closed || !_sessionOpen) return Task.CompletedTask; _failedCandidates.Clear(); _snapshot = _snapshot with { Restoration = null }; work = StopToPending(PlaybackState.Stopped); }
         Notify(); return work;
     }
     public Task PauseAsync(bool paused, CancellationToken ct)
@@ -209,7 +273,8 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         ct.ThrowIfCancellationRequested();
         lock (_sync)
         {
-            if (_closed || _order.Current is null) return Task.CompletedTask;
+            if (_closed || !_sessionOpen || _order.Current is null) return Task.CompletedTask;
+            ct.ThrowIfCancellationRequested();
             if (!paused && (_attempt == Guid.Empty || _snapshot.Playback.State is PlaybackState.Stopped or PlaybackState.Ended or PlaybackState.Failed))
             { _failedCandidates.Clear(); return StartCurrent(_resumePosition); }
             return _single.PauseAsync(paused, ct);
@@ -229,7 +294,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     {
         lock (_sync)
         {
-            if (_closed || _order.CurrentId != entryId || _snapshot.Playback.Generation != generation) return Task.CompletedTask;
+            if (_closed || !_sessionOpen || _order.CurrentId != entryId || _snapshot.Playback.Generation != generation) return Task.CompletedTask;
             return _single.SeekAsync(generation, positionMs, ct);
         }
     }
@@ -274,6 +339,12 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         _revocation = session.Revoked.Register(() => Revoke(session.Epoch));
         session.Revoked.ThrowIfCancellationRequested();
     }
+    private void BindAccountForIntent(MusicSession session, CancellationToken ct)
+    {
+        ct.ThrowIfCancellationRequested();
+        if (!_sessionOpen) throw new OperationCanceledException("音乐 Document 已关闭。", new CancellationToken(true));
+        BindAccount(session);
+    }
     private void Revoke(long epoch)
     {
         lock (_sync)
@@ -288,13 +359,27 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
     private Task StartCurrent(long startPosition = 0)
     {
         var current = _order.Current;
-        if (current is null) return Task.CompletedTask;
+        if (!_sessionOpen || current is null) return Task.CompletedTask;
         _attempt = Guid.NewGuid(); _terminalConsumed = false;
         _snapshot = _snapshot with { Revision = _snapshot.Revision + 1, Restoration = null };
         _resumePosition = startPosition;
         var track = current.Track ?? new MusicTrack(current.TrackId, $"歌曲 {current.TrackId}", "待加载", "", null, 0);
         // PlayAsync 只同步登记代次，执行体首先异步让出，保持本状态锁短暂；旧资源由单曲尾任务先释放。
-        return _single.PlayAsync(_attempt, track, _closing.Token, startPosition);
+        if (_sessionReady.IsCompletedSuccessfully)
+            return _single.PlayAsync(_attempt, track, _closing.Token, startPosition);
+        var attempt = _attempt;
+        var ready = _sessionReady;
+        return Task.Run(async () =>
+        {
+            await ready.ConfigureAwait(false);
+            Task play;
+            lock (_sync)
+            {
+                if (_closed || !_sessionOpen || attempt != _attempt) return;
+                play = _single.PlayAsync(attempt, track, _closing.Token, startPosition);
+            }
+            await play.ConfigureAwait(false);
+        });
     }
     private Task StopToPending(PlaybackState state)
     {
@@ -354,7 +439,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
         Task next = Task.CompletedTask;
         lock (_sync)
         {
-            if (_closed || attempt != _attempt) return;
+            if (_closed || !_sessionOpen || attempt != _attempt) return;
             if (state == PlaybackState.Failed)
             {
                 if (error != MusicError.Unavailable) return;
@@ -391,7 +476,7 @@ public sealed class PlaybackQueueCoordinator : IPlayerSession, IAsyncDisposable,
             if (_shutdown is not null) return new(_shutdown);
             _closed = true; _attempt = Guid.Empty; _single.Changed -= SingleChanged; _revocation.Unregister();
             _closing.Cancel(); Changed = null;
-            _shutdown = ShutdownAsync(); return new(_shutdown);
+            _shutdown = Task.Run(ShutdownAsync); return new(_shutdown);
         }
     }
     private async Task ShutdownAsync()

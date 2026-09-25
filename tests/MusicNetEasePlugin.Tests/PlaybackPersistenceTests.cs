@@ -35,6 +35,8 @@ public sealed class PlaybackPersistenceTests
         services.AddMusicNetEasePluginServices(directory.Path);
         using (var provider = services.BuildServiceProvider(new ServiceProviderOptions { ValidateOnBuild = true, ValidateScopes = true }))
         {
+            using var documentLifetime = new MusicLifetime();
+            using var playbackLease = new MusicPlaybackLease(provider.GetRequiredService<MusicPlaybackLifetime>(), documentLifetime);
             var accounts = provider.GetRequiredService<PlayerAccountCoordinator>(); var login = provider.GetRequiredService<LoginCoordinator>();
             var queue = provider.GetRequiredService<PlaybackQueueCoordinator>(); var persistence = provider.GetRequiredService<PlaybackPersistence>();
             Assert.Equal(0, persistence.Snapshot.AccountId); Assert.Empty(queue.Snapshot.Entries);

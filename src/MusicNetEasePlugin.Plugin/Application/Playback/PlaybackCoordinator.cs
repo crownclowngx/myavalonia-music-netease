@@ -88,7 +88,7 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
             if (retained) _accountRevocation = accountRegistration;
         }
         if (!retained) accountRegistration.Dispose();
-        _ = LoadAsync(previous, previousCancellation, operation, session, track, generation, completion, startPositionMs);
+        _ = Task.Run(() => LoadAsync(previous, previousCancellation, operation, session, track, generation, completion, startPositionMs));
         return completion.Task;
     }
     private async Task LoadAsync(Task previous, CancellationTokenSource? previousCancellation, CancellationTokenSource operation,
@@ -128,14 +128,16 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
         finally { completion.TrySetResult(); }
     }
     public Task StopAsync(Guid? owner = null) => StopCoreAsync(owner, null, PlaybackState.Stopped, "", false);
+    internal Task ReleaseSessionAsync() => StopCoreAsync(null, null, PlaybackState.Stopped, "", false, releaseSession: true);
     private Task StopIfCurrentAsync(long generation, bool clearTrack) => StopCoreAsync(null, generation, PlaybackState.Stopped, "", clearTrack);
-    private Task StopCoreAsync(Guid? owner, long? expected, PlaybackState state, string message, bool clearTrack, long? expectedAccount = null)
+    private Task StopCoreAsync(Guid? owner, long? expected, PlaybackState state, string message, bool clearTrack, long? expectedAccount = null, bool releaseSession = false)
     {
         Task previous;
         long stoppedGeneration;
         CancellationTokenSource? cancellation;
         CancellationTokenRegistration registration;
         var completion = new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously);
+        var sessionCompletion = releaseSession ? new TaskCompletionSource(TaskCreationOptions.RunContinuationsAsynchronously) : null;
         PlaybackSnapshot snapshot;
         lock (_sync)
         {
@@ -157,23 +159,36 @@ public sealed class PlaybackCoordinator : IAsyncDisposable, IDisposable
         cancellation?.Cancel();
         Notify(snapshot);
         _ = CompleteStopAsync();
-        return completion.Task;
+        return sessionCompletion?.Task ?? completion.Task;
         async Task CompleteStopAsync()
         {
+            Exception? failure = null;
             try
             {
                 await previous.ConfigureAwait(false);
-                try { await ReleaseMediaAsync().ConfigureAwait(false); }
-                catch (Exception)
+                try
+                {
+                    await ReleaseMediaAsync().ConfigureAwait(false);
+                    if (releaseSession) await _audio.ReleaseSessionAsync().ConfigureAwait(false);
+                }
+                catch (Exception ex)
                 {
                     Update(stoppedGeneration, s => s with { State = PlaybackState.Failed,
                         Message = "音频停止未完成，请重试停止；临时文件将在释放句柄后清理。" });
+                    failure = ex;
                 }
                 // 取消回调可能正在调度本方法；异步尾任务结束后再 Dispose 注册，避免在自身回调中互等。
                 registration.Dispose();
                 cancellation?.Dispose();
             }
-            finally { completion.TrySetResult(); }
+            catch (Exception ex) { failure = ex; }
+            finally
+            {
+                completion.TrySetResult();
+                if (failure is not null) sessionCompletion?.TrySetException(failure is MusicException ? failure
+                    : new MusicException(MusicError.Device, "音频资源释放失败，请重启 Host 后重试。"));
+                else sessionCompletion?.TrySetResult();
+            }
         }
     }
     public async Task PauseAsync(bool paused, CancellationToken ct)

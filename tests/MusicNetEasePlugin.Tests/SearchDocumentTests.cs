@@ -34,21 +34,28 @@ public sealed class SearchDocumentTests
     }
 
     [Fact, Trait("M1", "L09,U04,U05,U06")]
-    public async Task 多文档共用队列且关闭任意页面不会取消播放()
+    public async Task 多文档共用队列且只有最后页面关闭才释放播放资源()
     {
         await using var f = new PlaybackFixture(); await using var login = TestLogin.Create(new(), new(), TimeProvider.System, LoginOptions.Default);
         using var lifeA = new MusicLifetime(); using var lifeB = new MusicLifetime();
-        using var a = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeA);
-        using var b = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeB);
+        await using var playbackLifetime = new MusicPlaybackLifetime(f.Queue);
+        using var leaseA = new MusicPlaybackLease(playbackLifetime, lifeA);
+        using var leaseB = new MusicPlaybackLease(playbackLifetime, lifeB);
+        using var a = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeA, playbackLease: leaseA);
+        using var b = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeB, playbackLease: leaseB);
         a.SelectedTrack = MusicCatalog.Track(1); await a.PlayCommand.ExecuteAsync(null);
         Assert.Equal(a.Player.CurrentTrack, b.Player.CurrentTrack);
         lifeB.Close(); b.Dispose(); Assert.Equal(PlaybackState.Playing, f.Player.Snapshot.State);
-        lifeA.Close(); a.Dispose(); Assert.Equal(PlaybackState.Playing, f.Player.Snapshot.State);
+        lifeA.Close(); a.Dispose(); Assert.Equal(PlaybackState.Stopped, f.Player.Snapshot.State);
+        Assert.Null(f.Audio.Current); Assert.Equal(1, f.Audio.SessionReleases);
         using var lifeC = new MusicLifetime();
-        using var c = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeC);
+        using var leaseC = new MusicPlaybackLease(playbackLifetime, lifeC);
+        using var c = new MusicWorkspace(f.Catalog, f.Sessions, f.Queue, login, new ImmediateUi(), lifeC, playbackLease: leaseC);
         Assert.Contains("歌曲1", c.Player.CurrentTrack); Assert.Single(f.Audio.Opened);
+        Assert.Equal(PlaybackState.Stopped, f.Queue.Snapshot.Playback.State);
+        await f.Queue.PauseAsync(false, default); Assert.Equal(2, f.Audio.Opened.Count);
         await f.Queue.StopAsync(); Assert.Null(f.Audio.Current);
-        f.Audio.Emit(Assert.Single(f.Audio.Opened).Generation, PlaybackState.Playing);
+        f.Audio.Emit(f.Audio.Opened.First().Generation, PlaybackState.Playing);
         Assert.Equal(PlaybackState.Stopped, f.Player.Snapshot.State);
     }
 
