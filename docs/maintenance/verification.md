@@ -1,6 +1,6 @@
 # 开发验证指南
 
-> 命令在插件仓库根目录执行，需要 PowerShell 7 和 .NET SDK 10。默认完整检查为 V7；脚本事实见 [verify-development.ps1](../../tools/verify-development.ps1)。
+> 命令在插件仓库根目录执行，需要 PowerShell 7 和 .NET SDK 10。默认完整检查为 V8；脚本事实见 [verify-development.ps1](../../tools/verify-development.ps1)。
 
 ## 仅修改文档
 
@@ -19,18 +19,18 @@ git diff --check
 ## 完整本地开发检查
 
 ```powershell
-pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V7
+pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V8
 ```
 
 此命令依次运行门禁自测、locked restore、Debug 零警告构建、全量测试，以及场景映射、TRX、证据身份 / 时间 / 摘要、静态资源、文档和 Git 空白检查。开始和结束还会比较源码版本与指纹。
 
-结果写入 `TestResults/NetEaseV7/<runId>/`，包括 `verification.json`、`netease-login-development.trx`、截图、布局 / 手势、资源和原生解码证据。持久证据归档到 `docs/archive/records/<版本>/<本次运行>/`，保留原始字节和来源身份；本地输出目录可被清理，不作为永久链接。
+结果写入 `TestResults/NetEaseV8/<runId>/`，包括 `verification.json`、`netease-login-development.trx`、截图、布局 / 手势、FM / 发现、资源和原生解码证据。持久证据归档到 `docs/archive/records/<版本>/<本次运行>/`，保留原始字节和来源身份；本地输出目录可被清理，不作为永久链接。
 
 该检查不连接网易业务、不读取用户保存会话、不启动真实 Host，不向系统音频设备出声。原生 LibVLC 离线解码通过不等于真实扬声器播放通过。
 
 ## 专项检查与回归
 
-`-Milestone` 选择额外证据校验范围；脚本中的 `dotnet test` 仍运行整个测试项目，不按里程碑过滤用例。完整改动验证使用 V7。
+`-Milestone` 选择额外证据校验范围；脚本中的 `dotnet test` 仍运行整个测试项目，不按里程碑过滤用例。完整改动验证使用 V8。
 
 | 参数 | 增加的检查与说明 |
 | --- | --- |
@@ -40,9 +40,10 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V7
 | `V4` | 再核验 M2 歌单、队列、歌词、定位、恢复与寿命；[M2 矩阵](netease-v4-m2-daily-player-verification.md) |
 | `V5` | 再核验交互、图片缓存 / 租约、静态资源与布局；[V5 矩阵](netease-v5-ui-interaction-verification-plan.md) |
 | `V6` | 再核验抽屉、手势、焦点、反馈、密度和单步撤销；[V6 矩阵](netease-v6-drawer-and-interaction-verification-plan.md) |
-| `V7`（默认） | 再核验音乐库管理、46 场景、16 张截图、一致性 / 寿命 / 12 布局组合；[V7 矩阵](netease-v7-m3-music-library-verification-plan.md) |
+| `V7` | 再核验音乐库管理、46 场景、16 张截图、一致性 / 寿命 / 12 布局组合；[V7 矩阵](netease-v7-m3-music-library-verification-plan.md) |
+| `V8`（默认） | 再核验音乐发现、50 场景、16 张截图、60 布局组合、FM 预算 / 竞争 / 反馈、账号 / 恢复及远端记录；[V8 矩阵](netease-v8-m4-music-discovery-verification-plan.md) |
 
-场景到真实测试方法的映射见 [M1](../../tools/m1-test-map.json)、[V3](../../tools/v3-test-map.json)、[M2](../../tools/m2-test-map.json)、[V5](../../tools/v5-test-map.json)、[V6](../../tools/v6-test-map.json)、[V7](../../tools/v7-test-map.json)。映射及原始产物共同证明覆盖，不能仅以测试总数代替场景结果。
+场景到真实测试方法的映射见 [M1](../../tools/m1-test-map.json)、[V3](../../tools/v3-test-map.json)、[M2](../../tools/m2-test-map.json)、[V5](../../tools/v5-test-map.json)、[V6](../../tools/v6-test-map.json)、[V7](../../tools/v7-test-map.json)、[V8](../../tools/v8-test-map.json)。映射及原始产物共同证明覆盖，不能仅以测试总数代替场景结果。
 
 仅调试门禁脚本的失败注入时可运行：
 
@@ -58,11 +59,11 @@ pwsh -NoProfile -File tools/test-development-gate.ps1
 
 [实施记录](../archive/records/netease-v7/m3-implementation-20260924.md)保存当次数量与原始证据。真实账号、WebView2 官方令牌和 Host 按[H01–H05 记录](../archive/records/netease-v7/acceptance-20260924.md)验收，不进入默认离线门禁，不使用 Windows CI 或发布门禁。
 
-## V8 音乐发现验证计划
+## V8 音乐发现验证
 
-[V8 实施计划](../roadmap/netease-v8-m4-music-discovery-plan.md)与[专用验证矩阵](netease-v8-m4-music-discovery-verification-plan.md)已编写，覆盖推荐 / 榜单、歌手 / 专辑、私人 FM 和远端记录，计划包含 50 个自动业务场景、6 组门禁自测及 6 组人工验收。重点验证来源 / 完整性、作品身份、FM 单次推进 / 有限补取 / 不喜欢写入，以及远端与本地历史隔离。
+[V8 当前契约](../reference/netease-music-discovery.md)与[专用验证矩阵](netease-v8-m4-music-discovery-verification-plan.md)覆盖推荐 / 榜单、歌手 / 专辑、私人 FM 和远端记录。50 个自动业务场景与 6 组门禁自测已经接入；重点核验来源 / 完整性、作品身份、FM 单次推进 / 有限补取 / 不喜欢写入，以及远端与本地历史隔离。
 
-V8 业务、测试映射和脚本尚未实现，**当前不支持 `-Milestone V8`，默认仍为 V7**。实施时逐阶段补齐真实测试与证据，并继承 V7 及全部适用前置；全部接通后才更新默认命令。本次仅文档检查，不执行 V8 业务门禁，不使用 AIFLOW、Windows CI 或发布门禁。
+默认支持 `-Milestone V8`，继承 V7 及全部适用前置。[实施记录](../archive/records/netease-v8/m4-implementation-20260925.md)保存实际命令、源身份和原始证据；6 组[真实验收](../archive/records/netease-v8/acceptance-20260925.md)仍待执行。本轮不使用 AIFLOW、Windows CI 或发布门禁。
 
 ## Standalone 与真实环境
 

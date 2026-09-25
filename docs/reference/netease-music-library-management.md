@@ -97,6 +97,6 @@ Cookie 持久化失败保留已收到的远端回执，反馈存储问题并继�
 
 ## 7. 开发验证
 
-执行 `pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V7`，详见[验证指南](../maintenance/verification.md)与[46 场景矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)。默认离线本地门禁继承 M1 / V3 / M2 / V5 / V6，并核验 V7 TRX 方法映射、一致性、寿命、12 布局组合及 16 张截图的身份、时间、尺寸和摘要。只有实际断言成功后写证据。
+执行 `pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V7`，详见[验证指南](../maintenance/verification.md)与[46 场景矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)。该 V7 分支继承 M1 / V3 / M2 / V5 / V6，当前默认完整入口为 V8 并继续核验 V7 TRX 方法映射、一致性、寿命、12 布局组合及 16 张截图的身份、时间、尺寸和摘要。只有实际断言成功后写证据。
 
 真实账号、官方令牌、Host / Dock、DPI、物理 IME、读屏和声卡另行验收。开发过程不使用 AIFLOW、Windows CI 或发布门禁；包版本仍为 1.0.0，本轮不部署或发布。

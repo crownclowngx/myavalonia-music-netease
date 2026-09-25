@@ -1,0 +1,283 @@
+{
+  "schemaVersion": 1,
+  "methods": {
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM页面二十次挂卸释放订阅非最后页面关闭不停止共享播放": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM恢复不恢复供应资格远端读取不写入本机历史": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM结束后重新开始仍遵守同账号限流窗口": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.旧会话忽略取消时新FM仍只有一个物理读取": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.等待补取期间Next与重复Ended合并为一次推进": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.两个补取等待点关闭都会取消且不再发送": 2,
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.普通同曲意图退出FM后队列投影恢复编辑": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.发现连续刷新最多两个物理读取且关闭立即完成调用": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.反馈超过预算保留未知迟到成功不推进也不重发": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.FM反馈保存失败保留成功回执损坏和超时保留未知": 3,
+    "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.作品响应身份必须匹配且不完整专辑不冒充全集": 2,
+    "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.固定端点参数和非法身份在发送前验证": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次": 36,
+    "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.FM反馈回执不确定与拒绝不重试": 4,
+    "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.多歌手身份保持顺序旧资料仍可读取且未知身份不臆造": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.分页按原始数量推进超预算和未知专辑完整性保守处理": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryUiTests.生产发现菜单作品返回与FM按钮不混淆播放和反馈意图": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryUiTests.五页面三尺寸双色两密度真实布局及十六张截图": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryUiTests.服务注册保持共享FM及播放器与独立浏览模型": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.读取限流遵守等待窗口且导航证据来自实际队列和调用": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.懒加载缓存过期与失败保留旧内容且没有媒体打开": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.个性失败不会冒充通用且推荐和榜单打开真实歌单ID": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.歌手重复分页无进展停止且切换排序重新读取首批": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.多歌手选择到专辑并返回保持身份选择顺序和有界导航": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.发现播放和追加复用队列意图保留重复条目及来源": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.远端记录不写本地不去重合法记录并明确来源范围": 3,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.旧账号与旧请求迟到结果不能覆盖新状态或释放新忙碌资格": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.双页面浏览独立与二十轮释放后迟到UI不恢复内容": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.合法空推荐与协议失败具有不同页面反馈": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.FM显式开始共享播放器下一首及重复终态只推进一次": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.FM首批迟到不能替换期间用户选择的新队列": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.空批三轮和两次等待有界耗尽后进度不能重新补取": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.二十秒总预算和关闭不受忽略取消的读取阻塞": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.单批截断与去重以及网络错误立即停止补取": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.不可播放候选跨批次最多二十个不重置失败链": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.暂停下一首保持静默停止与最后页关闭撤销FM资格": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.同目标重复反馈只发送一次迟到成功不跳过新曲": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.不确定和拒绝不换曲不自动重发但普通下一首仍可用": 2,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.退出旧账号后读取和反馈均不能污染重登的新会话": 1,
+    "MusicNetEasePlugin.Tests.PrivateFmTests.FM观察证据来自实际请求推进与反馈记录": 1,
+    "MusicNetEasePlugin.Tests.DiscoveryUiTests.长列表作品返回恢复实际视口且不逐行读取": 1
+  },
+  "scenarios": {
+    "C04": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM页面二十次挂卸释放订阅非最后页面关闭不停止共享播放",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.双页面浏览独立与二十轮释放后迟到UI不恢复内容",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.同目标重复反馈只发送一次迟到成功不跳过新曲",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM观察证据来自实际请求推进与反馈记录"
+    ],
+    "C05": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM页面二十次挂卸释放订阅非最后页面关闭不停止共享播放",
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM恢复不恢复供应资格远端读取不写入本机历史",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.暂停下一首保持静默停止与最后页关闭撤销FM资格"
+    ],
+    "R01": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM页面二十次挂卸释放订阅非最后页面关闭不停止共享播放",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.五页面三尺寸双色两密度真实布局及十六张截图",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.双页面浏览独立与二十轮释放后迟到UI不恢复内容",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.长列表作品返回恢复实际视口且不逐行读取"
+    ],
+    "F10": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM恢复不恢复供应资格远端读取不写入本机历史",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.暂停下一首保持静默停止与最后页关闭撤销FM资格",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.退出旧账号后读取和反馈均不能污染重登的新会话"
+    ],
+    "H04": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM恢复不恢复供应资格远端读取不写入本机历史",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.发现播放和追加复用队列意图保留重复条目及来源",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.远端记录不写本地不去重合法记录并明确来源范围"
+    ],
+    "R03": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM恢复不恢复供应资格远端读取不写入本机历史",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.服务注册保持共享FM及播放器与独立浏览模型"
+    ],
+    "F04": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM结束后重新开始仍遵守同账号限流窗口",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.单批截断与去重以及网络错误立即停止补取",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.不可播放候选跨批次最多二十个不重置失败链"
+    ],
+    "C03": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.FM结束后重新开始仍遵守同账号限流窗口",
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.旧会话忽略取消时新FM仍只有一个物理读取",
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.发现连续刷新最多两个物理读取且关闭立即完成调用",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.读取限流遵守等待窗口且导航证据来自实际队列和调用",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.旧账号与旧请求迟到结果不能覆盖新状态或释放新忙碌资格",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM首批迟到不能替换期间用户选择的新队列"
+    ],
+    "F01": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.旧会话忽略取消时新FM仍只有一个物理读取",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM显式开始共享播放器下一首及重复终态只推进一次",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM首批迟到不能替换期间用户选择的新队列",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM观察证据来自实际请求推进与反馈记录"
+    ],
+    "F03": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.旧会话忽略取消时新FM仍只有一个物理读取",
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.等待补取期间Next与重复Ended合并为一次推进",
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.两个补取等待点关闭都会取消且不再发送",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.空批三轮和两次等待有界耗尽后进度不能重新补取",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.二十秒总预算和关闭不受忽略取消的读取阻塞",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.单批截断与去重以及网络错误立即停止补取",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM观察证据来自实际请求推进与反馈记录"
+    ],
+    "C06": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.旧会话忽略取消时新FM仍只有一个物理读取",
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.两个补取等待点关闭都会取消且不再发送",
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.发现连续刷新最多两个物理读取且关闭立即完成调用",
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.反馈超过预算保留未知迟到成功不推进也不重发",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.二十秒总预算和关闭不受忽略取消的读取阻塞"
+    ],
+    "F02": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.等待补取期间Next与重复Ended合并为一次推进",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM显式开始共享播放器下一首及重复终态只推进一次"
+    ],
+    "F06": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.等待补取期间Next与重复Ended合并为一次推进",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM显式开始共享播放器下一首及重复终态只推进一次",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM观察证据来自实际请求推进与反馈记录"
+    ],
+    "F05": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.普通同曲意图退出FM后队列投影恢复编辑",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.暂停下一首保持静默停止与最后页关闭撤销FM资格"
+    ],
+    "U03": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.普通同曲意图退出FM后队列投影恢复编辑",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.生产发现菜单作品返回与FM按钮不混淆播放和反馈意图",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.五页面三尺寸双色两密度真实布局及十六张截图"
+    ],
+    "D06": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.发现连续刷新最多两个物理读取且关闭立即完成调用",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.读取限流遵守等待窗口且导航证据来自实际队列和调用",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.懒加载缓存过期与失败保留旧内容且没有媒体打开",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.旧账号与旧请求迟到结果不能覆盖新状态或释放新忙碌资格"
+    ],
+    "C02": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.发现连续刷新最多两个物理读取且关闭立即完成调用",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.旧账号与旧请求迟到结果不能覆盖新状态或释放新忙碌资格",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.双页面浏览独立与二十轮释放后迟到UI不恢复内容",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.退出旧账号后读取和反馈均不能污染重登的新会话"
+    ],
+    "F08": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.反馈超过预算保留未知迟到成功不推进也不重发",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.FM反馈保存失败保留成功回执损坏和超时保留未知",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.FM反馈回执不确定与拒绝不重试",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.不确定和拒绝不换曲不自动重发但普通下一首仍可用"
+    ],
+    "F09": [
+      "MusicNetEasePlugin.Tests.DiscoveryBoundaryTests.反馈超过预算保留未知迟到成功不推进也不重发",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.同目标重复反馈只发送一次迟到成功不跳过新曲",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.不确定和拒绝不换曲不自动重发但普通下一首仍可用"
+    ],
+    "A02": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.FM反馈保存失败保留成功回执损坏和超时保留未知",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.FM反馈回执不确定与拒绝不重试",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.读取限流遵守等待窗口且导航证据来自实际队列和调用"
+    ],
+    "A03": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.作品响应身份必须匹配且不完整专辑不冒充全集",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.固定端点参数和非法身份在发送前验证",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次"
+    ],
+    "W02": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.作品响应身份必须匹配且不完整专辑不冒充全集",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.多歌手选择到专辑并返回保持身份选择顺序和有界导航"
+    ],
+    "W05": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.作品响应身份必须匹配且不完整专辑不冒充全集",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.分页按原始数量推进超预算和未知专辑完整性保守处理",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.多歌手选择到专辑并返回保持身份选择顺序和有界导航"
+    ],
+    "A01": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.固定端点参数和非法身份在发送前验证",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次"
+    ],
+    "A06": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.合法空推荐与协议失败具有不同页面反馈",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.空批三轮和两次等待有界耗尽后进度不能重新补取"
+    ],
+    "D01": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.懒加载缓存过期与失败保留旧内容且没有媒体打开",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.合法空推荐与协议失败具有不同页面反馈"
+    ],
+    "D02": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.个性失败不会冒充通用且推荐和榜单打开真实歌单ID"
+    ],
+    "D04": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.个性失败不会冒充通用且推荐和榜单打开真实歌单ID"
+    ],
+    "H01": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.远端记录不写本地不去重合法记录并明确来源范围"
+    ],
+    "H02": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.远端记录不写本地不去重合法记录并明确来源范围"
+    ],
+    "H03": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.全部只读端点成功拒绝损坏分别处理且只请求一次",
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.分页按原始数量推进超预算和未知专辑完整性保守处理",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.远端记录不写本地不去重合法记录并明确来源范围"
+    ],
+    "A04": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.多歌手身份保持顺序旧资料仍可读取且未知身份不臆造",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.多歌手选择到专辑并返回保持身份选择顺序和有界导航"
+    ],
+    "A05": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.多歌手身份保持顺序旧资料仍可读取且未知身份不臆造"
+    ],
+    "W01": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.多歌手身份保持顺序旧资料仍可读取且未知身份不臆造",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.生产发现菜单作品返回与FM按钮不混淆播放和反馈意图",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.多歌手选择到专辑并返回保持身份选择顺序和有界导航"
+    ],
+    "D05": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.分页按原始数量推进超预算和未知专辑完整性保守处理",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.歌手重复分页无进展停止且切换排序重新读取首批"
+    ],
+    "W03": [
+      "MusicNetEasePlugin.Tests.DiscoveryProtocolTests.分页按原始数量推进超预算和未知专辑完整性保守处理",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.歌手重复分页无进展停止且切换排序重新读取首批"
+    ],
+    "U01": [
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.生产发现菜单作品返回与FM按钮不混淆播放和反馈意图",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.五页面三尺寸双色两密度真实布局及十六张截图"
+    ],
+    "U02": [
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.生产发现菜单作品返回与FM按钮不混淆播放和反馈意图"
+    ],
+    "U04": [
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.生产发现菜单作品返回与FM按钮不混淆播放和反馈意图"
+    ],
+    "P04": [
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.生产发现菜单作品返回与FM按钮不混淆播放和反馈意图",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.懒加载缓存过期与失败保留旧内容且没有媒体打开"
+    ],
+    "D03": [
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.生产发现菜单作品返回与FM按钮不混淆播放和反馈意图",
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.个性失败不会冒充通用且推荐和榜单打开真实歌单ID"
+    ],
+    "U05": [
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.五页面三尺寸双色两密度真实布局及十六张截图"
+    ],
+    "R02": [
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.服务注册保持共享FM及播放器与独立浏览模型"
+    ],
+    "W04": [
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.多歌手选择到专辑并返回保持身份选择顺序和有界导航",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.长列表作品返回恢复实际视口且不逐行读取"
+    ],
+    "W06": [
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.多歌手选择到专辑并返回保持身份选择顺序和有界导航",
+      "MusicNetEasePlugin.Tests.DiscoveryUiTests.长列表作品返回恢复实际视口且不逐行读取"
+    ],
+    "P01": [
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.发现播放和追加复用队列意图保留重复条目及来源"
+    ],
+    "P02": [
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.发现播放和追加复用队列意图保留重复条目及来源"
+    ],
+    "P03": [
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.发现播放和追加复用队列意图保留重复条目及来源",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM显式开始共享播放器下一首及重复终态只推进一次"
+    ],
+    "C01": [
+      "MusicNetEasePlugin.Tests.DiscoveryWorkspaceTests.旧账号与旧请求迟到结果不能覆盖新状态或释放新忙碌资格",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.退出旧账号后读取和反馈均不能污染重登的新会话"
+    ],
+    "F07": [
+      "MusicNetEasePlugin.Tests.PrivateFmTests.同目标重复反馈只发送一次迟到成功不跳过新曲",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.退出旧账号后读取和反馈均不能污染重登的新会话",
+      "MusicNetEasePlugin.Tests.PrivateFmTests.FM观察证据来自实际请求推进与反馈记录"
+    ]
+  }
+}

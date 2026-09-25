@@ -2,7 +2,7 @@
 
 > 对象：`myavalonia-music-netease` / `myavalonia.plugin.music.netease`。更新日期：2026-09-25。
 > 当前状态：V1–V4 已实现并完成手工验收，对应 M0–M2 已完成；依据为[用户验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。
-> M3 / V7-01～10 已实现并通过本地开发验证，当前行为见[音乐库契约](../reference/netease-music-library-management.md)，依据见[实施记录](../archive/records/netease-v7/m3-implementation-20260924.md)。真实账号与 Host 验收待完成；M4 已编写 [V8 实施计划](netease-v8-m4-music-discovery-plan.md)，尚未实施；M5 继续保留候选范围与依赖。
+> M3 / V7-01～10 已实现并通过本地开发验证，当前行为见[音乐库契约](../reference/netease-music-library-management.md)，依据见[实施记录](../archive/records/netease-v7/m3-implementation-20260924.md)。真实账号与 Host 验收待完成；M4 / V8-01～10 已实现，见[音乐发现契约](../reference/netease-music-discovery.md)和[实施记录](../archive/records/netease-v8/m4-implementation-20260925.md)，真实账号 / Host 待验；M5 继续保留候选范围与依赖。
 
 V 编号是实施文档序号，M 编号是能力里程碑，均不表示插件包版本或交付日期。V1–V6 历史方案统一见[归档索引](../archive/README.md)，各自验收状态单独标明；当前行为由 `reference` 维护，V5 / V6 剩余工作见[待验清单](../maintenance/netease-v5-v6-acceptance.md)。
 
@@ -17,12 +17,12 @@ V 编号是实施文档序号，M 编号是能力里程碑，均不表示插件�
 | V3 / 界面改造 | 紧凑 Document / Tool、深浅主题、轻量动效与偏好 | [界面契约](../reference/netease-desktop-ui.md)、[V3 归档](../archive/plans/netease-v3-desktop-ui-and-theme-plan.md) |
 | V4 / M2 | 我的歌单、共享队列、四模式、连续播放、定位、逐行/翻译/逐字歌词、本地最近播放与静默恢复 | [日常播放器](../reference/netease-daily-player.md)、[V4 归档](../archive/plans/netease-v4-m2-daily-player-plan.md) |
 
-当前多个 Document 共用一份队列和播放器，各自独立搜索和浏览歌单。关闭任意或最后一页继续播放，重开订阅当前状态；退出账号或插件/进程关闭负责停止与释放。重启恢复队列后保持暂停，用户主动继续才取得资源并出声。此规则已替代 V2 的页面所有者停止设计。
+当前多个 Document 共用一份队列和播放器，各自独立搜索、浏览歌单和发现。关闭非最后一页继续播放；关闭最后音乐页停止并释放，设置 Tool 不维持播放租约。重开 / 重启恢复队列后静默，用户主动继续才取得资源并出声；FM 资格不恢复。退出账号或插件 / 进程关闭也会停止与释放。
 
 - 当前支持 Windows x64；Linux/macOS 原生目录加载、受保护存储及 Host 适配尚未实现。
 - 媒体使用 Flurl 有界完整临时缓冲；下载到本地缓冲不等于支持离线下载管理。
 - 播放资源按账号返回值区分可播、试听与无地址；当前请求 standard 音质，不凭元数据承诺完整播放权限。
-- 上游清单固定提交下的 440 个模块是实现参考，不等于已接入功能数量；音乐库写入子集由 V7 接入；当前仍无发现入口、Workbench Command 或 Workflow Action 注册。
+- 上游清单固定提交下的 440 个模块是实现参考，不等于已接入功能数量；音乐库写入子集由 V7 接入；V8 已接入发现入口，仍无 Workbench Command 或 Workflow Action 注册。
 - V1–V4 验收已收口；正式发布仍属独立工作，历史自动报告的证明范围不因用户验收而改变。
 
 ```mermaid
@@ -30,13 +30,13 @@ flowchart LR
     M0["M0 登录 · 已完成"] --> M1["M1 搜索与单曲播放 · 已完成"]
     M1 --> M2["M2 日常播放器 · 已完成"]
     M2 --> M3["M3 音乐库管理 · V7 已实现，真实验收待完成"]
-    M3 --> M4["M4 推荐发现 · V8 已规划，尚未实施"]
+    M3 --> M4["M4 推荐发现 · V8 已实现，真实验收待完成"]
     M2 --> M5["M5 场景扩展 · 按需候选"]
 ```
 
-## 2. M3 已实施与 M4 后续主线
+## 2. M3 / M4 已实施与待验范围
 
-M3 已按 V7 专用方案实施，M4 的范围、顺序和验收要求由 V8 计划明确。新功能继续复用现有登录、队列、播放器和 UI；不以移植全部上游模块为目标。
+M3 / M4 已按 V7 / V8 专用方案实施，真实账号和 Host 验收独立跟踪。新功能继续复用现有登录、队列、播放器和 UI；不以移植全部上游模块为目标。
 
 ### M3：管理自己的音乐
 
@@ -58,7 +58,7 @@ M3 已按 V7 专用方案实施，M4 的范围、顺序和验收要求由 V8 计
 
 ### M4：从“找歌听”扩展到“发现音乐”
 
-**开发入口：** [V8 · M4 音乐发现实施计划](netease-v8-m4-music-discovery-plan.md)与[V8 专用验证矩阵](../maintenance/netease-v8-m4-music-discovery-verification-plan.md)。已明确 V8-01～10、SOLID 职责、结构化作品身份、来源 / 分页、FM 有限补取及远端反馈、账号 / 寿命、中文注释和分阶段文档交付。计划覆盖 50 个自动业务场景、6 组门禁失败注入及 6 组人工验收；代码、V8 门禁和真实验收均尚未实施。当前默认本地检查仍为 V7，不使用 AIFLOW、Windows CI 或发布门禁。
+**开发入口：** [V8 · M4 音乐发现实施计划](../archive/plans/netease-v8-m4-music-discovery-plan.md)与[V8 专用验证矩阵](../maintenance/netease-v8-m4-music-discovery-verification-plan.md)。已明确 V8-01～10、SOLID 职责、结构化作品身份、来源 / 分页、FM 有限补取及远端反馈、账号 / 寿命、中文注释和分阶段文档交付。50 个自动业务场景、6 组门禁失败注入已接入；6 组人工验收[仍待执行](../archive/records/netease-v8/acceptance-20260925.md)。当前默认本地检查为 V8，继承 V7 及适用旧版，不使用 AIFLOW、Windows CI 或发布门禁。
 
 | 能力 | 接口候选 | 用户价值与边界 |
 | --- | --- | --- |
@@ -68,7 +68,7 @@ M3 已按 V7 专用方案实施，M4 的范围、顺序和验收要求由 V8 计
 | 私人 FM | `personal_fm`、`fm_trash` | 补充连续内容；下一首与“不喜欢”区分，后者产生远端写入 |
 | 远端最近播放与听歌记录 | `record_recent_song`、`user_record` | 标明数据来源与范围，不与本地历史混为同一事实 |
 
-V8 计划顺序为推荐/榜单 → 歌手/专辑 → 私人 FM → 远端历史。所有入口复用 M2 的队列和播放服务。播放寿命的旧文案冲突与当前代码基线见[V8 前置核对](netease-v8-m4-music-discovery-plan.md#2-已核对基线与实施前差项)，实施阶段 A 需同步消除，不将 FM 作为改变关闭策略的理由。
+V8 已按推荐 / 榜单 → 歌手 / 专辑 → 私人 FM → 远端历史实施。所有入口复用原队列和播放服务；[当前契约](../reference/netease-music-discovery.md)记录最终预算与边界。最后音乐页关闭停止的旧文案冲突已按既有代码修正，FM 不改变租约策略。
 
 **验收：** 推荐失效或无数据时可继续使用搜索和歌单；FM 缺数据时有限补取，不高速循环请求；账号退出后个人推荐和远端历史不残留到其他账号。
 
@@ -108,12 +108,12 @@ V5 E 阶段的封面一次性取色尚未实施，保留为可选候选。若后
 - [x] V3：紧凑桌面界面、主题与动效，用户确认手工验收完成。
 - [x] M2：歌单、队列、连续播放、歌词与恢复，用户确认手工验收完成。
 - [ ] M3：喜欢、收藏与歌单管理已实现并通过 V7 本地验证；真实账号 / Host / 用户总验收尚未完成。
-- [ ] M4：推荐、榜单、歌手/专辑、私人 FM 与远端记录；V8 实施计划及专用验证矩阵已编写，尚未实施。
+- [ ] M4：推荐、榜单、歌手 / 专辑、私人 FM 与远端记录已实现；V8 本地验证与真实账号 / Host / 用户总验收分别记录，人工验收未完成。
 - [ ] M5：按需选择扩展分支，尚未启动。
 
-默认本地开发检查为 V7，保留适用的 M1/V3/M2/V5/V6 回归，方法见[V7 专用验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)。后续改动分别更新当前契约、快速开始、回归矩阵和专用记录；实现、自动检查和人工验收分别记录依据。
+默认本地开发检查为 V8，保留适用的 M1/V3/M2/V5/V6/V7 回归，方法见[V8 专用验证矩阵](../maintenance/netease-v8-m4-music-discovery-verification-plan.md)。后续改动分别更新当前契约、快速开始、回归矩阵和专用记录；实现、自动检查和人工验收分别记录依据。
 
-V7 本地门禁已支持并默认执行 `-Milestone V7`，46 场景及失败注入见[专用验证矩阵](../maintenance/netease-v7-m3-music-library-verification-plan.md)。不使用 AIFLOW、Windows CI 或发布门禁，正式发布另行执行。
+V8 本地门禁默认执行 `-Milestone V8`，50 场景及失败注入见[专用验证矩阵](../maintenance/netease-v8-m4-music-discovery-verification-plan.md)。不使用 AIFLOW、Windows CI 或发布门禁，正式发布另行执行。
 
 ## 5. 依据与关联文档
 

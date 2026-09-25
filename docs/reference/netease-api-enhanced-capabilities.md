@@ -1,7 +1,7 @@
 # api-enhanced 上游能力清单与移植边界
 
 > 用途：为[能力路线图](../roadmap/netease-capability-roadmap.md)提供选型依据、能力范围和固定源码索引；本文属于上游调研参考。
-> 状态：登录、搜索/详情/播放资源、歌单与歌词相关子集已接入，V1–V4 手工验收已由用户确认完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。V7 喜欢、收藏和普通歌单编辑子集已接入，真实验收待完成；其余模块仍为调研候选；本地状态核对日期：2026-09-24，上游固定基线不变。
+> 状态：登录、搜索/详情/播放资源、歌单与歌词相关子集已接入，V1–V4 手工验收已由用户确认完成，见[验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。V7 喜欢、收藏和普通歌单编辑子集已接入，真实验收待完成；V8 推荐 / 榜单、作品、FM 和远端记录子集已接入，真实验收待完成；其余模块仍为调研候选；本地状态核对日期：2026-09-25，上游固定基线不变。
 > 基线：[a8c781fd64faab17fedfd46e0615a2609307f163](https://github.com/NeteaseCloudMusicApiEnhanced/api-enhanced/tree/a8c781fd64faab17fedfd46e0615a2609307f163)，提交日期 2026-09-11 UTC。
 > 统计：该提交 `module/` 下共有 **440 个直接子级 JavaScript 模块**。包括业务接口、本地包装和工具；不等于 440 个独立网易 HTTP 接口，更不代表 440 项当前可用能力。
 
@@ -16,7 +16,7 @@
 | --- | --- | --- |
 | 登录与会话 | QR key、本地二维码、扫码状态、账号检查、Cookie 会话、退出 | 已实现且手工验收完成；当前协议与历史证据见会话契约 |
 | 基础播放器 | 搜索、歌曲详情、播放地址、歌词、用户歌单、歌单曲目 | M1 与 M2 功能已接入，见[播放契约](netease-music-playback.md)和[日常播放器](netease-daily-player.md)；手工验收已收口，依据见本页顶部记录 |
-| 日常扩展 | 收藏、歌单编辑、推荐、FM、远端历史、歌手/专辑 | M3 喜欢 / 收藏 / 歌单编辑已实现，见[音乐库契约](netease-music-library-management.md)；M4 仍是候选 |
+| 日常扩展 | 收藏、歌单编辑、推荐、FM、远端历史、歌手/专辑 | M3 喜欢 / 收藏 / 歌单编辑已实现，见[音乐库契约](netease-music-library-management.md)；M4 发现子集已实现，见[音乐发现契约](netease-music-discovery.md) |
 | 场景扩展 | 云盘、下载、评论、视频、播客、广播、一起听等 | 路线图 M5 候选，按需求选择 |
 | 专项能力 | 账号管理、会员/广告/积分任务、音乐人、UGC、购买等 | 只记录上游范围；需具体产品需求与独立验证 |
 
@@ -75,7 +75,7 @@
 
 ## 4. 接入登记方式
 
-当前已接入端点、C# 入口、协议和验证边界分别维护在[HTTP 与会话契约](netease-http-session.md)、[音乐与播放契约](netease-music-playback.md)及[日常播放器](netease-daily-player.md)。本清单保留固定上游范围，不再复制接入状态表。
+当前已接入端点、C# 入口、协议和验证边界分别维护在[HTTP 与会话契约](netease-http-session.md)、[音乐与播放契约](netease-music-playback.md)、[日常播放器](netease-daily-player.md)及[音乐发现契约](netease-music-discovery.md)。本清单保留固定上游范围，不再复制接入状态表。
 
 新增能力时，在相应当前契约中登记上游模块、原生端点、C# 方法、请求协议与账号范围；自动测试和真实账号结果分别关联维护矩阵及当次记录。未实现的模块只作为调研候选，不登记为可用能力。
 

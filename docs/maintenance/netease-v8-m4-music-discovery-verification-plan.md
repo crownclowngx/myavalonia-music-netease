@@ -1,8 +1,8 @@
 # V8 · M4 音乐发现专用验证矩阵
 
-> 编写日期：2026-09-25。状态：**验证计划已编写；下列 V8 测试、方法映射、门禁与自动产物尚未实现，也未执行**。
-> 对应[V8 实施计划](../roadmap/netease-v8-m4-music-discovery-plan.md)。覆盖推荐 / 榜单、歌手 / 专辑、私人 FM、远端记录及与现有播放器的协作。
-> 只使用本地开发门禁，不使用 AIFLOW、Windows CI 或发布门禁。当前可执行入口仍为 V7；不得将本文的未来命令写成已经可用。
+> 编写日期：2026-09-25。状态：**V8 测试、方法映射、门禁和自动产物已实现；实际运行结果见专用实施记录，M01～M06 真实验收待执行**。
+> 对应[V8 实施计划](../archive/plans/netease-v8-m4-music-discovery-plan.md)。覆盖推荐 / 榜单、歌手 / 专辑、私人 FM、远端记录及与现有播放器的协作。
+> 只使用本地开发门禁，不使用 AIFLOW、Windows CI 或发布门禁。默认本地开发入口为 V8，保留 V7 及全部适用前置回归。
 
 ## 1. 分层、计数与通用断言
 
@@ -116,9 +116,9 @@ F03 的各等待点和请求进行中取消均必须测试；不可用链必须�
 
 布局尺寸沿用 1200×720、800×600、520×420；主题为浅 / 深，两档密度沿用现有偏好。60 = 5 个主要页面 × 3 尺寸 × 2 主题 × 2 密度。弹层、菜单和错误状态另用定向交互测试，不要求对所有状态做截图笛卡尔积。
 
-## 10. V8 本地门禁接入计划
+## 10. V8 本地门禁入口
 
-以下 V8 文件和字段均为拟实现，不表示当前仓库已经支持。
+以下文件及入口均已接入；[实施记录](../archive/records/netease-v8/m4-implementation-20260925.md)记录实际通过数和证据身份。
 
 | 文件 / 入口 | 必须完成的工作 |
 | --- | --- |
@@ -131,38 +131,40 @@ F03 的各等待点和请求进行中取消均必须测试；不可用链必须�
 
 完整执行顺序：门禁自测 → locked restore → Debug `-warnaserror` 构建 → 整个测试项目 → TRX → 全部场景映射 → 全部前置和 V8 证据 → 文档链接 → `git diff --check` → 源码身份一致性。`-Milestone` 只选择额外证据校验，不按 V8 Trait 过滤整个业务测试集。
 
-**当前代码 / 门禁变更仍使用：**
-
-```powershell
-pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V7
-```
-
-**仅在 V8 接入完成之后使用以下未来命令，计划阶段不可执行：**
+**当前完整验证命令：**
 
 ```powershell
 pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V8
 ```
 
-未来运行目录为 `TestResults/NetEaseV8/<runId>/`。`verification.json` 记录 schemaVersion、runId、revision、sourceSha256、workingTreeDirty、起止时间、实际测试数、各代覆盖及产物字节数 / SHA256；开始和结束源码身份一致。真实账号 / Host / 出声 / 部署 / 发布门禁字段继续为 false。
+运行目录为 `TestResults/NetEaseV8/<runId>/`。`verification.json` 记录 runId、revision、sourceSha256、workingTreeDirty、起止时间、实际测试数、各代覆盖及产物字节数 / SHA256；开始和结束源码身份一致。真实账号 / Host / 出声 / 部署 / 发布门禁字段继续为 false。
 
 ## 11. 必需自动证据
 
-| 产物 | 必须来自的实际观察 | 门禁检查重点 |
-| --- | --- | --- |
-| `netease-login-development.trx` | 全量测试真实结果，沿用现有文件名 | 本轮运行、无失败 / 跳过 / 零测试；真实方法和参数化数量覆盖全部场景 |
-| `v8-discovery-navigation.json` | D / W / P：端点目标、分页、来源、请求次数、接纳顺序和局部失败 | 请求 / 缓存有界；非法目标调用 0；无错误来源替换；不完整未冒充全集；非播放操作媒体打开 0 |
-| `v8-fm-session.json` | F / C：触发身份、每轮请求与实际等待、条目推进、反馈日志、终态和缓存峰值 | 在途≤1、补取≤3 / 20 秒、待播≤10、失败候选≤20；Next 写数 0；反馈不重复、目标正确、终态无双推进 |
-| `v8-remote-history.json` | H：来源 / 范围、字段未知、切换代次、存储与上报调用 | 读取本地写数 0、播放上报 0、旧范围应用 0；次数和时间无伪造 |
-| `v8-discovery-lifetime.json` | C / R：20 轮挂载、账号切换、关闭与重开、恢复 | 旧账号应用 0、残留订阅 / 计时器 / 未完成任务 0；静默恢复；FM 重放 0 |
-| `v8-discovery-layout.json` | U05：60 个生产控件组合的尺寸 / 主题 / 密度、关键按钮命中及滚动边界 | 组合唯一且齐全；无溢出、按钮可达、焦点有效；不能只检查截图存在 |
-| `v8-discovery-{theme}-{width}.png` | 发现页，三尺寸 × 两主题，紧凑密度 | 6 张真实渲染 PNG + 每张元数据 |
-| `v8-artist-{theme}.png`、`v8-album-{theme}.png` | 歌手分页与专辑页，800×600、两主题，舒适密度 | 4 张，身份入口和已加载范围可读 |
-| `v8-fm-{theme}.png`、`v8-fm-uncertain-{theme}.png` | FM 当前播放 / 耗尽与反馈未知，800×600、两主题 | 4 张；“下一首”与“不喜欢”及反馈结果可区分 |
-| `v8-remote-history-{theme}.png` | 网易记录来源 / 范围，520×420、两主题 | 2 张；窄布局的来源和范围切换仍可达 |
+每个业务 JSON 是指定测试真实观察的汇总，其他边界由第 2～9 节对应 TRX 方法断言证明；不能拿单个汇总值替代全部场景。合成账号与受控任务不证明线上账号权限。下列文件均位于本轮目录，由门禁在校验 TRX 后读取。
 
-合计 16 张专用截图，60 个完整布局组合由 JSON 与真实布局断言证明。每张 PNG 可解码且尺寸匹配，并有 `.json` 元数据记录 name、width、height、sha256、realHost=false 和 provenance。所有 V8 JSON 包含 schemaVersion 和 provenance（runId、revision、sourceSha256），时间落在本次执行窗口；汇总收录实际字节数 / 摘要。
+| 产物 | 实际观察与门禁检查 |
+| --- | --- |
+| `netease-login-development.trx` | 全量真实测试结果，无失败 / 跳过 / 零测试；50 场景映射及参数化最少结果数；适用旧版回归同轮执行 |
+| `v8-discovery-navigation.json` | 限流前后读取 2 次，读取媒体打开 0，完整快照真实 loadedIds 与 queuedIds 顺序相同 |
+| `v8-fm-session.json` | 在途峰值 1，Next 写数 0；显式反馈恰好 1 次，实际 songId 与目标相同，成功后当前曲已推进，SessionId / EntryId 有效，待播≤10 |
+| `v8-fm-budget.json` | 真实假时钟调度观察：3 次空批，等待 500 / 1500 ms，总耗时≥2000 且≤20000 ms |
+| `v8-fm-race.json` | 等待补取时 Next 与重复 Ended 竞争，实际读取 2、媒体打开 2、当前 ID=20、反馈 0，不能多跳到下一曲 |
+| `v8-fm-failures.json` | 不可播候选跨多批达到 20 后停止；批次数必须>1，实际媒体打开 0 |
+| `v8-fm-lifetime.json` | 20 次 FM 页面挂卸，订阅峰值 1、释放后订阅 0；非最后页关闭继续，最后页关闭后活动读取 / 媒体 / FM 资格为 0 |
+| `v8-discovery-account.json` | 旧账号迟到后实际旧行 0、新行 1、忙碌 false、队列 0；旧 finally 不释放新请求资格 |
+| `v8-discovery-restore.json` | 普通队列恢复非空；FM 读取 / 反馈 / 媒体打开 0、FM 未激活；三个远端来源读取的本地保存增量 0、本机最近记录前后相同 |
+| `v8-remote-history.json` | 实际远端重复记录保留 2 条，读取后队列和媒体打开 0；未知次数没有写成 0 次；三个范围另由参数化 TRX 证明 |
+| `v8-discovery-lifetime.json` | 20 轮发现页面释放、排队 UI 回调清空后，保留行、排队回调、额外媒体打开均为 0 |
+| `v8-discovery-layout.json` | 5 页面×3尺寸×2主题×2密度=60 唯一组合；测量控件宽高和横向边界，1 DIP 舍入容差内，无水平溢出；实际产出16截图 |
+| `v8-discovery-{theme}-{width}.png` | 发现页三尺寸、两主题、紧凑密度，共6张 |
+| `v8-artist-{theme}.png`、`v8-album-{theme}.png` | 作品页800×600、两主题、舒适密度，共4张 |
+| `v8-fm-{theme}.png`、`v8-fm-uncertain-{theme}.png` | 运行中的FM与反馈未知800×600、两主题，共4张 |
+| `v8-remote-history-{theme}.png` | 网易最近520×420、两主题，共2张 |
 
-证据保留场景级条目，不只记录全局最大值：例如 FM 每轮的开始 / 结束、请求与目标、结果分类、播放推进和写请求关联到同一会话 / 操作。检测到不同来源场景或不同账号的异常不能被总计数抵消。真实 Cookie、用户推荐内容及原始私有响应不能进入自动证据。
+11 份业务 JSON 加16张专用截图；每张 PNG 可解码且尺寸匹配，`.png.json` 记录 name、width、height、sha256、realHost=false、provenance。业务 JSON 具有 schemaVersion=1、realHost=false 和 provenance（runId、revision、sourceSha256）；文件时间属于本轮窗口。总报告保存原始产物字节数和 SHA-256。
+
+关联操作以实际 SessionId、EntryId、目标 / 当前歌曲及场景独立文件表达；没有持久保存真实 Cookie、私人推荐或原始响应。布局截图来自生产控件 Headless 渲染；键盘 Esc、菜单和鼠标意图由定向生产控件测试断言，物理输入和读屏留给 M05。超时 / 旧账号 / 回执保存失败 / 取消等剩余细节见实际方法映射。
 
 ## 12. 门禁自身失败注入（G）
 
@@ -202,7 +204,7 @@ pwsh -NoProfile -File tools/verify-development.ps1 -Milestone V8
 
 历史证据保持原字节，新执行另建目录；不修改旧 V7 报告使其看起来支持 V8。V8 专用当前契约、快速开始、路线图和导航在对应实现完成时更新，不提前写成已可用。
 
-本次仅修改计划与导航，按现有约定执行：
+只改文档时按现有约定执行：
 
 ```powershell
 . ./tools/DevelopmentChecks.ps1
@@ -210,4 +212,4 @@ Assert-MarkdownLinks (Get-Location).Path
 git diff --check
 ```
 
-另核对 50 场景唯一且分组数量一致、V8-01～10 均有场景覆盖、未来路径没有被做成失效链接、当前入口仍为 V7。此文档检查不表示已经运行 V8 单元测试、业务门禁或真实环境验收。
+同时核对 50 场景唯一、V8-01～10 有映射，源码和工具改动必须运行完整 V8 门禁。文档链接检查不代替业务或人工验收；[原方案](../archive/plans/netease-v8-m4-music-discovery-plan.md)保留为设计快照，当前契约与本矩阵记录最终落点。

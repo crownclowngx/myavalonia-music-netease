@@ -1,7 +1,8 @@
 # V8 · M4 从“找歌听”扩展到“发现音乐”实施计划
 
-> 编写日期：2026-09-25。状态：**计划已编写，V8 业务代码、专用门禁和真实环境验收尚未实施**。
-> 承接[能力路线图](netease-capability-roadmap.md)的 M4；V8 是计划 / 实施序号，不是插件包版本。测试与证据要求见[V8 专用验证矩阵](../maintenance/netease-v8-m4-music-discovery-verification-plan.md)。
+> 编写日期：2026-09-25。状态：**已实施并归档；正文保留实施前设计快照，当前行为与结果见专用契约及实施记录，真实验收待完成**。
+> 当前承接：[音乐发现契约](../../reference/netease-music-discovery.md)、[实施记录](../records/netease-v8/m4-implementation-20260925.md)、[人工待验](../records/netease-v8/acceptance-20260925.md)。
+> 承接[能力路线图](../../roadmap/netease-capability-roadmap.md)的 M4；V8 是计划 / 实施序号，不是插件包版本。测试与证据要求见[V8 专用验证矩阵](../../maintenance/netease-v8-m4-music-discovery-verification-plan.md)。
 > 首要规定：**满足 SOLID**；设计模式朴素使用；新增与修改的关键代码使用详细中文注释并说明设计思路。全过程不使用 AIFLOW、Windows CI 或发布门禁；正式发布时另行开展发布验证。
 
 ## 1. 目标与执行边界
@@ -20,23 +21,23 @@
 2. **V8 开发完成**：V8-01～10 全部实现，完整 V8 本地门禁及适用旧版回归通过，证据有实际来源。
 3. **M4 验收完成**：真实账号、真实 Host、声音 / 物理输入等专项验收完成，用户确认后再勾选路线图 M4。自动测试不能替代这一层。
 
-M3 已通过本地验证但真实验收尚未完成；V5 / V6 的[待验事项](../maintenance/netease-v5-v6-acceptance.md)继续单列。V8 可以复用其实现，不能因此将旧验收状态改为完成。
+M3 已通过本地验证但真实验收尚未完成；V5 / V6 的[待验事项](../../maintenance/netease-v5-v6-acceptance.md)继续单列。V8 可以复用其实现，不能因此将旧验收状态改为完成。
 
 ## 2. 已核对基线与实施前差项
 
 | 当前入口 | 已核对事实 | V8 的衔接要求 |
 | --- | --- | --- |
-| [MusicContracts](../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicContracts.cs) | `MusicTrack` 有歌曲 ID，歌手 / 专辑目前只有展示字符串；`MusicSession` 有 AccountId、Epoch、CredentialVersion 和撤销令牌 | 增加可选的结构化歌手 / 专辑身份；所有个人内容复用会话隔离，不用名称反查代替身份 |
-| [MusicNavigation](../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicNavigation.cs) | 浏览页为 Search / Library / History；歌词和队列为独立抽屉 | 增加发现入口及页面内作品导航；浏览不能驱动播放，也不能破坏抽屉状态 |
-| [PlaylistBrowser](../../src/MusicNetEasePlugin.Plugin/Features/Library/PlaylistBrowser.cs)、[歌单 API](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/NeteasePlaylistApi.cs) | 已有歌单详情、分页、账号隔离和完整性边界 | 推荐歌单和榜单以真实歌单 ID 打开原详情，不复制第二套歌单编辑器 |
-| [QueueContracts](../../src/MusicNetEasePlugin.Plugin/Application/Playback/QueueContracts.cs)、[队列协调器](../../src/MusicNetEasePlugin.Plugin/Application/Playback/PlaybackQueueCoordinator.cs) | `IPlayerSession` 提供替换、立即播放、追加、上下首；队列协调器是唯一写入者，以 EntryId / AttemptId 区分条目与播放尝试 | 普通发现内容直接使用现有意图；FM 只增加最小内容供应衔接，不另建播放器或第二个队列写入者 |
-| [MusicRequestExecutor](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/MusicRequestExecutor.cs)、[LibraryRequestExecutor](../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/LibraryRequestExecutor.cs) | 已有只读会话保护和 M3 写回执保护，后者包含歌单专用令牌与错误文案 | 读取复用兼容部分；FM 写操作只抽取真正共用的薄发送保护，不照搬歌单令牌 / 写后回查语义 |
-| [音乐库协调器](../../src/MusicNetEasePlugin.Plugin/Application/Library/MusicLibraryCoordinator.cs) | 喜欢、收藏及写入一致性已有共享实现 | 新歌曲行复用已确认喜欢状态和操作；不再维护一份发现页喜欢集合 |
-| [服务注册](../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs) | 播放器 / 库服务为容器共享，浏览及编辑按 Document 隔离，Host 与 Standalone 共用组合入口 | 页面模型保持 Scoped；FM 运行状态共享；不得重复注册 Host 贡献根 |
-| [播放寿命](../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicPlaybackLifetime.cs) | 最后一个音乐 Document 归还租约会调用 `SuspendDocumentSessionAsync`；设置 Tool 不持有租约 | 保留当前代码语义：关闭非最后页继续，关闭最后页停止 / 释放，重开静默；FM 一并停止补取 |
-| [验证入口](../../tools/verify-development.ps1) | 参数最大到 V7，默认 V7；已有场景映射、离线 UI / 原生证据和失败注入 | V8 先搭骨架、逐阶段补齐；全部接通后才切换默认值，计划期间保持 V7 |
+| [MusicContracts](../../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicContracts.cs) | `MusicTrack` 有歌曲 ID，歌手 / 专辑目前只有展示字符串；`MusicSession` 有 AccountId、Epoch、CredentialVersion 和撤销令牌 | 增加可选的结构化歌手 / 专辑身份；所有个人内容复用会话隔离，不用名称反查代替身份 |
+| [MusicNavigation](../../../src/MusicNetEasePlugin.Plugin/Features/Music/MusicNavigation.cs) | 浏览页为 Search / Library / History；歌词和队列为独立抽屉 | 增加发现入口及页面内作品导航；浏览不能驱动播放，也不能破坏抽屉状态 |
+| [PlaylistBrowser](../../../src/MusicNetEasePlugin.Plugin/Features/Library/PlaylistBrowser.cs)、[歌单 API](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/NeteasePlaylistApi.cs) | 已有歌单详情、分页、账号隔离和完整性边界 | 推荐歌单和榜单以真实歌单 ID 打开原详情，不复制第二套歌单编辑器 |
+| [QueueContracts](../../../src/MusicNetEasePlugin.Plugin/Application/Playback/QueueContracts.cs)、[队列协调器](../../../src/MusicNetEasePlugin.Plugin/Application/Playback/PlaybackQueueCoordinator.cs) | `IPlayerSession` 提供替换、立即播放、追加、上下首；队列协调器是唯一写入者，以 EntryId / AttemptId 区分条目与播放尝试 | 普通发现内容直接使用现有意图；FM 只增加最小内容供应衔接，不另建播放器或第二个队列写入者 |
+| [MusicRequestExecutor](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/MusicRequestExecutor.cs)、[LibraryRequestExecutor](../../../src/MusicNetEasePlugin.Plugin/Infrastructure/Http/LibraryRequestExecutor.cs) | 已有只读会话保护和 M3 写回执保护，后者包含歌单专用令牌与错误文案 | 读取复用兼容部分；FM 写操作只抽取真正共用的薄发送保护，不照搬歌单令牌 / 写后回查语义 |
+| [音乐库协调器](../../../src/MusicNetEasePlugin.Plugin/Application/Library/MusicLibraryCoordinator.cs) | 喜欢、收藏及写入一致性已有共享实现 | 新歌曲行复用已确认喜欢状态和操作；不再维护一份发现页喜欢集合 |
+| [服务注册](../../../src/MusicNetEasePlugin.Plugin/Plugin/MusicNetEasePluginServices.cs) | 播放器 / 库服务为容器共享，浏览及编辑按 Document 隔离，Host 与 Standalone 共用组合入口 | 页面模型保持 Scoped；FM 运行状态共享；不得重复注册 Host 贡献根 |
+| [播放寿命](../../../src/MusicNetEasePlugin.Plugin/Application/Playback/MusicPlaybackLifetime.cs) | 最后一个音乐 Document 归还租约会调用 `SuspendDocumentSessionAsync`；设置 Tool 不持有租约 | 保留当前代码语义：关闭非最后页继续，关闭最后页停止 / 释放，重开静默；FM 一并停止补取 |
+| [验证入口](../../../tools/verify-development.ps1) | 参数最大到 V7，默认 V7；已有场景映射、离线 UI / 原生证据和失败注入 | V8 先搭骨架、逐阶段补齐；全部接通后才切换默认值，计划期间保持 V7 |
 
-**实施前必须消除的文档冲突：** 路线图基线及[日常播放器文档](../reference/netease-daily-player.md)部分段落仍写“最后一页关闭后继续播放”，但该文档后段和现有租约代码已采用停止 / 释放语义。阶段 A 需结合现有寿命测试核对并同步这些当前说明。V8 以已核对的代码行为为兼容基线，不借 FM 暗中改变关闭策略；本计划不宣称这项文档修正或实机验收已经完成。
+**实施前必须消除的文档冲突：** 路线图基线及[日常播放器文档](../../reference/netease-daily-player.md)部分段落仍写“最后一页关闭后继续播放”，但该文档后段和现有租约代码已采用停止 / 释放语义。阶段 A 需结合现有寿命测试核对并同步这些当前说明。V8 以已核对的代码行为为兼容基线，不借 FM 暗中改变关闭策略；本计划不宣称这项文档修正或实机验收已经完成。
 
 ## 3. 交付清单与明确排除项
 
@@ -90,7 +91,7 @@ M3 已通过本地验证但真实验收尚未完成；V5 / V6 的[待验事项](
 
 ### 5.1 接口候选登记
 
-固定参考沿用[上游能力清单](../reference/netease-api-enhanced-capabilities.md)中的提交 `a8c781fd64faab17fedfd46e0615a2609307f163`。下表只确认路线图候选名称与接入用途；**未据此确认真实 HTTP 路径、加密方式、响应字段、权限或当前线上可用性**。阶段 A 逐个阅读该提交模块及共享请求依赖，再补协议测试和脱敏依据，不能把模块名当成 C# 直连地址。
+固定参考沿用[上游能力清单](../../reference/netease-api-enhanced-capabilities.md)中的提交 `a8c781fd64faab17fedfd46e0615a2609307f163`。下表只确认路线图候选名称与接入用途；**未据此确认真实 HTTP 路径、加密方式、响应字段、权限或当前线上可用性**。阶段 A 逐个阅读该提交模块及共享请求依赖，再补协议测试和脱敏依据，不能把模块名当成 C# 直连地址。
 
 | 能力 | 候选模块 | 实施前必须核对 |
 | --- | --- | --- |
@@ -250,22 +251,22 @@ B～E 每阶段同步实现单元 / 协议 / UI 测试和相应门禁检查；F 
 
 ## 10. 测试门禁与专用文档交付
 
-详细步骤以[V8 验证矩阵](../maintenance/netease-v8-m4-music-discovery-verification-plan.md)为准。离线自动测试复用 xUnit、Fake / 可控时钟、Flurl 夹具和生产 Avalonia Headless / Skia，不读取用户会话、不访问网易业务、不启动真实 Host 或系统音频输出。
+详细步骤以[V8 验证矩阵](../../maintenance/netease-v8-m4-music-discovery-verification-plan.md)为准。离线自动测试复用 xUnit、Fake / 可控时钟、Flurl 夹具和生产 Avalonia Headless / Skia，不读取用户会话、不访问网易业务、不启动真实 Host 或系统音频输出。
 
 完整 V8 门禁必须继承 V7 及其全部适用前置：门禁自测 → locked restore → Debug 零警告构建 → 全量测试 → TRX / 场景方法映射 → 新旧证据 → Markdown 链接 / Git 空白 → 源码身份一致性。跳过、零测试、缺场景、旧证据、无效字段或超时均失败退出；自测和业务证据分开。
 
 | 文档 | 本次动作 / 后续维护时点 |
 | --- | --- |
-| 本计划、[V8 专用验证矩阵](../maintenance/netease-v8-m4-music-discovery-verification-plan.md) | 本次新增；作为后续指导，所有完成勾选保持未完成 |
-| [根 README](../../README.md)、[总导航](../README.md)、[能力路线图](netease-capability-roadmap.md)、[验证指南](../maintenance/verification.md) | 本次增加 V8 入口和计划状态，保持现有可执行 V7 命令 |
+| 本计划、[V8 专用验证矩阵](../../maintenance/netease-v8-m4-music-discovery-verification-plan.md) | 本次新增；作为后续指导，所有完成勾选保持未完成 |
+| [根 README](../../../README.md)、[总导航](../../README.md)、[能力路线图](../../roadmap/netease-capability-roadmap.md)、[验证指南](../../maintenance/verification.md) | 本次增加 V8 入口和计划状态，保持现有可执行 V7 命令 |
 | `docs/reference/netease-music-discovery.md` | 从阶段 B 开始新增 M4 专用当前契约；只描述已接入能力，记录端点 / 来源 / 模型 / 预算 / FM 反馈与未确认限制 |
-| [日常播放器](../reference/netease-daily-player.md)、[界面契约](../reference/netease-desktop-ui.md)、[HTTP 与会话](../reference/netease-http-session.md)、[音乐库契约](../reference/netease-music-library-management.md) | 阶段 A 对齐寿命冲突；相应实现时更新队列、作品入口、账户取消与库操作复用 |
-| [播放器快速开始](../quick-start/netease-playback.md)、[上游清单](../reference/netease-api-enhanced-capabilities.md) | 功能实际可用后补操作 / 降级步骤和接入状态；没有实现的接口继续候选 |
+| [日常播放器](../../reference/netease-daily-player.md)、[界面契约](../../reference/netease-desktop-ui.md)、[HTTP 与会话](../../reference/netease-http-session.md)、[音乐库契约](../../reference/netease-music-library-management.md) | 阶段 A 对齐寿命冲突；相应实现时更新队列、作品入口、账户取消与库操作复用 |
+| [播放器快速开始](../../quick-start/netease-playback.md)、[上游清单](../../reference/netease-api-enhanced-capabilities.md) | 功能实际可用后补操作 / 降级步骤和接入状态；没有实现的接口继续候选 |
 | `docs/archive/records/netease-v8/m4-implementation-YYYYMMDD.md` | 实施开始时新增专用记录，逐阶段记录源码身份、变更、设计取舍、实际命令、结果及缺口 |
 | `docs/archive/records/netease-v8/acceptance-YYYYMMDD.md` | 真实验收发生时新增专用记录，分列账号、Host、声音、物理输入与用户确认，不伪造成功 |
-| [归档索引](../archive/README.md) | 有实际记录时登记；本计划完成用途后移入 `archive/plans`，加归档说明并更新入站 / 出站链接 |
+| [归档索引](../README.md) | 有实际记录时登记；本计划完成用途后移入 `archive/plans`，加归档说明并更新入站 / 出站链接 |
 
-尚未生成的路径仅用代码标记，不建立失效 Markdown 链接。原始 TRX / JSON / PNG 按[文档维护约定](../maintenance/documentation.md)保留字节；自动报告继续明确真实账号 / Host / 出声 / 部署 / 发布门禁未执行。
+尚未生成的路径仅用代码标记，不建立失效 Markdown 链接。原始 TRX / JSON / PNG 按[文档维护约定](../../maintenance/documentation.md)保留字节；自动报告继续明确真实账号 / Host / 出声 / 部署 / 发布门禁未执行。
 
 ## 11. 收口清单
 

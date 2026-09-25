@@ -97,7 +97,7 @@
 
 ## 7. V7 本地门禁实现
 
-下列脚本与真实方法映射均已接入；默认完整本地检查为 V7。新增源码 / 用例时继续维护该矩阵，不以 Trait 字符串代替执行。
+下列脚本与真实方法映射均已接入；当前默认完整本地检查为 V8，继承本页 V7 检查。新增源码 / 用例时继续维护该矩阵，不以 Trait 字符串代替执行。
 
 | 文件 | 当前职责 |
 | --- | --- |
@@ -106,7 +106,7 @@
 | `tools/TestV7DevelopmentGate.ps1` | 合成正例与反例，证明 V7 各失败条件会拒绝；只在临时目录操作 |
 | `tools/DevelopmentChecks.ps1` | 加载 V7 检查模块，按需提取既有通用能力，不复制整套 V6 工具 |
 | `tools/test-development-gate.ps1` | 运行 V7 自测并传播非零退出；保留已有通用及 V5 / V6 自测 |
-| `tools/verify-development.ps1` | 支持 V7，扩展 M1 / V3 / M2 / V5 / V6 全部条件分支；V7 接续前置检查并输出 v7ScenarioCoverage；默认值为 V7 |
+| `tools/verify-development.ps1` | 支持 V7，扩展 M1 / V3 / M2 / V5 / V6 全部条件分支；V7 接续前置检查并输出 v7ScenarioCoverage；当前默认值为 V8，V7 仍可显式选择 |
 | 测试项目及 `TestEvidence` | 在实际断言通过后生成专用产物，使用本轮身份，不硬编码成功报告；按需扩充元数据，保持旧证据兼容 |
 
 完整本地检查命令：
