@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v6-drawer-lyrics.png",
+  "width": 1200,
+  "height": 720,
+  "sha256": "1E10FEBC62C3837BCCDBB2E4D4B5CCED5174B9E8151B21A5F72FA6723698CE6A",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260925-125719-87518b41",
+    "revision": "67f887922b72486b1dcbff2c371d899a98a62f90",
+    "sourceSha256": "D368F773E2A20035BE0C61205EEF564DE28EEB363A93E223CAC7C5BD2D7AAE98"
+  }
+}

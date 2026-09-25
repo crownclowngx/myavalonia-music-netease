@@ -4,7 +4,7 @@
 > 当前状态：V1–V4 已实现并完成手工验收，对应 M0–M2 已完成；依据为[用户验收收口记录](../archive/records/netease-v1-v4-acceptance-20260923.md)。
 > M3 / V7-01～10 已实现并通过本地开发验证，当前行为见[音乐库契约](../reference/netease-music-library-management.md)，依据见[实施记录](../archive/records/netease-v7/m3-implementation-20260924.md)。真实账号与 Host 验收待完成；M4 / V8-01～10 已实现，见[音乐发现契约](../reference/netease-music-discovery.md)和[实施记录](../archive/records/netease-v8/m4-implementation-20260925.md)，真实账号 / Host 待验；M5 继续保留候选范围与依赖。
 
-V 编号是实施文档序号，M 编号是能力里程碑，均不表示插件包版本或交付日期。V1–V6 历史方案统一见[归档索引](../archive/README.md)，各自验收状态单独标明；当前行为由 `reference` 维护，V5 / V6 剩余工作见[待验清单](../maintenance/netease-v5-v6-acceptance.md)。
+V 编号是实施文档序号，M 编号是能力里程碑，均不表示插件包版本或交付日期。V1–V8 历史方案统一见[归档索引](../archive/README.md)，各自验收状态单独标明；当前行为由 `reference` 维护，V5 / V6 剩余工作见[待验清单](../maintenance/netease-v5-v6-acceptance.md)。
 
 针对现有 M0–M2 能力的体验改造，V6 的 18 项已全量接入，见 [专用修改方案](../archive/plans/netease-v6-drawer-and-interaction-change-plan.md)和[实施记录](../archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)。[原候选评估](../archive/plans/netease-v6-interaction-candidates-evaluation.md)保留取舍依据；[V5 历史复核](../archive/records/netease-v5/completion-audit-20260923.md)中的 C01–C08 已由 V6 承接，D01–D05 性能与实机待验继续保留，统一见[当前状态](../README.md#当前状态与待验范围)。V5/V6 均不表示下列 M3–M5 已启动。
 

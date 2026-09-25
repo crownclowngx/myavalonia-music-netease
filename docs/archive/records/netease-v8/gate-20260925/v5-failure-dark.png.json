@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v5-failure-dark.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "517277E321648C8A5AA9DA941F5E6402F4AD067411E57451048B272A76111AF1",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260925-125719-87518b41",
+    "revision": "67f887922b72486b1dcbff2c371d899a98a62f90",
+    "sourceSha256": "D368F773E2A20035BE0C61205EEF564DE28EEB363A93E223CAC7C5BD2D7AAE98"
+  }
+}

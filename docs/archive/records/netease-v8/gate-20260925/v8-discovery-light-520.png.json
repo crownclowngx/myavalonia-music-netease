@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v8-discovery-light-520.png",
+  "width": 520,
+  "height": 420,
+  "sha256": "BC44BD2140A72A0416EB012726193A57B397B10C2626D8D8F86A5241394CBE67",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260925-125719-87518b41",
+    "revision": "67f887922b72486b1dcbff2c371d899a98a62f90",
+    "sourceSha256": "D368F773E2A20035BE0C61205EEF564DE28EEB363A93E223CAC7C5BD2D7AAE98"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v8-album-dark.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "BCBA2A3F1FFAE4E16C5A20D9DAF6E406A5B692A2555CDA93FEB90E6CB4512554",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260925-125719-87518b41",
+    "revision": "67f887922b72486b1dcbff2c371d899a98a62f90",
+    "sourceSha256": "D368F773E2A20035BE0C61205EEF564DE28EEB363A93E223CAC7C5BD2D7AAE98"
+  }
+}

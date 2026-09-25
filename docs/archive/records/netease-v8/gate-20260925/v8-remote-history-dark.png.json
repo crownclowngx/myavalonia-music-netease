@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v8-remote-history-dark.png",
+  "width": 520,
+  "height": 420,
+  "sha256": "B3A966DA36026119BD671DD0FE215BBF10B75EB708545ED5FFDC63C340403692",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260925-125719-87518b41",
+    "revision": "67f887922b72486b1dcbff2c371d899a98a62f90",
+    "sourceSha256": "D368F773E2A20035BE0C61205EEF564DE28EEB363A93E223CAC7C5BD2D7AAE98"
+  }
+}

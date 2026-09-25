@@ -1,0 +1,552 @@
+{
+  "schemaVersion": 1,
+  "realHost": false,
+  "screenshots": 16,
+  "combinations": [
+    {
+      "page": "Daily",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Fm",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Daily",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Fm",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 1200,
+      "height": 720,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Daily",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Fm",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Daily",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Fm",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 800,
+      "height": 600,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Daily",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Fm",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Daily",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Fm",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 520,
+      "height": 420,
+      "dark": false,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Daily",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Fm",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Daily",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Fm",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 1200,
+      "height": 720,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Daily",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Fm",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Daily",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Fm",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 800,
+      "height": 600,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 12
+    },
+    {
+      "page": "Daily",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Fm",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": false,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Daily",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "ArtistSongs",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Album",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    },
+    {
+      "page": "Fm",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 11
+    },
+    {
+      "page": "Recent",
+      "width": 520,
+      "height": 420,
+      "dark": true,
+      "comfortable": true,
+      "horizontalOverflow": 0,
+      "buttons": 14
+    }
+  ],
+  "provenance": {
+    "runId": "20260925-125719-87518b41",
+    "revision": "67f887922b72486b1dcbff2c371d899a98a62f90",
+    "sourceSha256": "D368F773E2A20035BE0C61205EEF564DE28EEB363A93E223CAC7C5BD2D7AAE98"
+  }
+}

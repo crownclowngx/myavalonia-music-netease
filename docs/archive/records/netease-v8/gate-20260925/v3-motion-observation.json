@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "environment": "Avalonia Headless / Skia, fixed offline data",
+  "samples": [
+    {
+      "reducedMotion": false,
+      "scenario": "idle",
+      "wallMilliseconds": 501.8827,
+      "cpuMilliseconds": 46.875,
+      "allocatedBytes": 0,
+      "activeFadeAfter": false
+    },
+    {
+      "reducedMotion": false,
+      "scenario": "playing",
+      "wallMilliseconds": 503.8418,
+      "cpuMilliseconds": 46.875,
+      "allocatedBytes": 82688,
+      "activeFadeAfter": false
+    },
+    {
+      "reducedMotion": false,
+      "scenario": "hidden",
+      "wallMilliseconds": 498.0281,
+      "cpuMilliseconds": 0,
+      "allocatedBytes": 14192,
+      "activeFadeAfter": false
+    },
+    {
+      "reducedMotion": true,
+      "scenario": "idle",
+      "wallMilliseconds": 501.8858,
+      "cpuMilliseconds": 0,
+      "allocatedBytes": 3984,
+      "activeFadeAfter": false
+    },
+    {
+      "reducedMotion": true,
+      "scenario": "playing",
+      "wallMilliseconds": 499.1178,
+      "cpuMilliseconds": 15.625,
+      "allocatedBytes": 10704,
+      "activeFadeAfter": false
+    },
+    {
+      "reducedMotion": true,
+      "scenario": "hidden",
+      "wallMilliseconds": 496.1771,
+      "cpuMilliseconds": 15.625,
+      "allocatedBytes": 3408,
+      "activeFadeAfter": false
+    }
+  ],
+  "detachedViews": 40,
+  "retainedViews": 0,
+  "realHost": false,
+  "frameTimeMeasured": false
+}

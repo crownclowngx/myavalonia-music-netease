@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v8-album-light.png",
+  "width": 800,
+  "height": 600,
+  "sha256": "A1399D57A0681D61610CB47B4D520BA358F542616E30E9B1F4F654CB2CD94D23",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260925-125719-87518b41",
+    "revision": "67f887922b72486b1dcbff2c371d899a98a62f90",
+    "sourceSha256": "D368F773E2A20035BE0C61205EEF564DE28EEB363A93E223CAC7C5BD2D7AAE98"
+  }
+}

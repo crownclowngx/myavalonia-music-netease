@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "v8-discovery-dark-520.png",
+  "width": 520,
+  "height": 420,
+  "sha256": "8E9173B3FD2D9F88C3D2BA2B80D6EBBBC35A8DEB46AD7CBB3AED64BF2B553BB6",
+  "realHost": false,
+  "provenance": {
+    "runId": "20260925-125719-87518b41",
+    "revision": "67f887922b72486b1dcbff2c371d899a98a62f90",
+    "sourceSha256": "D368F773E2A20035BE0C61205EEF564DE28EEB363A93E223CAC7C5BD2D7AAE98"
+  }
+}
