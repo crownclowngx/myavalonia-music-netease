@@ -16,8 +16,13 @@ public interface IMusicSessionAccessor
 }
 public sealed record MusicTrack(long Id, string Name, string Artists, string Album, string? Cover, long DurationMs)
 {
+    /// <summary>旧缓存缺身份时保持空值；作品导航不得根据同名文字推测 ID。</summary>
+    public IReadOnlyList<ArtistRef> ArtistRefs { get; init; } = Array.Empty<ArtistRef>();
+    public AlbumRef? AlbumRef { get; init; }
     public string Display => $"{Name} — {Artists}";
 }
+public sealed record ArtistRef(long Id, string Name);
+public sealed record AlbumRef(long Id, string Name);
 public sealed record MusicSearchPage(IReadOnlyList<MusicTrack> Tracks, int Offset, bool HasMore);
 public interface IMusicCatalogApi
 {

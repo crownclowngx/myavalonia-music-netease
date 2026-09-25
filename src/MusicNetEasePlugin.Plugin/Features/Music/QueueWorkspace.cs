@@ -41,8 +41,8 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
         (_player, _ui) = (player, ui);
         NextCommand = new AsyncRelayCommand(() => Execute(() => player.NextAsync(false, default)), () => _snapshot.CanNext);
         PreviousCommand = new AsyncRelayCommand(() => Execute(() => player.NextAsync(true, default)), () => _snapshot.CanPrevious);
-        PlayCommand = new AsyncRelayCommand(() => Execute(() => Selected is { } row ? player.SelectAsync(row.Id, default) : Task.CompletedTask), () => Selected is not null);
-        RemoveCommand = new AsyncRelayCommand(() => Execute(() => Selected is { } row ? player.RemoveAsync(row.Id, default) : Task.CompletedTask), () => Selected is not null);
+        PlayCommand = new AsyncRelayCommand(() => Execute(() => Selected is { } row ? player.SelectAsync(row.Id, default) : Task.CompletedTask), () => CanEdit && Selected is not null);
+        RemoveCommand = new AsyncRelayCommand(() => Execute(() => Selected is { } row ? player.RemoveAsync(row.Id, default) : Task.CompletedTask), () => CanEdit && Selected is not null);
         ClearCommand = new AsyncRelayCommand(() => Execute(player.ClearAsync), () => Rows.Count > 0);
         RequestClearCommand = new RelayCommand(() => { _clearRevision = _queueRevision; ConfirmClear = Rows.Count > 0; });
         CancelClearCommand = new RelayCommand(() => ConfirmClear = false);
@@ -51,8 +51,8 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
             if (_clearRevision != _queueRevision) { ConfirmClear = false; Message = "队列已经变化，请重新确认。"; return; }
             ConfirmClear = false; await Execute(() => player.ClearIfUnchangedAsync(_clearRevision));
         }, () => ConfirmClear);
-        UpCommand = new RelayCommand(() => { if (Selected is { } row) player.Move(row.Id, -1); }, () => Selected is not null);
-        DownCommand = new RelayCommand(() => { if (Selected is { } row) player.Move(row.Id, 1); }, () => Selected is not null);
+        UpCommand = new RelayCommand(() => { if (Selected is { } row) player.Move(row.Id, -1); }, () => CanEdit && Selected is not null);
+        DownCommand = new RelayCommand(() => { if (Selected is { } row) player.Move(row.Id, 1); }, () => CanEdit && Selected is not null);
         UndoCommand = new RelayCommand(() =>
         {
             var undo = _snapshot.Undo;
@@ -68,6 +68,7 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
     public string CountText => $"播放队列 · {Rows.Count} 首";
     public string ButtonText => $"队列 {Rows.Count}";
     public bool IsEmpty => Rows.Count == 0;
+    public bool CanEdit => _snapshot.FmSessionId == Guid.Empty;
     public long QueueRevision => _snapshot.QueueRevision;
     public long AccountEpoch => _snapshot.AccountEpoch;
     public bool CanUndo => _snapshot.Undo is not null;
@@ -81,7 +82,7 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
         return moved;
     }
     public void CancelMove() { if (!_closed) Message = "队列已经变化，已取消拖动，请重新调整。"; }
-    public string OrderHint => ModeIndex == 3 ? "队列顺序 · 随机模式的实际下一首由播放器选择" : "队列顺序 · 当前项之后继续播放";
+    public string OrderHint => !CanEdit ? "私人 FM 管理队列；结束 FM 后可编辑与切换模式" : ModeIndex == 3 ? "队列顺序 · 随机模式的实际下一首由播放器选择" : "队列顺序 · 当前项之后继续播放";
     public bool ConfirmClear { get => _confirmClear; private set { if (SetProperty(ref _confirmClear, value)) ConfirmClearCommand.NotifyCanExecuteChanged(); } }
     public string ClearText => $"清空 {Rows.Count} 首并停止播放？";
     public QueueRow? Current => Rows.FirstOrDefault(row => row.IsCurrent);
@@ -103,7 +104,7 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
         catch (MusicException ex) { _ui.Post(() => { if (!_closed) Message = ex.Message; }); }
     }
     private void Changed(object? sender, PlayerSessionSnapshot snapshot)
-    { if (snapshot.QueueRevision != _queueRevision || snapshot.Undo != _snapshot.Undo || snapshot.CanNext != _snapshot.CanNext || snapshot.CanPrevious != _snapshot.CanPrevious) _ui.Post(() => { if (!_closed) Apply(snapshot); }); }
+    { if (snapshot.QueueRevision != _queueRevision || snapshot.FmSessionId != _snapshot.FmSessionId || snapshot.Undo != _snapshot.Undo || snapshot.CanNext != _snapshot.CanNext || snapshot.CanPrevious != _snapshot.CanPrevious) _ui.Post(() => { if (!_closed) Apply(snapshot); }); }
     private void Apply(PlayerSessionSnapshot snapshot)
     {
         if (snapshot.Revision <= _revision) return;
@@ -129,6 +130,7 @@ public sealed class QueueWorkspace : ObservableObject, IDisposable
             foreach (var property in new[] { nameof(CountText), nameof(ButtonText), nameof(ClearText), nameof(IsEmpty), nameof(Current) }) OnPropertyChanged(property);
         }
         OnPropertyChanged(nameof(QueueRevision)); OnPropertyChanged(nameof(CanUndo)); OnPropertyChanged(nameof(UndoText));
+        OnPropertyChanged(nameof(CanEdit));
         OnPropertyChanged(nameof(ModeIndex)); OnPropertyChanged(nameof(OrderHint)); UpdateCommands();
     }
     private void UpdateCommands()

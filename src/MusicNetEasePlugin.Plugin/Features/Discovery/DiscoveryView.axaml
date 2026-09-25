@@ -1,0 +1,38 @@
+<UserControl x:Class="MusicNetEasePlugin.Features.Discovery.DiscoveryView" x:Name="DiscoveryRoot"
+ xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+ xmlns:vm="using:MusicNetEasePlugin.Features.Discovery" xmlns:music="using:MusicNetEasePlugin.Features.Music" xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:models="using:MusicNetEasePlugin.Application.Discovery" x:DataType="vm:DiscoveryWorkspace">
+ <Grid RowDefinitions="Auto,Auto,Auto,*,Auto" RowSpacing="4">
+  <WrapPanel>
+   <Button Content="每日推荐" Command="{Binding DailyCommand}" /><Button Content="个性歌单" Command="{Binding PersonalCommand}" />
+   <Button Content="通用歌单" Command="{Binding GeneralCommand}" /><Button Content="榜单" Command="{Binding ChartsCommand}" /><Button Content="私人 FM" Command="{Binding FmCommand}" />
+  </WrapPanel>
+  <Grid Grid.Row="1" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="4">
+   <TextBlock Text="{Binding Title}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+   <Button Grid.Column="1" Content="返回" Command="{Binding BackCommand}" /><Button Grid.Column="2" Content="刷新" Command="{Binding RefreshCommand}" />
+  </Grid>
+  <WrapPanel Grid.Row="2">
+   <Button Content="歌曲" Command="{Binding ArtistSongsCommand}" IsVisible="{Binding IsArtist}" />
+   <Button Content="专辑" Command="{Binding ArtistAlbumsCommand}" IsVisible="{Binding IsArtist}" />
+   <Button Content="{Binding SortText}" Command="{Binding SortCommand}" IsVisible="{Binding IsArtist}" />
+   <Button Content="{Binding PlayAllText}" Command="{Binding PlayAllCommand}" IsVisible="{Binding HasSongs}" />
+   <Button Content="更多" Command="{Binding MoreCommand}" IsVisible="{Binding HasMore}" />
+  </WrapPanel>
+  <Grid Grid.Row="3">
+   <music:SongListBox x:Name="DiscoverySongs" ItemsSource="{Binding Songs}" SelectedItem="{Binding Selected, Mode=TwoWay}" ActivateCommand="{Binding PlayCommand}" IsVisible="{Binding HasSongs}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="发现歌曲">
+    <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+    <ListBox.ItemTemplate><DataTemplate x:DataType="vm:DiscoverySong"><music:SongRowView Title="{Binding Name}" Subtitle="{Binding Detail}" Artist="{Binding Artists}" Album="{Binding Album}" TrackId="{Binding Id}" PlayCommand="{Binding $parent[vm:DiscoveryView].Model.PlayCommand}" NextCommand="{Binding $parent[vm:DiscoveryView].Model.PlayNextCommand}" AppendCommand="{Binding $parent[vm:DiscoveryView].Model.AppendCommand}" /></DataTemplate></ListBox.ItemTemplate>
+   </music:SongListBox>
+   <music:SongListBox x:Name="DiscoveryCards" ItemsSource="{Binding Cards}" SelectedItem="{Binding SelectedCard, Mode=TwoWay}" ActivateCommand="{Binding OpenCardCommand}" IsVisible="{Binding HasCards}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="发现歌单与作品">
+    <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
+    <ListBox.ItemTemplate><DataTemplate x:DataType="models:MusicCard"><Grid ColumnDefinitions="40,*,Auto" ColumnSpacing="8" Margin="4,6"><Border Width="40" Height="40" Background="{DynamicResource NeteaseSelectionBrush}" CornerRadius="6"><Grid><PathIcon Width="20" Height="20" Data="{DynamicResource NeteaseMusicIcon}" /><ui:ArtworkImage Address="{Binding Cover}" Stretch="UniformToFill" /></Grid></Border><StackPanel Grid.Column="1"><TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" /><TextBlock Text="{Binding Description}" Classes="netease-secondary" TextTrimming="CharacterEllipsis" /></StackPanel><Button Grid.Column="2" Content="打开" Click="OpenCard" /></Grid></DataTemplate></ListBox.ItemTemplate>
+   </music:SongListBox>
+   <ScrollViewer IsVisible="{Binding IsFm}"><StackPanel Spacing="8" DataContext="{Binding Fm}" x:DataType="vm:PrivateFmWorkspace">
+    <TextBlock Text="开始私人 FM 将替换当前待播队列。下一首只切歌；不喜欢会影响网易的推荐偏好。" TextWrapping="Wrap" />
+    <TextBlock Text="{Binding Track}" TextWrapping="Wrap" FontWeight="SemiBold" />
+    <WrapPanel><Button x:Name="StartFmButton" Content="开始私人 FM" Command="{Binding StartCommand}" /><Button Content="下一首" Command="{Binding NextCommand}" /><Button x:Name="DislikeFmButton" Content="不喜欢这首" Command="{Binding DislikeCommand}" /><Button Content="结束 FM" Command="{Binding EndCommand}" /></WrapPanel>
+    <TextBlock Text="{Binding Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
+   </StackPanel></ScrollViewer>
+  </Grid>
+  <TextBlock Grid.Row="4" Text="{Binding Message}" TextWrapping="Wrap" MaxHeight="64" ToolTip.Tip="{Binding Message}" AutomationProperties.LiveSetting="Polite" />
+ </Grid>
+</UserControl>

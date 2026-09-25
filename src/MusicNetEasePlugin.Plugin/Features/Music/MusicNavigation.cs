@@ -3,7 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 
 namespace MusicNetEasePlugin.Features.Music;
 
-public enum MusicBrowsePage { Search, Library, History }
+public enum MusicBrowsePage { Search, Library, History, Discovery }
 public enum MusicSidePanel { None, Lyrics, Queue }
 
 /// <summary>
@@ -27,6 +27,7 @@ public sealed class MusicNavigation : ObservableObject
     public bool SearchSelected => _page == MusicBrowsePage.Search;
     public bool LibrarySelected => _page == MusicBrowsePage.Library;
     public bool HistorySelected => _page == MusicBrowsePage.History;
+    public bool IsDiscovery => _page == MusicBrowsePage.Discovery;
     public MusicSidePanel SidePanel => _panel;
     public bool IsSearch => SearchSelected;
     public bool IsLibrary => LibrarySelected;
@@ -70,7 +71,7 @@ public sealed class MusicNavigation : ObservableObject
     private void Refresh()
     {
         foreach (var name in new[] { nameof(SearchSelected), nameof(LibrarySelected), nameof(HistorySelected), nameof(IsSearch), nameof(IsLibrary), nameof(IsHistory),
-            nameof(IsLyrics), nameof(IsQueue), nameof(IsQueueBeside), nameof(IsQueuePage), nameof(CanBack), nameof(IsOpen), nameof(IsBeside), nameof(ActualDrawerWidth),
+            nameof(IsDiscovery), nameof(IsLyrics), nameof(IsQueue), nameof(IsQueueBeside), nameof(IsQueuePage), nameof(CanBack), nameof(IsOpen), nameof(IsBeside), nameof(ActualDrawerWidth),
             nameof(PanelTitle), nameof(LyricsAction), nameof(QueueAction), nameof(SidePanel) }) OnPropertyChanged(name);
     }
 }

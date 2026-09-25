@@ -80,6 +80,12 @@ public partial class SongRowView : UserControl
         }, RoutingStrategies.Tunnel);
     }
     public void OpenMenu() { SelectRow(); MoreButton.Flyout?.ShowAt(MoreButton); }
+    private void ShowWorks(object? sender, RoutedEventArgs e)
+    {
+        MoreButton.Flyout?.Hide();
+        if (TrackId > 0 && this.FindAncestorOfType<MusicView>()?.Model is { } model) model.OpenTrackWorksCommand.Execute(TrackId);
+        e.Handled = true;
+    }
     private void ShowDetails(object? sender, RoutedEventArgs e)
     {
         // 只展示当前已加载资料；绑定到行属性，虚拟化重用或资料补全不会遗留上首信息。

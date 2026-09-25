@@ -98,7 +98,12 @@ internal sealed class NeteaseMusicApi(NeteaseTransport transport, XeapiTransport
         var album = item.TryGetProperty("al", out var al) ? al : item.TryGetProperty("album", out al) ? al : default;
         return new(id, name, artists.ValueKind == JsonValueKind.Array
             ? string.Join(" / ", artists.EnumerateArray().Select(a => Text(a, "name")).Where(n => !string.IsNullOrEmpty(n))) : "未知歌手",
-            Text(album, "name") ?? "未知专辑", Text(album, "picUrl"), Math.Max(Number(item, "dt"), Number(item, "duration")));
+            Text(album, "name") ?? "未知专辑", Text(album, "picUrl"), Math.Max(Number(item, "dt"), Number(item, "duration")))
+        {
+            ArtistRefs = artists.ValueKind == JsonValueKind.Array ? artists.EnumerateArray().Where(a => Number(a, "id") > 0)
+                .Select(a => new ArtistRef(Number(a, "id"), Text(a, "name") ?? "未知歌手")).DistinctBy(a => a.Id).ToArray() : [],
+            AlbumRef = Number(album, "id") > 0 ? new(Number(album, "id"), Text(album, "name") ?? "未知专辑") : null
+        };
     }
     private static string? Text(JsonElement item, string name) => item.ValueKind == JsonValueKind.Object &&
         item.TryGetProperty(name, out var value) && value.ValueKind == JsonValueKind.String ? value.GetString() : null;

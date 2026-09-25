@@ -29,7 +29,7 @@
     <Button x:Name="NextTrackButton" Classes="netease-button icon" Command="{Binding Queue.NextCommand}" ToolTip.Tip="下一首" AutomationProperties.Name="下一首"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseNextIcon}" /></Button>
    </StackPanel>
    <StackPanel x:Name="AuxiliaryControls" Grid.Column="2" Orientation="Horizontal" Spacing="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-    <ComboBox x:Name="ModePicker" Width="112" MinHeight="30" Padding="6,2" FontSize="12" ItemsSource="{Binding Queue.Modes}" SelectedIndex="{Binding Queue.ModeIndex, Mode=TwoWay}" AutomationProperties.Name="播放模式" />
+    <ComboBox x:Name="ModePicker" Width="112" MinHeight="30" Padding="6,2" FontSize="12" IsEnabled="{Binding Queue.CanEdit}" ItemsSource="{Binding Queue.Modes}" SelectedIndex="{Binding Queue.ModeIndex, Mode=TwoWay}" AutomationProperties.Name="播放模式" />
     <Slider x:Name="WideVolume" Width="90" Margin="4,0" Minimum="0" Maximum="100" Value="{Binding Player.Volume, Mode=TwoWay}" ToolTip.Tip="{Binding Player.VolumeText}" AutomationProperties.Name="音量" />
     <Button x:Name="VolumeButton" Classes="netease-button" Content="音量" ToolTip.Tip="{Binding Player.VolumeText}" AutomationProperties.Name="调整音量">
      <Button.Flyout><Flyout><StackPanel Spacing="6" Width="190"><TextBlock Text="{Binding Player.VolumeText}" /><Slider x:Name="VolumeSlider" Value="{Binding Player.Volume, Mode=TwoWay}" Minimum="0" Maximum="100" AutomationProperties.Name="音量" /><Button Content="静音 / 恢复音量" Command="{Binding Player.MuteCommand}" /></StackPanel></Flyout></Button.Flyout>
@@ -39,6 +39,7 @@
     <Button x:Name="MorePlaybackButton" Classes="netease-button icon" ToolTip.Tip="更多播放操作与曲目信息" AutomationProperties.Name="更多播放操作"><PathIcon Width="18" Height="18" Data="{StaticResource NeteaseMoreIcon}" />
      <Button.Flyout><Flyout><StackPanel MaxWidth="320" Spacing="6">
       <SelectableTextBlock Text="{Binding Player.TrackName}" TextWrapping="Wrap" /><SelectableTextBlock Text="{Binding Player.Artists}" TextWrapping="Wrap" /><SelectableTextBlock Text="{Binding Player.Album}" TextWrapping="Wrap" />
+      <Button Content="查看歌手 / 专辑" Command="{Binding OpenTrackWorksCommand}" CommandParameter="{Binding Player.CurrentTrackId}" />
       <library:SongLibraryActionsView Editor="{Binding Library}" TrackId="{Binding Player.CurrentTrackId, TargetNullValue=0}" />
       <Button Content="重新读取音乐库" Command="{Binding Library.RefreshCommand}" IsVisible="{Binding Library, Converter={x:Static ObjectConverters.IsNotNull}}" />
       <TextBlock Text="{Binding Library.Message}" TextWrapping="Wrap" AutomationProperties.LiveSetting="Polite" />
@@ -46,7 +47,7 @@
       <TextBlock Text="{Binding Player.Timeline.SeekReason}" TextWrapping="Wrap" IsVisible="{Binding Player.Timeline.SeekReason, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
       <TextBlock Text="{Binding Player.Timeline.BufferText}" TextWrapping="Wrap" IsVisible="{Binding Player.IsLoading}" />
       <TextBlock Text="{Binding Player.Notice.Text}" TextWrapping="Wrap" />
-      <ComboBox ItemsSource="{Binding Queue.Modes}" SelectedIndex="{Binding Queue.ModeIndex, Mode=TwoWay}" AutomationProperties.Name="更多中的播放模式" />
+      <ComboBox IsEnabled="{Binding Queue.CanEdit}" ItemsSource="{Binding Queue.Modes}" SelectedIndex="{Binding Queue.ModeIndex, Mode=TwoWay}" AutomationProperties.Name="更多中的播放模式" />
       <Button Content="停止并回到开头" Command="{Binding Player.StopCommand}" />
      </StackPanel></Flyout></Button.Flyout>
     </Button>

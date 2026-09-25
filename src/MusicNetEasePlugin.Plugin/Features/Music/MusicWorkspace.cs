@@ -7,6 +7,7 @@ using MyAvaloniaManagement.PluginSdk;
 using MusicNetEasePlugin.Application.Appearance;
 using MusicNetEasePlugin.Features.Library;
 using MusicNetEasePlugin.Application.Lyrics;
+using MusicNetEasePlugin.Features.Discovery;
 
 namespace MusicNetEasePlugin.Features.Music;
 
@@ -44,10 +45,22 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
     private int _offset;
     private MusicTrack? _selected;
     public MusicWorkspace(IMusicCatalogApi catalog, IMusicSessionAccessor sessions, IPlayerSession playback,
-        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null, PlaybackPersistence? persistence = null, TimeProvider? time = null, PlaylistEditor? library = null, MusicPlaybackLease? playbackLease = null)
+        LoginCoordinator login, ILoginUiDispatcher ui, IDocumentLifetime lifetime, IAccountImageSource? images = null, UiPreferences? preferences = null, PlaylistBrowser? playlists = null, LyricsCoordinator? lyrics = null, PlaybackPersistence? persistence = null, TimeProvider? time = null, PlaylistEditor? library = null, MusicPlaybackLease? playbackLease = null, DiscoveryWorkspace? discovery = null)
     {
         (_catalog, _sessions, _playback, _login, _ui) = (catalog, sessions, playback, login, ui);
         _playbackLease = playbackLease;
+        Discovery = discovery;
+        ShowDiscoveryCommand = new AsyncRelayCommand(async () => { Navigation.Browse(MusicBrowsePage.Discovery); if (Discovery is not null) await Discovery.NavigateAsync(DiscoveryPage.Daily); });
+        OpenTrackWorksCommand = new AsyncRelayCommand<long>(id => Discovery is not null && id > 0 ? Discovery.OpenWorksAsync(id) : Task.CompletedTask);
+        RemoteRecentCommand = new AsyncRelayCommand(() => OpenRemote(DiscoveryPage.Recent));
+        RemoteWeekCommand = new AsyncRelayCommand(() => OpenRemote(DiscoveryPage.Week));
+        RemoteAllCommand = new AsyncRelayCommand(() => OpenRemote(DiscoveryPage.AllTime));
+        if (Discovery is not null)
+        {
+            Discovery.ShowDiscovery = () => Navigation.Browse(MusicBrowsePage.Discovery);
+            Discovery.OpenPlaylist = async id => { Navigation.Browse(MusicBrowsePage.Library); if (Playlists is not null) await Playlists.OpenAsync(id); };
+            Navigation.PropertyChanged += DiscoveryNavigationChanged;
+        }
         SearchBusy = new(ui, time);
         Player = new(playback, ui, images, preferences);
         Preferences = preferences;
@@ -74,6 +87,15 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
         _lifetime = lifetime.ClosingToken.Register(Close);
     }
     public ObservableCollection<MusicTrack> Tracks { get; } = [];
+    public DiscoveryWorkspace? Discovery { get; }
+    public IAsyncRelayCommand ShowDiscoveryCommand { get; }
+    public IAsyncRelayCommand<long> OpenTrackWorksCommand { get; }
+    public IAsyncRelayCommand RemoteRecentCommand { get; }
+    public IAsyncRelayCommand RemoteWeekCommand { get; }
+    public IAsyncRelayCommand RemoteAllCommand { get; }
+    private Task OpenRemote(DiscoveryPage page) { Navigation.Browse(MusicBrowsePage.Discovery); return Discovery?.NavigateAsync(page) ?? Task.CompletedTask; }
+    private void DiscoveryNavigationChanged(object? sender, System.ComponentModel.PropertyChangedEventArgs e)
+    { if (e.PropertyName == nameof(MusicNavigation.IsDiscovery) && !Navigation.IsDiscovery) Discovery?.Suspend(); }
     public UiPreferences? Preferences { get; }
     public PlaylistBrowser? Playlists { get; }
     public PlaylistEditor? Library { get; }
@@ -201,6 +223,8 @@ public sealed class MusicWorkspace : ObservableObject, IDisposable
             _stopWork = completion.Task;
         }
         _closing.Cancel();
+        Navigation.PropertyChanged -= DiscoveryNavigationChanged;
+        Discovery?.Dispose();
         Library?.Dispose();
         Playlists?.Dispose();
         Queue.Dispose();

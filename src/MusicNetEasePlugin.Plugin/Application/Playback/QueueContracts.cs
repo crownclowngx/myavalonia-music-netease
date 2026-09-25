@@ -18,7 +18,7 @@ public sealed record QueueEntry(Guid EntryId, long TrackId, string Source, long?
 }
 public sealed record PlayerSessionSnapshot(long Revision, long QueueRevision, long AccountId, long AccountEpoch,
     IReadOnlyList<QueueEntry> Entries, Guid? CurrentEntryId, PlaybackMode Mode, PlaybackSnapshot Playback,
-    bool CanPrevious = false, bool CanNext = false, RestoredQueue? Restoration = null, QueueUndoInfo? Undo = null)
+    bool CanPrevious = false, bool CanNext = false, RestoredQueue? Restoration = null, QueueUndoInfo? Undo = null, Guid FmSessionId = default)
 {
     public static PlayerSessionSnapshot Empty { get; } = new(0, 0, 0, 0, Array.Empty<QueueEntry>(), null, PlaybackMode.Sequential, new(0, PlaybackState.Idle));
 }

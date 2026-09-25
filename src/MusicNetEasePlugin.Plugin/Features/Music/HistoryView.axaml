@@ -1,7 +1,7 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Music.HistoryView" xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:vm="using:MusicNetEasePlugin.Features.Music" x:DataType="vm:HistoryWorkspace">
  <UserControl.Resources><vm:TrackDurationConverter x:Key="Duration" /></UserControl.Resources>
  <Grid RowDefinitions="Auto,*,Auto" RowSpacing="6">
-  <TextBlock Text="{Binding CountText}" Classes="netease-secondary" />
+  <WrapPanel><TextBlock Text="{Binding CountText}" Classes="netease-secondary" VerticalAlignment="Center" Margin="0,0,8,0" /><Button Content="网易最近" Command="{Binding $parent[vm:MusicView].Model.RemoteRecentCommand}" /><Button Content="一周排行" Command="{Binding $parent[vm:MusicView].Model.RemoteWeekCommand}" /><Button Content="全部排行" Command="{Binding $parent[vm:MusicView].Model.RemoteAllCommand}" /></WrapPanel>
   <vm:SongListBox x:Name="HistoryList" Grid.Row="1" Classes="netease-results" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected, Mode=TwoWay}" ActivateCommand="{Binding PlayCommand}" ScrollViewer.HorizontalScrollBarVisibility="Disabled" AutomationProperties.Name="本机最近播放">
    <ListBox.ItemsPanel><ItemsPanelTemplate><VirtualizingStackPanel /></ItemsPanelTemplate></ListBox.ItemsPanel>
    <ListBox.ItemTemplate><DataTemplate x:DataType="vm:HistoryRow"><StackPanel>

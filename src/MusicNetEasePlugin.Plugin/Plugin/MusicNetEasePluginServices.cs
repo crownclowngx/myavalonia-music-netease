@@ -13,6 +13,8 @@ using MusicNetEasePlugin.Application.Appearance;
 using MusicNetEasePlugin.Application.Library;
 using MusicNetEasePlugin.Features.Library;
 using MusicNetEasePlugin.Application.Lyrics;
+using MusicNetEasePlugin.Application.Discovery;
+using MusicNetEasePlugin.Features.Discovery;
 
 namespace MusicNetEasePlugin.Plugin;
 
@@ -56,6 +58,15 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<XeapiTransport>();
         services.TryAddSingleton<NeteaseMusicApi>();
         services.TryAddSingleton<MusicRequestExecutor>();
+        services.TryAddSingleton<IDiscoveryCatalogApi, NeteaseDiscoveryApi>();
+        services.TryAddSingleton<IArtistAlbumApi, NeteaseArtistAlbumApi>();
+        services.TryAddSingleton<IRemoteHistoryApi, NeteaseRemoteHistoryApi>();
+        services.TryAddSingleton<NeteasePrivateFmApi>();
+        services.TryAddSingleton<IPrivateFmContentApi>(p => p.GetRequiredService<NeteasePrivateFmApi>());
+        services.TryAddSingleton<IPrivateFmFeedbackApi>(p => p.GetRequiredService<NeteasePrivateFmApi>());
+        services.TryAddSingleton<PrivateFmCoordinator>();
+        services.TryAddScoped<DiscoveryWorkspace>();
+        services.TryAddScoped<PrivateFmWorkspace>();
         services.TryAddSingleton<IPlaylistCatalogApi, NeteasePlaylistApi>();
         services.TryAddScoped<PlaylistBrowser>();
         services.TryAddSingleton<ILibraryCheckTokenProvider>(_ => new WebViewLibraryCheckTokenProvider(Path.GetFullPath(root)));
@@ -73,7 +84,8 @@ public static class MusicNetEasePluginServices
         services.TryAddSingleton<IPlaybackStateStore>(_ => new PlaybackStateStore(Path.GetFullPath(root)));
         services.TryAddSingleton<PlaybackPersistence>();
         services.TryAddSingleton(provider => new PlaybackQueueCoordinator(provider.GetRequiredService<IMusicSessionAccessor>(),
-            provider.GetRequiredService<PlaybackCoordinator>(), provider.GetRequiredService<PlaybackPersistence>(), requireDocument: true));
+            provider.GetRequiredService<PlaybackCoordinator>(), provider.GetRequiredService<PlaybackPersistence>(), requireDocument: true, fm: provider.GetRequiredService<PrivateFmCoordinator>()));
+        services.TryAddSingleton<IPrivateFmPlayer>(provider => provider.GetRequiredService<PlaybackQueueCoordinator>());
         services.TryAddSingleton<PlayerAccountCoordinator>();
         services.TryAddSingleton<IPlayerSession>(provider => provider.GetRequiredService<PlaybackQueueCoordinator>());
         services.TryAddSingleton<ILyricsApi, NeteaseLyricsApi>();
@@ -86,11 +98,13 @@ public static class MusicNetEasePluginServices
         services.TryAddScoped(provider =>
         {
             _ = provider.GetRequiredService<PlayerAccountCoordinator>();
+            var discovery = provider.GetRequiredService<DiscoveryWorkspace>();
+            discovery.Fm = provider.GetRequiredService<PrivateFmWorkspace>();
             return new MusicWorkspace(provider.GetRequiredService<IMusicCatalogApi>(),
             provider.GetRequiredService<IMusicSessionAccessor>(), provider.GetRequiredService<IPlayerSession>(),
             provider.GetRequiredService<LoginCoordinator>(), provider.GetRequiredService<ILoginUiDispatcher>(),
             provider.GetRequiredService<MyAvaloniaManagement.PluginSdk.IDocumentLifetime>(), provider.GetRequiredService<IAccountImageSource>(),
-            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>(), provider.GetRequiredService<LyricsCoordinator>(), provider.GetRequiredService<PlaybackPersistence>(), library: provider.GetRequiredService<PlaylistEditor>(), playbackLease: provider.GetRequiredService<MusicPlaybackLease>());
+            provider.GetRequiredService<UiPreferences>(), provider.GetRequiredService<PlaylistBrowser>(), provider.GetRequiredService<LyricsCoordinator>(), provider.GetRequiredService<PlaybackPersistence>(), library: provider.GetRequiredService<PlaylistEditor>(), playbackLease: provider.GetRequiredService<MusicPlaybackLease>(), discovery: discovery);
         });
         return services;
     }

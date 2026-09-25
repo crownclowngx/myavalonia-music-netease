@@ -13,6 +13,7 @@
    <Button x:Name="MoreButton" Classes="netease-button icon" ToolTip.Tip="歌曲操作" AutomationProperties.Name="歌曲操作"><PathIcon Width="16" Height="16" Data="{DynamicResource NeteaseMoreIcon}" />
     <Button.Flyout><MenuFlyout>
      <MenuItem Header="完整曲目信息" Click="ShowDetails" />
+     <MenuItem Header="查看歌手 / 专辑" Click="ShowWorks" />
      <MenuItem x:Name="NextItem" Header="下一首播放" Command="{Binding #RowRoot.NextCommand}" IsVisible="False" />
      <MenuItem x:Name="AppendItem" Header="加入队列" Command="{Binding #RowRoot.AppendCommand}" IsVisible="False" />
      <MenuItem x:Name="FromHereItem" Header="从这里播放整份歌单（替换队列）" Command="{Binding #RowRoot.FromHereCommand}" IsVisible="False" />

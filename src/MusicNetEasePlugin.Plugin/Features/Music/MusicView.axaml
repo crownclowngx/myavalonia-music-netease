@@ -1,7 +1,7 @@
 <UserControl x:Class="MusicNetEasePlugin.Features.Music.MusicView" x:Name="MusicRoot"
  xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
  xmlns:vm="using:MusicNetEasePlugin.Features.Music" xmlns:models="using:MusicNetEasePlugin.Application.Playback"
- xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:conv="using:Avalonia.Data.Converters" xmlns:library="using:MusicNetEasePlugin.Features.Library" x:DataType="vm:MusicWorkspace"
+ xmlns:ui="using:MusicNetEasePlugin.Infrastructure.Ui" xmlns:conv="using:Avalonia.Data.Converters" xmlns:library="using:MusicNetEasePlugin.Features.Library" xmlns:discovery="using:MusicNetEasePlugin.Features.Discovery" x:DataType="vm:MusicWorkspace"
  Background="{DynamicResource NeteaseDocumentBackgroundBrush}" Foreground="{DynamicResource NeteaseTextBrush}" FontSize="13" Classes.netease-comfortable="{Binding Preferences.ComfortableDensity}">
  <UserControl.Resources><ResourceDictionary><ResourceDictionary.MergedDictionaries><ResourceInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseThemeResources.axaml" /></ResourceDictionary.MergedDictionaries><vm:TrackDurationConverter x:Key="TrackDuration" /></ResourceDictionary></UserControl.Resources>
  <UserControl.Styles><StyleInclude Source="avares://MusicNetEasePlugin.Plugin/Styles/NeteaseControlStyles.axaml" /></UserControl.Styles>
@@ -13,6 +13,7 @@
   </Grid>
   <Grid Grid.Row="1" ColumnDefinitions="*,Auto" Margin="12,0,12,8"><StackPanel Orientation="Horizontal" Spacing="6">
    <ToggleButton Content="搜索" IsChecked="{Binding Navigation.SearchSelected, Mode=OneWay}" Command="{Binding ShowSearchCommand}" AutomationProperties.Name="搜索页面" />
+   <ToggleButton Content="发现" IsChecked="{Binding Navigation.IsDiscovery, Mode=OneWay}" Command="{Binding ShowDiscoveryCommand}" IsVisible="{Binding Discovery, Converter={x:Static ObjectConverters.IsNotNull}}" AutomationProperties.Name="音乐发现" />
    <ToggleButton Content="我的歌单" IsChecked="{Binding Navigation.LibrarySelected, Mode=OneWay}" Command="{Binding ShowLibraryCommand}" AutomationProperties.Name="我的歌单页面" />
    <ToggleButton Content="最近播放" IsChecked="{Binding Navigation.HistorySelected, Mode=OneWay}" Command="{Binding ShowHistoryCommand}" AutomationProperties.Name="最近播放页面" />
   </StackPanel>
@@ -48,6 +49,7 @@
    </Grid>
    <library:PlaylistView IsVisible="{Binding #MusicRoot.Model.Navigation.IsLibrary}" DataContext="{Binding Playlists}" />
    <vm:HistoryView IsVisible="{Binding #MusicRoot.Model.Navigation.IsHistory}" DataContext="{Binding History}" />
+   <discovery:DiscoveryView IsVisible="{Binding #MusicRoot.Model.Navigation.IsDiscovery}" DataContext="{Binding Discovery}" />
    </Grid>
    <Border x:Name="Drawer" IsVisible="False" HorizontalAlignment="Right" Background="{DynamicResource NeteasePanelBrush}" BorderBrush="{DynamicResource NeteaseBorderBrush}" BorderThickness="1,0,0,0">
     <Grid ColumnDefinitions="8,*">
