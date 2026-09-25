@@ -17,6 +17,7 @@
 | 部署插件或生成正式包 | [部署与发布](docs/maintenance/deployment-and-release.md) |
 | 查看后续候选能力 | [能力路线图](docs/roadmap/netease-capability-roadmap.md) |
 | 使用和维护 M3 音乐库管理 | [V7 已实施方案](docs/archive/plans/netease-v7-m3-music-library-management-plan.md)、[专用验证矩阵](docs/maintenance/netease-v7-m3-music-library-verification-plan.md) |
+| 按计划实施 M4 音乐发现 | [V8 实施计划](docs/roadmap/netease-v8-m4-music-discovery-plan.md)、[V8 专用验证矩阵](docs/maintenance/netease-v8-m4-music-discovery-verification-plan.md) |
 
 ## 当前状态
 
@@ -24,6 +25,7 @@
 - V6 的 18 项交互增强已实现并通过本地开发验证，已完成指定 Controls 部署与 Host 启动复测；性能、Dock、DPI、物理输入、读屏及真实出声等完整验收仍单列。
 - V5 复核中的 C01–C08 已由 V6 接续实现，D01–D05 性能及实机待验仍保留；M4–M5 尚未实施，正式 ZIP 尚未发布。
 - V7 / M3 的喜欢、收藏与歌单管理已实现；默认本地门禁为 V7，保留全部适用旧版回归。真实账号、官方令牌链与 Host 验收仍待执行，见[音乐库契约](docs/reference/netease-music-library-management.md)和[实施记录](docs/archive/records/netease-v7/m3-implementation-20260924.md)。
+- V8 / M4 的推荐、榜单、歌手 / 专辑、私人 FM 和远端记录已编写实施计划及专用验证矩阵，业务、V8 门禁和真实验收尚未实施；当前命令仍使用 V7。
 
 V / M 编号表示方案序号与能力里程碑，不是插件包版本。详细状态和依据统一见[文档导航](docs/README.md#当前状态与待验范围)。
 

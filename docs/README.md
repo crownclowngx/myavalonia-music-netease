@@ -1,6 +1,6 @@
 # 网易云音乐插件文档
 
-> 本插件唯一文档总导航；整理日期：2026-09-24。当前行为以 `quick-start` 和 `reference` 为准，历史操作与证据见 `archive`。
+> 本插件唯一文档总导航；更新日期：2026-09-25。当前行为以 `quick-start` 和 `reference` 为准，历史操作与证据见 `archive`。
 
 ## 按任务查找
 
@@ -15,6 +15,7 @@
 | 部署、打包和检查真实 Host | [部署与发布](maintenance/deployment-and-release.md) |
 | 查看下一步候选功能 | [能力路线图](roadmap/netease-capability-roadmap.md) |
 | 使用 / 维护 M3 音乐库管理 | [V7 专用实施方案](archive/plans/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
+| 按计划实施 M4 音乐发现 | [V8 实施计划](roadmap/netease-v8-m4-music-discovery-plan.md)、[V8 专用验证矩阵](maintenance/netease-v8-m4-music-discovery-verification-plan.md) |
 | 查找过去的设计、实施与部署 | [归档索引](archive/README.md) |
 | 新增、更新或迁移文档 | [文档维护约定](maintenance/documentation.md) |
 
@@ -29,7 +30,8 @@ V 表示方案 / 实施序号，M 表示能力里程碑，均不是插件包版�
 | V6 抽屉与交互 | V6-01～18 已实现、本地开发验证通过；完整实机验收未完成 | [实施与自动证据](archive/records/netease-v6/drawer-and-interaction-implementation-20260923.md)、[验证矩阵](maintenance/netease-v6-drawer-and-interaction-verification-plan.md) |
 | 最近开发部署 | 2026-09-23 部署到指定 Controls，共用 LibVLC；实际 Host 启动复测通过 | [V6 部署记录](archive/records/netease-v6/deployment-20260923.md) |
 | V7 / M3 音乐库管理 | V7-01～10 已实现并通过本地验证；真实账号、官方令牌链与 Host 待验收 | [V7 方案](archive/plans/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
-| M4–M5 / 正式发布 | 后续功能尚未实施；正式 ZIP 发布、跨平台适配不在已完成结论内 | [能力路线图](roadmap/netease-capability-roadmap.md)、[发布流程](maintenance/deployment-and-release.md) |
+| V8 / M4 音乐发现 | 实施计划和专用验证矩阵已编写；业务、V8 门禁及真实验收尚未实施 | [V8 计划](roadmap/netease-v8-m4-music-discovery-plan.md)、[V8 验证矩阵](maintenance/netease-v8-m4-music-discovery-verification-plan.md) |
+| M5 / 正式发布 | 后续扩展尚未启动；正式 ZIP 发布、跨平台适配不在已完成结论内 | [能力路线图](roadmap/netease-capability-roadmap.md)、[发布流程](maintenance/deployment-and-release.md) |
 
 剩余的 D01–D05 性能 / 实机项目与 V6 新增交互验收统一维护在[待验清单](maintenance/netease-v5-v6-acceptance.md)，其中列出已有证据、缺口和关闭条件。V5 的封面取色仍为可选未实施项，见[后续候选](roadmap/netease-capability-roadmap.md#现有界面的可选增强)。方案归档不改变这些状态；后续验证新增带日期记录，再更新清单与本表。
 
@@ -65,6 +67,8 @@ V1–V7 原方案及已完成决策的 V6 候选评估统一放在 `archive/plan
 默认完整开发检查为 V7，包含适用的 M1 / V3 / M2 / V5 / V6 回归。命令、产物、手工验证与发布边界统一见[验证指南](maintenance/verification.md)。当前本地开发不使用 AIFLOW、Windows CI 或发布门禁。
 
 V7 方案已归档，[实施及自动证据](archive/records/netease-v7/m3-implementation-20260924.md)与[真实验收待办](archive/records/netease-v7/acceptance-20260924.md)分别记录。V7 不改变 V5 / V6 的既有待验结论。
+
+V8 尚未实施，计划保留在 `roadmap`，专用验证矩阵位于 `maintenance`。按推荐 / 榜单 → 歌手 / 专辑 → 私人 FM → 远端记录推进，优先满足 SOLID、详细中文注释和完整本地测试门禁。V8 脚本落地前不修改上述 V7 默认入口，不使用 AIFLOW、Windows CI 或发布门禁。
 
 ## 文档目录
 

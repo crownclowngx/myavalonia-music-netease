@@ -58,6 +58,12 @@ pwsh -NoProfile -File tools/test-development-gate.ps1
 
 [实施记录](../archive/records/netease-v7/m3-implementation-20260924.md)保存当次数量与原始证据。真实账号、WebView2 官方令牌和 Host 按[H01–H05 记录](../archive/records/netease-v7/acceptance-20260924.md)验收，不进入默认离线门禁，不使用 Windows CI 或发布门禁。
 
+## V8 音乐发现验证计划
+
+[V8 实施计划](../roadmap/netease-v8-m4-music-discovery-plan.md)与[专用验证矩阵](netease-v8-m4-music-discovery-verification-plan.md)已编写，覆盖推荐 / 榜单、歌手 / 专辑、私人 FM 和远端记录，计划包含 50 个自动业务场景、6 组门禁自测及 6 组人工验收。重点验证来源 / 完整性、作品身份、FM 单次推进 / 有限补取 / 不喜欢写入，以及远端与本地历史隔离。
+
+V8 业务、测试映射和脚本尚未实现，**当前不支持 `-Milestone V8`，默认仍为 V7**。实施时逐阶段补齐真实测试与证据，并继承 V7 及全部适用前置；全部接通后才更新默认命令。本次仅文档检查，不执行 V8 业务门禁，不使用 AIFLOW、Windows CI 或发布门禁。
+
 ## Standalone 与真实环境
 
 通过完整检查后可打开独立工作台：
