@@ -42,4 +42,6 @@ dotnet run --project src/MusicNetEasePlugin.Standalone -c Debug --no-build
 
 仅修改文档时使用[文档检查](docs/maintenance/verification.md#仅修改文档)。当前本地开发不使用 AIFLOW、Windows CI 或发布门禁。
 
+在项目根目录生成不含 libVLC 原生库的本地 ZIP：`pwsh -NoProfile -File .\build-zip.ps1`。默认 Debug，输出到 `artifacts/zip/` 的本次子目录；参数和配套清单见[打包说明](docs/maintenance/netease-zip-packaging.md)。
+
 项目许可见 [LICENSE](LICENSE)，上游参考与第三方声明见 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md)。

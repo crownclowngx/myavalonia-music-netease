@@ -13,6 +13,7 @@
 | 验证改动或查看测试依据 | [验证指南](maintenance/verification.md) |
 | 完成 V5 / V6 剩余验收 | [性能与实机待验清单](maintenance/netease-v5-v6-acceptance.md) |
 | 部署、打包和检查真实 Host | [部署与发布](maintenance/deployment-and-release.md) |
+| 在项目目录生成不含 libVLC 的 ZIP | [本地 ZIP 打包说明](maintenance/netease-zip-packaging.md) |
 | 查看下一步候选功能 | [能力路线图](roadmap/netease-capability-roadmap.md) |
 | 使用 / 维护 M3 音乐库管理 | [V7 专用实施方案](archive/plans/netease-v7-m3-music-library-management-plan.md)、[V7 验证矩阵](maintenance/netease-v7-m3-music-library-verification-plan.md) |
 | 使用 / 维护 M4 音乐发现 | [V8 实施计划](archive/plans/netease-v8-m4-music-discovery-plan.md)、[V8 专用验证矩阵](maintenance/netease-v8-m4-music-discovery-verification-plan.md) |

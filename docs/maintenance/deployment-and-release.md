@@ -95,6 +95,10 @@ dotnet msbuild src/MusicNetEasePlugin.Plugin/MusicNetEasePlugin.Plugin.csproj `
 - 不修改 `plugin.manifest.json`，不因为临时目录改名而改变 Plugin、Document 或 Tool ID；
 - 复制完成后重新启动 Host，再从插件状态和真实 Dock 验证加载结果。
 
+## 不携带 libVLC 的本地 ZIP
+
+在项目根目录执行 `pwsh -NoProfile -File .\build-zip.ps1`。默认 Debug，使用隔离构建和既有包协议，排除 libVLC 原生库，保留必需托管依赖；输出 ZIP 与配套摘要清单。详见[专用打包说明](netease-zip-packaging.md)。该命令不部署 Host，也不运行发布门禁。
+
 ## 正式发布 ZIP
 
 发布前先完成 Release 构建和测试，并按兼容变更更新 `PluginVersion`：
