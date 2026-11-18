@@ -7,7 +7,7 @@
     <PluginVersion>1.0.0</PluginVersion>
     <ManagedPluginRuntimeIdentifier>win-x64</ManagedPluginRuntimeIdentifier>
     <ManagedPluginEntryType>MusicNetEasePlugin.Plugin.MusicNetEasePluginModule</ManagedPluginEntryType>
-    <ManagedPluginSdkMinInclusive>3.4.1</ManagedPluginSdkMinInclusive>
+    <ManagedPluginSdkMinInclusive>3.4.2</ManagedPluginSdkMinInclusive>
     <ManagedPluginSdkMaxExclusive>4.0.0</ManagedPluginSdkMaxExclusive>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <!-- 原生库可选携带；用户配置的共享目录只在运行时读取，不写进插件清单。 -->
